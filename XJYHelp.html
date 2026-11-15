@@ -1,0 +1,1001 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>XJY Editor 帮助</title>
+    <style>
+* {
+  box-sizing: border-box;
+}
+:root {
+  --ink: #253044;
+  --muted: #69768b;
+  --line: #e5e9f0;
+  --accent: #6655d6;
+  --wash: #f5f6fa;
+  --note: #fff8e6;
+  --note-line: #f0d9a0;
+}
+html {
+  scroll-padding-top: 72px;
+}
+body {
+  margin: 0;
+  color: var(--ink);
+  background: #fff;
+  font:
+    15px/1.75 'Segoe UI',
+    'Microsoft YaHei',
+    sans-serif;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--line);
+}
+header .brand {
+  font-weight: 600;
+}
+header .brand span {
+  color: var(--accent);
+  margin-right: 6px;
+}
+header nav {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 13px;
+}
+header select {
+  font: inherit;
+  font-size: 13px;
+  padding: 3px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+}
+a {
+  color: var(--accent);
+}
+.layout {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 40px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.toc {
+  position: sticky;
+  top: 72px;
+  align-self: start;
+  max-height: calc(100vh - 96px);
+  overflow: auto;
+  font-size: 14px;
+}
+.toc ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.toc li {
+  margin: 2px 0;
+}
+.toc a {
+  display: block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.toc a:hover,
+.toc a.current {
+  background: var(--wash);
+  color: var(--accent);
+}
+.toc .group {
+  margin: 14px 10px 4px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+article h1 {
+  font-size: 26px;
+  line-height: 1.3;
+  margin: 6px 0 8px;
+}
+article > p.lead {
+  color: var(--muted);
+  margin-top: 0;
+}
+section {
+  padding: 8px 0 18px;
+  border-top: 1px solid var(--line);
+}
+section:first-of-type {
+  border-top: 0;
+}
+h2 {
+  font-size: 20px;
+  margin: 18px 0 6px;
+}
+h3 {
+  font-size: 15px;
+  margin: 16px 0 4px;
+}
+p,
+ul,
+ol {
+  margin: 6px 0;
+}
+ul,
+ol {
+  padding-left: 22px;
+}
+kbd {
+  display: inline-block;
+  padding: 0 5px;
+  border: 1px solid #cfd5df;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--wash);
+  font:
+    12px/1.6 Consolas,
+    monospace;
+}
+code {
+  /* An atomic inline box can wrap between items such as ".db、.db3" (no break before "."). */
+  display: inline-block;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: var(--wash);
+  font:
+    13px Consolas,
+    monospace;
+}
+.note {
+  margin: 10px 0;
+  padding: 8px 12px;
+  border: 1px solid var(--note-line);
+  border-radius: 8px;
+  background: var(--note);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-size: 14px;
+}
+th,
+td {
+  text-align: left;
+  vertical-align: top;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+}
+th {
+  background: var(--wash);
+  font-weight: 600;
+}
+.top {
+  font-size: 13px;
+}
+article[hidden] {
+  display: none;
+}
+@media (max-width: 820px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 16px;
+  }
+  .toc {
+    position: static;
+    max-height: none;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .toc ol {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 8px;
+  }
+  .toc a {
+    padding: 2px 6px;
+  }
+  .toc .group {
+    margin: 8px 6px 2px;
+  }
+  header {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+  }
+  header nav {
+    margin-left: 0;
+  }
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+header a.brand {
+  color: inherit;
+  text-decoration: none;
+}
+</style>
+  </head>
+  <body>
+    <header>
+      <div class="brand"><span>⌘</span><span id="brandtext">XJY Editor 帮助</span></div>
+      <nav id="applinks" aria-label="编辑器">
+        <a data-page="index.html" data-offline="XJYEditor.html" href="index.html">XJY Editor</a>
+        <a data-page="csv.html" data-offline="CSVEditor.html" href="csv.html">CSV</a>
+        <a data-page="sqlite.html" data-offline="SQLiteEditor.html" href="sqlite.html">SQLite</a>
+        <a data-page="excel.html" data-offline="ExcelEditor.html" href="excel.html">Excel</a>
+      </nav>
+      <select id="language" aria-label="界面语言 / Language">
+        <option value="zh-CN">简体中文</option>
+        <option value="en">English</option>
+      </select>
+    </header>
+
+    <div class="layout">
+      <aside class="toc" id="toc" aria-label="目录"></aside>
+      <main>
+        <!-- ============================ 简体中文 ============================ -->
+        <article lang="zh-CN" data-title="XJY Editor 帮助">
+          <h1>XJY Editor 帮助</h1>
+          <p class="lead">
+            XJY Editor 在浏览器中查看和编辑 XML、JSON、YAML 文档，另有 CSV、SQLite、Excel
+            三个数据编辑器。本页说明各项功能、保存方式和使用限制。
+          </p>
+
+          <section data-topic="start" data-group="入门">
+            <h2>快速上手</h2>
+            <ol>
+              <li>
+                打开 <a data-page="index.html" data-offline="XJYEditor.html" href="index.html">XJY Editor</a>，点击「打开文件」选择
+                <code>.xml</code>、<code>.json</code> 或 <code>.yaml</code> 文件；也可以先点「XML 示例」等按钮体验。
+              </li>
+              <li>左侧目录树选择节点，右侧修改名称、值或属性；进入容器后可在「智能表格」中成批编辑同级节点。</li>
+              <li>
+                修改完成后点击「保存」或按 <kbd>Ctrl</kbd>+<kbd>S</kbd>。保存时保留原文件的编码和换行符，详见<a href="#save">保存、草稿与导出</a>。
+              </li>
+            </ol>
+            <p>
+              页头的「CSV 编辑器」「SQLite 编辑器」「Excel 编辑器」在新标签页中打开对应的数据编辑器，当前编辑内容不受影响。
+            </p>
+            <p>
+              文件只在你的浏览器中处理，不上传到服务器；例外情况见<a href="#privacy">隐私与数据</a>。
+            </p>
+          </section>
+
+          <section data-topic="open" data-group="XML / JSON / YAML">
+            <h2>打开文件与编码</h2>
+            <p>点击「打开文件」选择本机文件。格式按扩展名判断：<code>.xml</code>、<code>.json</code>、<code>.yaml</code> / <code>.yml</code>。</p>
+            <h3>编码识别</h3>
+            <ul>
+              <li>文件带 BOM 时按 BOM 识别（UTF-8、UTF-16 LE / BE）。</li>
+              <li>XML 声明中写明的编码（如 <code>encoding="GBK"</code>）会被采用。</li>
+              <li>其余文件先按严格 UTF-8 读取。</li>
+              <li>
+                都无法确定时会弹出「选择文件编码」窗口：下拉选择编码，下方预览实时显示读取效果，确认文字正常后再打开。中文界面默认建议
+                GB18030，英文界面默认建议 Windows-1252。
+              </li>
+            </ul>
+            <p>看起来是二进制内容的文件不会被打开。打开后，页面底部的文件状态行显示关联的文件名、编码和换行符，例如「关联文件：data.xml · GB18030 · CRLF」。</p>
+            <h3>语法错误</h3>
+            <p>
+              文件有语法错误时，内容进入源码修复流程：在「源码」页修改并点击「应用源码」，修复前不能使用树和表格编辑。「✓ 语法校验」可随时检查当前文档或未应用的源码。
+            </p>
+          </section>
+
+          <section data-topic="tree" data-group="XML / JSON / YAML">
+            <h2>浏览与编辑节点</h2>
+            <h3>单节点编辑</h3>
+            <p>
+              在左侧目录树选择节点，右侧可修改名称、类型、属性或值；输入完成后移出焦点即应用。节点可以添加、复制、上移 / 下移、移动和删除，也可以在目录树和表格中拖动调整顺序。
+            </p>
+            <h3>导航</h3>
+            <ul>
+              <li><kbd>Alt</kbd>+<kbd>←</kbd> / <kbd>Alt</kbd>+<kbd>→</kbd> 后退 / 前进，<kbd>Alt</kbd>+<kbd>↑</kbd> 进入父节点。</li>
+              <li><kbd>Ctrl</kbd>+<kbd>K</kbd> 聚焦搜索框，可搜索名称、值、属性或显示路径，点击结果会展开并定位节点。</li>
+              <li>目录树与源码双向定位：在源码中移动光标会选中对应节点，反之亦然。</li>
+            </ul>
+            <h3>源码</h3>
+            <p>
+              「〈〉源码」页可直接编辑文本。修改后点击「应用源码」才会更新节点；未应用时暂停定位和节点比较。「⇥ 格式化」按两空格缩进重新排版，可撤销。
+            </p>
+            <h3>更多工具</h3>
+            <p>
+              「⧉ 重复检查」列出 XML 中完全相同的同级元素（只提示，不修改）。此外还有条件查询、检查点、批量预览、模板以及 Schema 子集校验。
+            </p>
+          </section>
+
+          <section data-topic="table" data-group="XML / JSON / YAML">
+            <h2>智能表格</h2>
+            <p>
+              进入一个容器节点后，「▦ 智能表格」把它的同级子节点显示为表格：XML 的属性和简单子元素、JSON / YAML 的字段各成一列。按
+              <kbd>Enter</kbd> 应用单元格；带子树的字段可以继续进入。
+            </p>
+            <ul>
+              <li>首列复选框支持多选，「全选筛选结果」「清除选择」用于批量操作。</li>
+              <li>筛选后，结构相同的记录会重新识别为属性列。</li>
+              <li>在编辑框内拖动是选择文字，不会移动行。</li>
+              <li>同一列中做相似的修改可触发<a href="#assist">辅助编辑</a>。</li>
+            </ul>
+          </section>
+
+          <section data-topic="assist" data-group="XML / JSON / YAML">
+            <h2>辅助编辑</h2>
+            <p>辅助编辑把你在几个单元格中做的相同修改，批量应用到同一列的其他单元格。XJY Editor 和 CSV、SQLite、Excel 编辑器都支持。</p>
+            <h3>自动识别</h3>
+            <p>
+              在同一列中，对三个不同的记录连续做相似的插入或删除（例如都删掉开头的 <code>PRE_</code>），第三次提交后会弹出预览，列出将要修改的其余单元格。
+            </p>
+            <h3>主动发起</h3>
+            <p>点击「辅助编辑」，或右键单元格选择「辅助编辑此列…」，自行指定列、规则、内容和位置。<kbd>Shift</kbd>+右键保留浏览器自己的菜单。</p>
+            <h3>规则与范围</h3>
+            <ul>
+              <li>系统按优先级匹配规则：完全一致 → 忽略大小写 → 等长同模式 → 仅等长。下拉列表可以改选其他兼容规则，也可以恢复初始规则。</li>
+              <li>结束位置从右侧计数；字符按 Unicode 码点计数。</li>
+              <li>范围默认为当前筛选结果，可明确切换到当前目录的全部记录。</li>
+              <li>自动模式不会重复处理你手动修改的那三项。</li>
+            </ul>
+            <p>检查预览后点击确认才写入；整批修改可以一次撤销。</p>
+          </section>
+
+          <section data-topic="save" data-group="保存与输出">
+            <h2>保存、草稿与导出</h2>
+            <h3>保存</h3>
+            <p>
+              每个编辑器都只有一个「保存」按钮（<kbd>Ctrl</kbd>+<kbd>S</kbd>）。保存按打开时的编码、BOM 和换行符写出文件。是否能直接写回原文件，取决于浏览器和打开方式：
+            </p>
+            <table>
+              <thead>
+                <tr><th>情况</th><th>保存结果</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Edge 或 Chrome，通过 HTTPS 或本机地址访问，用「打开文件」打开</td>
+                  <td>直接写回原文件。第一次保存时浏览器会询问是否允许修改该文件。</td>
+                </tr>
+                <tr><td>通过<a href="#helper">本机助手</a>右键打开</td><td>直接写回原文件。</td></tr>
+                <tr>
+                  <td>其他浏览器、通过普通 HTTP 访问、离线版，或打开的是示例</td>
+                  <td>下载一个同名文件，下载即视为已保存。</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>页面底部的文件状态行会说明当前属于哪种情况：「关联文件：…」表示写回原文件，「保存时下载 · …」表示下载。</p>
+            <h3>保存时的提示</h3>
+            <ul>
+              <li><b>文件已被其他程序修改</b>：打开后磁盘上的文件又被改过时，保存前会询问是否覆盖。</li>
+              <li><b>换行符混用</b>：文件中同时有 CRLF 和 LF 时，保存会统一为一种，先询问是否继续。</li>
+              <li>
+                <b>字符无法用原编码保存</b>：例如在 GBK 文件中输入了 emoji，会列出出问题的行，文件不会被写出。请修改这些字符后再保存。
+              </li>
+            </ul>
+            <h3>源码草稿</h3>
+            <p>源码页有未应用的修改时，按钮显示为「保存源码」，保存的是源码文本本身，不会自动应用到节点。CSV 和 Excel 编辑器则要求先应用或放弃源码草稿。</p>
+            <h3>本地草稿</h3>
+            <p>「保存本地草稿」「恢复草稿」把内容存在浏览器本地，用于意外关闭后的恢复，不能代替保存文件。草稿属于当前网址，换一个网址或使用离线版时互不相通。</p>
+            <h3>导出</h3>
+            <p>「↓ 导出文件」（XJY Editor）以及表格编辑器中的「导出 CSV…」「导出数据库…」「导出工作簿…」下载一份新文件，不影响原文件，也不清除未保存标记。</p>
+          </section>
+
+          <section data-topic="convert" data-group="保存与输出">
+            <h2>转换并导出</h2>
+            <p>「转换并导出…」把正在编辑的内容转换成另一种格式并下载新文件，当前文档保持不变。</p>
+            <table>
+              <thead>
+                <tr><th>编辑器</th><th>转换内容</th><th>可转换为</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>XJY Editor</td><td>当前整个文档（包括未应用的源码）</td><td>XML、JSON、YAML 中的另两种</td></tr>
+                <tr><td>CSV</td><td>当前整个表格，包括筛选隐藏的记录</td><td>XLSX、TSV、CSV（可改编码）</td></tr>
+                <tr><td>Excel</td><td>当前工作表的完整使用范围</td><td>CSV、TSV</td></tr>
+                <tr><td>SQLite</td><td>当前表的全部记录</td><td>CSV、TSV、XLSX</td></tr>
+              </tbody>
+            </table>
+            <p>转换前会显示预览和会发生的变化，例如 XML 转 JSON 时注释会丢失、属性写成 <code>@名称</code>。需要勾选「我已了解以上转换规则和内容变化」后才能导出。</p>
+            <h3>会被拒绝的情况</h3>
+            <ul>
+              <li>XML 中有 DTD，或转换后的元素名、属性名不合法。</li>
+              <li>YAML 使用锚点 / 别名、自定义标签或多文档。</li>
+              <li>有重复键，或嵌套超过 200 层。</li>
+              <li>表格超过 100 万个单元格，或超出 Excel 的行列限制。</li>
+              <li>目标编码无法表示其中的字符。</li>
+            </ul>
+          </section>
+
+          <section data-topic="compare" data-group="保存与输出">
+            <h2>与 FindChanged 比较</h2>
+            <h3>比较两个节点</h3>
+            <ol>
+              <li>在智能表格中勾选恰好两个同级节点，点击「比较选中两项」。</li>
+              <li>确认左右顺序（可交换），点击底部「打开 FindChanged」。</li>
+              <li>FindChanged 在新标签页中显示两个子树的差异。</li>
+            </ol>
+            <p>
+              在 FindChanged 中点击差异可以回到 XJY Editor 定位：共有的差异回到右侧节点，左侧独有的差异回到左侧节点。来源内容改动后需要重新比较。
+            </p>
+            <h3>比较整个文件</h3>
+            <p>「交给 FindChanged」可以比较基线、当前内容或另一个文档的完整文件。</p>
+            <div class="note">
+              FindChanged 中的修改不会写回 XJY Editor。XML 只能比较元素；YAML 引用和受保护结构暂不支持比较。每侧最多 5 MiB、10 万行，超出时只提供文件下载。
+            </div>
+          </section>
+
+          <section data-topic="csv" data-group="数据编辑器">
+            <h2>CSV 编辑器</h2>
+            <p>打开或拖入 <code>.csv</code>、<code>.tsv</code>、<code>.txt</code> 文件，在「解析设置」中确认编码、分隔符和是否把首行作为表头。</p>
+            <ul>
+              <li>支持逗号、分号、制表符分隔；编码支持 UTF-8、UTF-16 和 GB18030，识别不了时需要你手动选择并预览。</li>
+              <li>所有字段按文本处理：前导零、长数字、日期和空格都按原样保留。</li>
+              <li>
+                双击单元格在格内编辑：<kbd>Enter</kbd> 确认，<kbd>Shift</kbd>+<kbd>Enter</kbd> 换行，<kbd>Esc</kbd> 取消。可插入 / 删除行列、改表头、粘贴矩形区域。
+              </li>
+              <li>拖动或 <kbd>Shift</kbd> 扩选、<kbd>Ctrl</kbd> 多选；复制为制表符分隔文本，可直接粘贴到 Excel。</li>
+              <li>查找、按列筛选、在选区或全表中替换，替换前有预览。</li>
+              <li>「源码」页直接编辑 CSV 文本，点击「应用源码」后更新表格。</li>
+            </ul>
+            <p>保存时只改动编辑过的记录，其余记录、编码和换行符保持原样。删除整列会连同筛选隐藏的数据一起删除，确认窗口会提示。</p>
+          </section>
+
+          <section data-topic="sqlite" data-group="数据编辑器">
+            <h2>SQLite 编辑器</h2>
+            <p>打开 <code>.sqlite</code>、<code>.sqlite3</code>、<code>.db</code>、<code>.db3</code> 数据库文件，左侧选择表或视图，表格每页 100 条，可按列筛选。</p>
+            <ul>
+              <li>双击字段编辑，并明确选择写入类型：文本、整数、实数、NULL 或 BLOB（十六进制）。整数按 64 位精确处理，不会被舍入。</li>
+              <li>可添加记录（使用默认值和自动主键）和删除多行。数据库自身的约束、外键和触发器照常生效，失败时整个操作回退。</li>
+              <li>「结构」页只读显示建表 SQL，可以复制。</li>
+            </ul>
+            <h3>只读的情况</h3>
+            <ul>
+              <li>视图、虚拟表、系统表、生成列，以及无法唯一定位记录的表。</li>
+              <li>WAL 模式的数据库：请先在原应用中关闭数据库（完成检查点）再打开。</li>
+              <li>已有外键错误的数据库不接受新修改。</li>
+            </ul>
+            <p>保存写出整个数据库文件。不支持执行任意 SQL、修改表结构或打开加密数据库。</p>
+          </section>
+
+          <section data-topic="excel" data-group="数据编辑器">
+            <h2>Excel 编辑器</h2>
+            <p>打开 <code>.xlsx</code> 工作簿，切换工作表、翻页、按地址定位和筛选。隐藏的行列默认不显示，可以选择显示。</p>
+            <ul>
+              <li>双击单元格编辑，可写入文本、数值、布尔、日期、公式或错误值。文本 <code>001</code> 会保留前导零。</li>
+              <li>粘贴制表符分隔文本前会确认，内容一律按文本写入。</li>
+              <li>「源码」页可编辑当前工作表的 XML，只允许修改已有单元格的值和公式。</li>
+            </ul>
+            <p>
+              保存时只修改目标工作表，原有样式、图表、其他工作表都保留。浏览器不计算公式：修改后公式标为「待重算」，请在 Excel 中打开保存后的文件完成重算。
+            </p>
+            <h3>限制</h3>
+            <ul>
+              <li><code>.xls</code> 旧格式只能查看和复制，不能保存；请先在 Excel 中另存为 <code>.xlsx</code>。</li>
+              <li>受保护的工作表、含宏或签名的工作簿只读；合并区域只能改左上角；共享公式和数组公式区域只读。</li>
+              <li>不能插入 / 删除整行整列、修改格式或工作表名。</li>
+              <li>工作簿最大 30 MB，解压后最大 100 MB；单元格文本最多 32767 个字符。不支持加密工作簿。</li>
+            </ul>
+          </section>
+
+          <section data-topic="helper" data-group="数据编辑器">
+            <h2>本机助手（右键打开）</h2>
+            <p>XJY Editor 助手是一个 Windows 小程序。安装后，在资源管理器中右键文件，选择「用 XJY Editor 打开」，即可在浏览器中打开该文件，保存时直接写回原文件。</p>
+            <ul>
+              <li>支持 <code>.xml</code>、<code>.json</code>、<code>.yaml</code>、<code>.csv</code>、<code>.tsv</code>、<code>.sqlite</code>、<code>.sqlite3</code>、<code>.db</code>、<code>.db3</code>、<code>.xlsx</code>、<code>.xls</code>，按格式进入对应的编辑器。</li>
+              <li>Windows 11 中菜单可能在「显示更多选项」里。只对单个文件显示，多选或文件夹不显示。</li>
+              <li>双击 <code>XJYEditorHelper.exe</code> 安装，不需要管理员权限，也不改变文件的默认打开程序。再次双击安装目录中的助手，或在 Windows「设置 → 应用」中卸载。</li>
+              <li>助手只在本机 127.0.0.1 上工作，只能访问你选中的那一个文件；文件内容不经过网站服务器。单个文件最大 128 MiB。</li>
+              <li>页面停止使用 10 分钟后助手自动退出；刷新页面后不会自动重新关联文件，需要右键重新打开。</li>
+            </ul>
+            <p>CSV、SQLite、Excel 文件的直接写回需要助手 0.3.0 或更新版本；旧版本保存时会改为下载。</p>
+          </section>
+
+          <section data-topic="keys" data-group="参考">
+            <h2>快捷键</h2>
+            <table>
+              <thead>
+                <tr><th>按键</th><th>作用</th><th>适用</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>保存</td><td>全部编辑器</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>撤销（SQLite 编辑器请用工具栏按钮）</td><td>XJY Editor、CSV、Excel</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></td><td>重做</td><td>XJY Editor、CSV、Excel</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>Y</kbd></td><td>重做</td><td>CSV、Excel</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>搜索节点</td><td>XJY Editor</td></tr>
+                <tr><td><kbd>Alt</kbd>+<kbd>←</kbd> / <kbd>→</kbd></td><td>后退 / 前进</td><td>XJY Editor</td></tr>
+                <tr><td><kbd>Alt</kbd>+<kbd>↑</kbd></td><td>进入父节点</td><td>XJY Editor</td></tr>
+                <tr><td><kbd>Esc</kbd></td><td>关闭搜索结果；取消单元格编辑</td><td>全部编辑器</td></tr>
+                <tr><td><kbd>Enter</kbd> / <kbd>Shift</kbd>+<kbd>Enter</kbd></td><td>确认单元格 / 在单元格内换行</td><td>表格</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>选择下一个相同文本（多光标）</td><td>源码编辑</td></tr>
+                <tr><td><kbd>Shift</kbd>+右键</td><td>显示浏览器自己的右键菜单</td><td>表格</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section data-topic="privacy" data-group="参考">
+            <h2>隐私与数据</h2>
+            <ul>
+              <li>文件的读取、编辑、转换和保存都在你的浏览器中完成，网站服务器只提供页面，不接收文件内容。</li>
+              <li>本地草稿和界面偏好保存在浏览器本地存储中，只有这台电脑的这个浏览器能读到。</li>
+              <li>使用「打开 FindChanged」「交给 FindChanged」时，所选内容会在浏览器中交给 FindChanged 页面（默认 https://findchanged.com）。只发送选中的节点或文档，不会修改原文件。</li>
+              <li>本机助手只在本机工作，不把文件发给网站。</li>
+            </ul>
+          </section>
+
+          <section data-topic="limits" data-group="参考">
+            <h2>限制</h2>
+            <ul>
+              <li>XML 不支持 DTD；Schema 校验只支持一部分声明。</li>
+              <li>YAML 的锚点、别名和自定义标签受保护，部分操作（比较、转换）不可用。</li>
+              <li>直接写回原文件只在 Edge / Chrome 等支持文件系统访问的浏览器中可用；其他浏览器保存为下载。</li>
+              <li>CSV、SQLite、Excel 编辑器目前只有中文界面。</li>
+            </ul>
+          </section>
+
+          <section data-topic="faq" data-group="参考">
+            <h2>常见问题</h2>
+            <h3>为什么点「保存」变成了下载？</h3>
+            <p>
+              当前浏览器或访问方式不能写回原文件，例如普通 HTTP 访问、离线版、非 Edge / Chrome 浏览器，或打开的是示例。可以改用 HTTPS 地址，或通过<a href="#helper">本机助手</a>打开。
+            </p>
+            <h3>保存时提示「没有权限」？</h3>
+            <p>第一次保存时浏览器会询问是否允许修改文件，请选择允许。如果之前拒绝过，重新用「打开文件」打开该文件即可再次询问。</p>
+            <h3>打开后中文是乱码？</h3>
+            <p>文件没有 BOM 又不是 UTF-8 时，需要在「选择文件编码」窗口中挑选正确的编码，例如 GB18030。确认预览正常后再打开。</p>
+            <h3>提示文件已被其他程序修改？</h3>
+            <p>打开以后，磁盘上的文件被别的程序改过。选择覆盖会用当前内容替换磁盘上的版本；选择取消则保持磁盘文件不变，你可以先导出当前内容再比较。</p>
+            <h3>刷新页面后内容还在吗？</h3>
+            <p>未保存的修改会在离开页面前提示。可用「保存本地草稿」做恢复备份，但它不能代替保存文件。</p>
+          </section>
+        </article>
+
+        <!-- ============================ English ============================ -->
+        <article lang="en" data-title="XJY Editor Help" hidden>
+          <h1>XJY Editor Help</h1>
+          <p class="lead">
+            XJY Editor views and edits XML, JSON and YAML documents in the browser, and adds three data
+            editors for CSV, SQLite and Excel. This page explains the features, how saving works, and the
+            limits.
+          </p>
+
+          <section data-topic="start" data-group="Getting started">
+            <h2>Quick start</h2>
+            <ol>
+              <li>
+                Open <a data-page="index.html" data-offline="XJYEditor.html" href="index.html">XJY Editor</a> and click
+                <b>Open file</b> to choose an <code>.xml</code>, <code>.json</code> or <code>.yaml</code> file, or try one of
+                the sample buttons first.
+              </li>
+              <li>
+                Select a node in the tree on the left and edit its name, value or attributes on the right. Inside a
+                container, the <b>Smart table</b> edits sibling nodes together.
+              </li>
+              <li>
+                Click <b>Save</b> or press <kbd>Ctrl</kbd>+<kbd>S</kbd>. The original encoding and line endings are kept;
+                see <a href="#save">Saving, drafts and export</a>.
+              </li>
+            </ol>
+            <p>The CSV, SQLite and Excel editor links in the header open in a new tab and leave your current work untouched.</p>
+            <p>Files are processed only in your browser and are not uploaded. See <a href="#privacy">Privacy and data</a> for the exceptions.</p>
+          </section>
+
+          <section data-topic="open" data-group="XML / JSON / YAML">
+            <h2>Opening files and encodings</h2>
+            <p>Click <b>Open file</b> to choose a local file. The format follows the extension: <code>.xml</code>, <code>.json</code>, <code>.yaml</code> / <code>.yml</code>.</p>
+            <h3>Encoding detection</h3>
+            <ul>
+              <li>A byte order mark decides the encoding (UTF-8, UTF-16 LE / BE).</li>
+              <li>An encoding named in the XML declaration (such as <code>encoding="GBK"</code>) is used.</li>
+              <li>Otherwise the file is read as strict UTF-8.</li>
+              <li>
+                If none of these works, the <b>Choose the file encoding</b> window opens. Pick an encoding and check the live
+                preview before opening. The suggestion is Windows-1252 in the English interface and GB18030 in the
+                Chinese one.
+              </li>
+            </ul>
+            <p>Files that look binary are not opened. The file status line at the bottom shows the linked file, encoding and line endings, for example “Linked file: data.xml · GB18030 · CRLF”.</p>
+            <h3>Syntax errors</h3>
+            <p>
+              A file with syntax errors opens in source repair mode: fix it on the <b>Source</b> tab and click
+              <b>Apply source</b>. The tree and table are unavailable until then. <b>Validate syntax</b> checks the document or
+              the unapplied source at any time.
+            </p>
+          </section>
+
+          <section data-topic="tree" data-group="XML / JSON / YAML">
+            <h2>Browsing and editing nodes</h2>
+            <h3>Editing a node</h3>
+            <p>
+              Select a node in the tree; edit its name, type, attributes or value on the right. Changes apply when the
+              field loses focus. Nodes can be added, copied, moved up or down, moved elsewhere and deleted, and you can
+              drag them in the tree and the table to reorder.
+            </p>
+            <h3>Navigation</h3>
+            <ul>
+              <li><kbd>Alt</kbd>+<kbd>←</kbd> / <kbd>Alt</kbd>+<kbd>→</kbd> go back / forward; <kbd>Alt</kbd>+<kbd>↑</kbd> goes to the parent.</li>
+              <li><kbd>Ctrl</kbd>+<kbd>K</kbd> focuses search. Search names, values, attributes or display paths; clicking a result reveals the node.</li>
+              <li>The tree and the source follow each other: moving the cursor in the source selects the node, and selecting a node highlights its source.</li>
+            </ul>
+            <h3>Source</h3>
+            <p>
+              Edit text directly on the <b>Source</b> tab and click <b>Apply source</b> to update the nodes. While the
+              source has unapplied changes, locating and node comparison pause. <b>Format</b> re-indents with two spaces
+              and can be undone.
+            </p>
+            <h3>More tools</h3>
+            <p>
+              <b>Check duplicates</b> lists identical sibling elements in XML (report only). There are also condition
+              queries, checkpoints, batch previews, templates and a subset of Schema validation.
+            </p>
+          </section>
+
+          <section data-topic="table" data-group="XML / JSON / YAML">
+            <h2>Smart table</h2>
+            <p>
+              Inside a container node, the <b>Smart table</b> shows its children as rows: XML attributes and simple
+              child elements, or JSON / YAML fields, become columns. Press <kbd>Enter</kbd> to apply a cell; fields with
+              subtrees can be entered.
+            </p>
+            <ul>
+              <li>Use the first-column check boxes, <b>Select filtered rows</b> and <b>Clear selection</b> for batch actions.</li>
+              <li>After filtering, records with the same structure are recognised as columns again.</li>
+              <li>Dragging inside an edit box selects text; it does not move rows.</li>
+              <li>Similar edits in one column can start <a href="#assist">assisted editing</a>.</li>
+            </ul>
+          </section>
+
+          <section data-topic="assist" data-group="XML / JSON / YAML">
+            <h2>Assisted editing</h2>
+            <p>Assisted editing repeats the change you made in a few cells across the rest of the column. It is available in XJY Editor and in the CSV, SQLite and Excel editors.</p>
+            <h3>Automatic</h3>
+            <p>
+              Make a similar insertion or deletion in three different records of one column (for example, remove a
+              leading <code>PRE_</code>). After the third edit, a preview lists the other cells that would change.
+            </p>
+            <h3>On request</h3>
+            <p>Click <b>Assisted editing</b>, or right-click a cell and choose <b>Assist editing this column…</b>, to choose the column, rule, text and position yourself. <kbd>Shift</kbd>+right-click keeps the browser menu.</p>
+            <h3>Rules and scope</h3>
+            <ul>
+              <li>Rules are tried in order: exact match → ignore case → same length and pattern → same length only. You can pick another compatible rule or restore the first one.</li>
+              <li>End positions count from the right; characters are counted as Unicode code points.</li>
+              <li>The scope is the current filter result by default; you can switch to all records in the current folder.</li>
+              <li>The automatic mode does not repeat your three manual edits.</li>
+            </ul>
+            <p>Nothing is written until you confirm the preview, and the whole batch undoes in one step.</p>
+          </section>
+
+          <section data-topic="save" data-group="Saving and output">
+            <h2>Saving, drafts and export</h2>
+            <h3>Save</h3>
+            <p>
+              Every editor has a single <b>Save</b> button (<kbd>Ctrl</kbd>+<kbd>S</kbd>). It writes the file with the
+              encoding, byte order mark and line endings it was opened with. Whether it writes back to the original file
+              depends on the browser and how the file was opened:
+            </p>
+            <table>
+              <thead>
+                <tr><th>Situation</th><th>What Save does</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Edge or Chrome over HTTPS or a local address, file opened with <b>Open file</b></td>
+                  <td>Writes back to the original file. The browser asks for permission the first time.</td>
+                </tr>
+                <tr><td>File opened with the <a href="#helper">local helper</a></td><td>Writes back to the original file.</td></tr>
+                <tr>
+                  <td>Other browsers, plain HTTP, the offline version, or a sample</td>
+                  <td>Downloads a file with the same name; the download counts as saved.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>The file status line tells you which applies: “Linked file: …” writes back, “Saving downloads the file · …” downloads.</p>
+            <h3>Questions while saving</h3>
+            <ul>
+              <li><b>The file was changed by another program</b>: if the file on disk changed after you opened it, you are asked before it is overwritten.</li>
+              <li><b>Mixed line endings</b>: if the file mixes CRLF and LF, saving uses one of them throughout and asks before continuing.</li>
+              <li>
+                <b>Characters the encoding cannot store</b>: for example an emoji in a GBK file. The affected lines are
+                listed and nothing is written; change those characters and save again.
+              </li>
+            </ul>
+            <h3>Source drafts</h3>
+            <p>While the Source tab has unapplied changes, the button reads <b>Save source</b> and saves the source text itself without applying it. The CSV and Excel editors ask you to apply or discard the draft first.</p>
+            <h3>Local drafts</h3>
+            <p><b>Save local draft</b> and <b>Restore draft</b> keep a copy in browser storage for recovery after an accidental close. They do not replace saving the file, and drafts belong to the current address only.</p>
+            <h3>Export</h3>
+            <p><b>Export file</b> (XJY Editor) and <b>Export CSV…</b>, <b>Export database…</b>, <b>Export workbook…</b> in the table editors download a new copy. They leave the original file alone and do not clear the unsaved mark.</p>
+          </section>
+
+          <section data-topic="convert" data-group="Saving and output">
+            <h2>Convert and export</h2>
+            <p><b>Convert and export…</b> converts what you are editing into another format and downloads a new file. The current document does not change.</p>
+            <table>
+              <thead>
+                <tr><th>Editor</th><th>What is converted</th><th>Targets</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>XJY Editor</td><td>The whole document, including unapplied source</td><td>The other two of XML, JSON, YAML</td></tr>
+                <tr><td>CSV</td><td>The whole table, including filtered-out records</td><td>XLSX, TSV, CSV (encoding can change)</td></tr>
+                <tr><td>Excel</td><td>The used range of the current sheet</td><td>CSV, TSV</td></tr>
+                <tr><td>SQLite</td><td>All records of the current table</td><td>CSV, TSV, XLSX</td></tr>
+              </tbody>
+            </table>
+            <p>A preview lists what will change, for example XML comments are dropped and attributes become <code>@name</code> keys. Tick the box confirming you understand the conversion before exporting.</p>
+            <h3>Conversions that are refused</h3>
+            <ul>
+              <li>XML with a DTD, or element and attribute names that would be invalid.</li>
+              <li>YAML with anchors / aliases, custom tags or several documents.</li>
+              <li>Duplicate keys, or nesting deeper than 200 levels.</li>
+              <li>Tables over one million cells, or beyond Excel's row and column limits.</li>
+              <li>Characters the target encoding cannot represent.</li>
+            </ul>
+          </section>
+
+          <section data-topic="compare" data-group="Saving and output">
+            <h2>Comparing with FindChanged</h2>
+            <h3>Compare two nodes</h3>
+            <ol>
+              <li>In the smart table, tick exactly two sibling nodes and click <b>Compare selected pair</b>.</li>
+              <li>Check the left and right sides (you can swap them) and click <b>Open FindChanged</b>.</li>
+              <li>FindChanged shows the differences between the two subtrees in a new tab.</li>
+            </ol>
+            <p>
+              Clicking a difference in FindChanged locates it back in XJY Editor: shared differences go to the right
+              node, differences only on the left go to the left node. Compare again after changing the source.
+            </p>
+            <h3>Compare whole files</h3>
+            <p><b>Send to FindChanged</b> compares the baseline, the current content or another document as whole files.</p>
+            <div class="note">
+              Changes made in FindChanged are not written back. XML compares elements only; protected YAML structures
+              cannot be compared yet. Each side is limited to 5 MiB and 100,000 lines; larger content is offered as a
+              download instead.
+            </div>
+          </section>
+
+          <section data-topic="csv" data-group="Data editors">
+            <h2>CSV editor</h2>
+            <p>Open or drop a <code>.csv</code>, <code>.tsv</code> or <code>.txt</code> file and confirm the encoding, delimiter and header row in <b>Parse settings</b>.</p>
+            <ul>
+              <li>Comma, semicolon and tab delimiters; UTF-8, UTF-16 and GB18030. If the encoding cannot be detected, choose it yourself with a preview.</li>
+              <li>Every field is text: leading zeros, long numbers, dates and spaces are kept exactly.</li>
+              <li>
+                Double-click a cell to edit in place: <kbd>Enter</kbd> confirms, <kbd>Shift</kbd>+<kbd>Enter</kbd> adds a
+                line break, <kbd>Esc</kbd> cancels. Insert or delete rows and columns, rename headers, paste a block.
+              </li>
+              <li>Drag or <kbd>Shift</kbd> to extend a selection, <kbd>Ctrl</kbd> to add cells. Copies are tab-separated and paste straight into Excel.</li>
+              <li>Find, filter by column, and replace in the selection or the whole table with a preview.</li>
+              <li>The <b>Source</b> tab edits the CSV text; <b>Apply source</b> updates the table.</li>
+            </ul>
+            <p>Saving rewrites only the edited records; other records, the encoding and line endings stay as they were. Deleting a column also deletes its filtered-out data, and the confirmation says so.</p>
+          </section>
+
+          <section data-topic="sqlite" data-group="Data editors">
+            <h2>SQLite editor</h2>
+            <p>Open a <code>.sqlite</code>, <code>.sqlite3</code>, <code>.db</code> or <code>.db3</code> database, choose a table or view on the left, and page through 100 records at a time with column filters.</p>
+            <ul>
+              <li>Double-click a field and choose the type to write: text, integer, real, NULL or BLOB (hex). Integers are exact 64-bit values, never rounded.</li>
+              <li>Add records (with defaults and automatic keys) and delete several rows. The database's own constraints, foreign keys and triggers apply, and a failed action is rolled back completely.</li>
+              <li>The <b>Structure</b> tab shows the table SQL read-only, ready to copy.</li>
+            </ul>
+            <h3>Read-only cases</h3>
+            <ul>
+              <li>Views, virtual tables, system tables, generated columns, and tables whose rows cannot be identified uniquely.</li>
+              <li>Databases in WAL mode: close the database in its own application (checkpoint) first.</li>
+              <li>Databases that already have foreign key errors do not accept new changes.</li>
+            </ul>
+            <p>Saving writes the whole database file. Running arbitrary SQL, changing table structure and encrypted databases are not supported.</p>
+          </section>
+
+          <section data-topic="excel" data-group="Data editors">
+            <h2>Excel editor</h2>
+            <p>Open an <code>.xlsx</code> workbook, switch sheets, page through rows, go to an address and filter. Hidden rows and columns stay hidden unless you show them.</p>
+            <ul>
+              <li>Double-click a cell to write text, a number, a boolean, a date, a formula or an error value. Text such as <code>001</code> keeps its leading zeros.</li>
+              <li>Pasting tab-separated text asks first and always writes text.</li>
+              <li>The <b>Source</b> tab edits the current sheet's XML; only values and formulas of existing cells may change.</li>
+            </ul>
+            <p>
+              Saving changes only the edited sheet; styles, charts and other sheets are kept. The browser does not
+              calculate formulas: edited formulas are marked “needs recalculation”, so open the saved file in Excel to
+              recalculate.
+            </p>
+            <h3>Limits</h3>
+            <ul>
+              <li>Legacy <code>.xls</code> files can be viewed and copied but not saved; save them as <code>.xlsx</code> in Excel first.</li>
+              <li>Protected sheets and workbooks with macros or signatures are read-only; only the top-left cell of a merged range can change; shared and array formula ranges are read-only.</li>
+              <li>Inserting or deleting whole rows or columns, formatting and renaming sheets are not supported.</li>
+              <li>Workbooks up to 30 MB (100 MB uncompressed); cell text up to 32,767 characters. Encrypted workbooks are not supported.</li>
+            </ul>
+          </section>
+
+          <section data-topic="helper" data-group="Data editors">
+            <h2>Local helper (right-click to open)</h2>
+            <p>The XJY Editor helper is a small Windows program. After installing it, right-click a file in File Explorer and choose <b>用 XJY Editor 打开</b> to open it in your browser; Save then writes straight back to the file.</p>
+            <ul>
+              <li>Supports <code>.xml</code>, <code>.json</code>, <code>.yaml</code>, <code>.csv</code>, <code>.tsv</code>, <code>.sqlite</code>, <code>.sqlite3</code>, <code>.db</code>, <code>.db3</code>, <code>.xlsx</code> and <code>.xls</code>, each in its own editor.</li>
+              <li>On Windows 11 the entry may be under <b>Show more options</b>. It appears for a single file only, not for several files or folders.</li>
+              <li>Double-click <code>XJYEditorHelper.exe</code> to install; no administrator rights are needed and default file associations do not change. Double-click the installed helper again, or use Windows Settings → Apps, to uninstall.</li>
+              <li>The helper works only on 127.0.0.1 and can reach only the file you chose; file contents never go through the website. Files up to 128 MiB.</li>
+              <li>The helper exits ten minutes after the page stops using it. Reloading the page does not relink the file; open it again from the menu.</li>
+            </ul>
+            <p>Writing back CSV, SQLite and Excel files needs helper 0.3.0 or later; older helpers download on save instead.</p>
+          </section>
+
+          <section data-topic="keys" data-group="Reference">
+            <h2>Keyboard shortcuts</h2>
+            <table>
+              <thead>
+                <tr><th>Keys</th><th>Action</th><th>Where</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Save</td><td>All editors</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Undo (use the toolbar button in the SQLite editor)</td><td>XJY Editor, CSV, Excel</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></td><td>Redo</td><td>XJY Editor, CSV, Excel</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>Y</kbd></td><td>Redo</td><td>CSV, Excel</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Search nodes</td><td>XJY Editor</td></tr>
+                <tr><td><kbd>Alt</kbd>+<kbd>←</kbd> / <kbd>→</kbd></td><td>Back / forward</td><td>XJY Editor</td></tr>
+                <tr><td><kbd>Alt</kbd>+<kbd>↑</kbd></td><td>Go to parent</td><td>XJY Editor</td></tr>
+                <tr><td><kbd>Esc</kbd></td><td>Close search results; cancel a cell edit</td><td>All editors</td></tr>
+                <tr><td><kbd>Enter</kbd> / <kbd>Shift</kbd>+<kbd>Enter</kbd></td><td>Confirm a cell / line break in a cell</td><td>Tables</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>Select the next occurrence (multiple cursors)</td><td>Source editing</td></tr>
+                <tr><td><kbd>Shift</kbd>+right-click</td><td>Show the browser's own menu</td><td>Tables</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section data-topic="privacy" data-group="Reference">
+            <h2>Privacy and data</h2>
+            <ul>
+              <li>Reading, editing, converting and saving all happen in your browser. The web server only delivers the pages and never receives file contents.</li>
+              <li>Local drafts and interface preferences are kept in browser storage, readable only by this browser on this computer.</li>
+              <li><b>Open FindChanged</b> and <b>Send to FindChanged</b> hand the chosen content to the FindChanged page in your browser (https://findchanged.com by default). Only the selected nodes or document are sent, and the original file is not changed.</li>
+              <li>The local helper works only on your computer and does not send files to the website.</li>
+            </ul>
+          </section>
+
+          <section data-topic="limits" data-group="Reference">
+            <h2>Limits</h2>
+            <ul>
+              <li>XML DTDs are not supported; Schema validation covers a subset of declarations.</li>
+              <li>YAML anchors, aliases and custom tags are protected, and some actions (compare, convert) are unavailable for them.</li>
+              <li>Writing back to the original file needs a browser with file system access, such as Edge or Chrome; other browsers download on save.</li>
+              <li>The CSV, SQLite and Excel editors are currently available in Chinese only.</li>
+            </ul>
+          </section>
+
+          <section data-topic="faq" data-group="Reference">
+            <h2>Frequently asked questions</h2>
+            <h3>Why does Save download a file?</h3>
+            <p>
+              This browser or address cannot write back to the original file: plain HTTP, the offline version, a
+              browser other than Edge or Chrome, or a sample. Use the HTTPS address, or open the file with the
+              <a href="#helper">local helper</a>.
+            </p>
+            <h3>Saving says permission was denied</h3>
+            <p>The browser asks for permission the first time you save; choose Allow. If you declined before, open the file again with <b>Open file</b> to be asked again.</p>
+            <h3>Text looks garbled after opening</h3>
+            <p>A file without a byte order mark that is not UTF-8 needs the right encoding in the <b>Choose the file encoding</b> window, for example GB18030 for Chinese text. Check the preview before opening.</p>
+            <h3>It says the file was changed by another program</h3>
+            <p>The file on disk changed after you opened it. Overwrite replaces the disk version with your content; Cancel leaves the disk file alone so you can export your content and compare first.</p>
+            <h3>Is my work kept when I reload?</h3>
+            <p>You are warned before leaving a page with unsaved changes. <b>Save local draft</b> keeps a recovery copy, but it does not replace saving the file.</p>
+          </section>
+        </article>
+      </main>
+    </div>
+
+    <script>
+/* Help page: one bilingual page (help.html, offline XJYHelp.html), or one language per page on the
+   website (/zh/help/, /en/help/). Builds the table of contents and keeps the shared topic anchors. */
+(function () {
+  'use strict';
+  const KEY = 'xjy-language-v1';
+  const picker = document.getElementById('language');
+  const articles = [...document.querySelectorAll('article')];
+  // Website pages hold one language; the picker then moves to the other language's page.
+  const single = articles.length === 1;
+
+  function initialLocale() {
+    if (single) return articles[0].lang;
+    const query = new URLSearchParams(location.search).get('lang');
+    if (query === 'en' || query === 'zh-CN') return query;
+    if (query === 'zh') return 'zh-CN';
+    try {
+      const saved = localStorage.getItem(KEY);
+      if (saved === 'en' || saved === 'zh-CN') return saved;
+    } catch (_) {}
+    return (navigator.language || '').toLowerCase().startsWith('zh') ? 'zh-CN' : 'en';
+  }
+
+  // Offline copies sit beside the standalone editor files.
+  if (location.protocol === 'file:')
+    for (const a of document.querySelectorAll('a[data-offline]'))
+      a.setAttribute('href', a.dataset.offline);
+
+  function render(locale) {
+    let active = null;
+    for (const article of articles) {
+      const on = article.lang === locale;
+      article.hidden = !on;
+      if (on) active = article;
+      // Only the visible language owns the shared topic anchors.
+      for (const section of article.querySelectorAll('section[data-topic]'))
+        if (on) section.id = section.dataset.topic;
+        else section.removeAttribute('id');
+    }
+    document.documentElement.lang = locale;
+    document.title = active.dataset.title;
+    document.getElementById('brandtext').textContent = active.dataset.title;
+    picker.value = locale;
+    const toc = document.getElementById('toc');
+    toc.setAttribute('aria-label', locale === 'en' ? 'Contents' : '目录');
+    document
+      .getElementById('applinks')
+      .setAttribute('aria-label', locale === 'en' ? 'Editors' : '编辑器');
+    toc.replaceChildren();
+    let group = null,
+      list = null;
+    for (const section of active.querySelectorAll('section[data-topic]')) {
+      if (section.dataset.group !== group) {
+        group = section.dataset.group;
+        const label = document.createElement('div');
+        label.className = 'group';
+        label.textContent = group;
+        list = document.createElement('ol');
+        toc.append(label, list);
+      }
+      const item = document.createElement('li'),
+        link = document.createElement('a');
+      link.href = '#' + section.dataset.topic;
+      link.textContent = section.querySelector('h2').textContent;
+      item.append(link);
+      list.append(item);
+    }
+    highlight();
+  }
+
+  function highlight() {
+    const topic = location.hash.slice(1);
+    for (const a of document.querySelectorAll('#toc a'))
+      a.classList.toggle('current', a.getAttribute('href') === '#' + topic);
+  }
+
+  function reveal() {
+    const target = location.hash && document.getElementById(location.hash.slice(1));
+    if (target) target.scrollIntoView();
+    highlight();
+  }
+
+  picker.addEventListener('change', () => {
+    try {
+      localStorage.setItem(KEY, picker.value);
+    } catch (_) {}
+    if (single) {
+      const option = picker.selectedOptions[0];
+      location.href = option.dataset.href + location.hash;
+      return;
+    }
+    render(picker.value);
+    reveal();
+  });
+  window.addEventListener('hashchange', highlight);
+  render(initialLocale());
+  reveal();
+})();
+</script>
+  </body>
+</html>
