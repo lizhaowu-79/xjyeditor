@@ -456,19 +456,21 @@ header a.brand {
 
           <section data-topic="sqlite" data-group="数据编辑器">
             <h2>SQLite 编辑器</h2>
-            <p>打开 <code>.sqlite</code>、<code>.sqlite3</code>、<code>.db</code>、<code>.db3</code> 数据库文件，左侧选择表或视图，表格每页 100 条，可按列筛选。</p>
+            <p>打开 <code>.sqlite</code>、<code>.sqlite3</code>、<code>.db</code>、<code>.db3</code> 数据库文件，左侧选择表或视图，表格每页 100 条，支持多条件组合筛选（包含、不包含、比较运算符、NULL 与空文本判断）和列头点击排序。</p>
             <ul>
               <li>双击字段编辑，并明确选择写入类型：文本、整数、实数、NULL 或 BLOB（十六进制）。整数按 64 位精确处理，不会被舍入。</li>
               <li>可添加记录（使用默认值和自动主键）和删除多行。数据库自身的约束、外键和触发器照常生效，失败时整个操作回退。</li>
-              <li>「结构」页只读显示建表 SQL，可以复制。</li>
+              <li><b>导入 CSV</b>：可将 CSV / TSV 导入为新表或追加到已有表，自动识别编码与分隔符、推断字段类型并逐列调整，一步撤销。</li>
+              <li><b>结构</b>页：列出数据表、视图、索引与触发器及建表 SQL；支持新建/修改/删除表（优先使用 <code>ALTER TABLE</code>，需要时自动重建表并保留数据、索引、触发器与自增序号）和新建/删除索引。</li>
+              <li><b>SQL</b>页：支持执行全部（<kbd>Ctrl</kbd>+<kbd>Enter</kbd>）、执行光标所在语句（<kbd>Shift</kbd>+<kbd>Enter</kbd>）或选中语句；只读查询不产生修改历史，含写入的整批作为一个事务和一步撤销，每个结果集最多显示前 1000 行。</li>
             </ul>
-            <h3>只读的情况</h3>
+            <h3>只读与限制</h3>
             <ul>
-              <li>视图、虚拟表、系统表、生成列，以及无法唯一定位记录的表。</li>
-              <li>WAL 模式的数据库：请先在原应用中关闭数据库（完成检查点）再打开。</li>
-              <li>已有外键错误的数据库不接受新修改。</li>
+              <li>视图、虚拟表、系统表、生成列，以及无法唯一定位记录的表不在数据页直接编辑。</li>
+              <li>WAL 模式的数据库只允许查询：请先在原应用中关闭数据库（完成检查点）再修改。</li>
+              <li>已有外键错误的数据库在数据页拒绝修改，可在「SQL」页修复外键问题（不允许产生新的外键错误）。</li>
             </ul>
-            <p>保存写出整个数据库文件。不支持执行任意 SQL、修改表结构或打开加密数据库。</p>
+            <p>保存写出整个数据库文件。暂不支持打开加密数据库。</p>
           </section>
 
           <section data-topic="excel" data-group="数据编辑器">
@@ -785,19 +787,21 @@ header a.brand {
 
           <section data-topic="sqlite" data-group="Data editors">
             <h2>SQLite editor</h2>
-            <p>Open a <code>.sqlite</code>, <code>.sqlite3</code>, <code>.db</code> or <code>.db3</code> database, choose a table or view on the left, and page through 100 records at a time with column filters.</p>
+            <p>Open a <code>.sqlite</code>, <code>.sqlite3</code>, <code>.db</code> or <code>.db3</code> database, choose a table or view on the left, and page through 100 records at a time with multi-condition filters and column sorting.</p>
             <ul>
               <li>Double-click a field and choose the type to write: text, integer, real, NULL or BLOB (hex). Integers are exact 64-bit values, never rounded.</li>
               <li>Add records (with defaults and automatic keys) and delete several rows. The database's own constraints, foreign keys and triggers apply, and a failed action is rolled back completely.</li>
-              <li>The <b>Structure</b> tab shows the table SQL read-only, ready to copy.</li>
+              <li><b>Import CSV</b>: import CSV / TSV files into a new table or append to an existing table with encoding/delimiter detection, conservative type inference and single-step undo.</li>
+              <li>The <b>Structure</b> tab lists tables, views, indexes and triggers alongside their SQL definitions, and lets you create, modify or drop tables and indexes with a live SQL preview.</li>
+              <li>The <b>SQL</b> tab runs all statements (<kbd>Ctrl</kbd>+<kbd>Enter</kbd>), the statement at the cursor (<kbd>Shift</kbd>+<kbd>Enter</kbd>) or the selection; read-only queries leave no undo history, while write batches run in one transaction as a single undo step (up to 1,000 result rows displayed).</li>
             </ul>
-            <h3>Read-only cases</h3>
+            <h3>Read-only cases and limits</h3>
             <ul>
-              <li>Views, virtual tables, system tables, generated columns, and tables whose rows cannot be identified uniquely.</li>
-              <li>Databases in WAL mode: close the database in its own application (checkpoint) first.</li>
-              <li>Databases that already have foreign key errors do not accept new changes.</li>
+              <li>Views, virtual tables, system tables, generated columns, and tables whose rows cannot be identified uniquely are read-only in the data grid.</li>
+              <li>Databases in WAL mode allow read-only queries only: close the database in its own application (checkpoint) first before modifying.</li>
+              <li>Databases that already have foreign key errors are read-only in the data grid, but can be repaired from the <b>SQL</b> tab (no new foreign key errors may be introduced).</li>
             </ul>
-            <p>Saving writes the whole database file. Running arbitrary SQL, changing table structure and encrypted databases are not supported.</p>
+            <p>Saving writes the whole database file. Encrypted databases are not supported.</p>
           </section>
 
           <section data-topic="excel" data-group="Data editors">

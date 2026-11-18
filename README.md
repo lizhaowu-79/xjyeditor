@@ -28,7 +28,7 @@
 | :--- | :--- | :--- | :--- | :--- |
 | **1. 结构化文档编辑器** | `.xml` / `.kml` / `.json` / `.yaml` / `.yml` | [打开编辑器 ↗](https://xjyeditor.com/app/) | [`XJYEditor.html`](./XJYEditor.html) | 左侧目录树 + 中间**数据类型分色表格** + 源码双向实时定位；保留 JSON 64 位大整数精度与 YAML 1.2 注释/锚点；支持 XML 同级重复节点检查、坏文件源码修复与 36 条批量辅助编辑规则 |
 | **2. CSV / TSV 编辑器** | `.csv` / `.tsv` / `.txt` | [打开 CSV ↗](https://xjyeditor.com/app/csv) | [`CSVEditor.html`](./CSVEditor.html) | 所有字段按原文本保护，**绝不吞掉 `00123` 前导零、不把 18 位长编号转成科学计数法**；同时按语义分色显示文本、数值、日期与布尔值；未改动行按原始字节写回 |
-| **3. SQLite 编辑器** | `.sqlite` / `.sqlite3` / `.db` / `.db3` | [打开 SQLite ↗](https://xjyeditor.com/app/sqlite) | [`SQLiteEditor.html`](./SQLiteEditor.html) | 内置 WebAssembly SQLite 引擎，免装客户端直接按类型读写 `INTEGER`（64 位安全）、`REAL`、`TEXT`、`NULL`、`BLOB`；完整遵守外键、触发器与约束，失败自动原子回滚 |
+| **3. SQLite 编辑器** | `.sqlite` / `.sqlite3` / `.db` / `.db3` | [打开 SQLite ↗](https://xjyeditor.com/app/sqlite) | [`SQLiteEditor.html`](./SQLiteEditor.html) | 内置 WebAssembly SQLite 引擎，免装客户端直接按类型读写 `INTEGER`（64 位安全）、`REAL`、`TEXT`、`NULL`、`BLOB`；支持**多条件筛选排序、SQL 查询与执行、导入 CSV 建表/追加、新建/修改/删除表结构与索引**，全库原子事务与一步撤销 |
 | **4. Excel 编辑器** | `.xlsx`（在位编辑）/ `.xls`（只读预览） | [打开 Excel ↗](https://xjyeditor.com/app/excel) | [`ExcelEditor.html`](./ExcelEditor.html) | **外科手术式在位修改**：只更新你改动过的单元格，原工作簿中的样式、图表、公式与其他工作表原封不动 |
 
 ### 🎨 为什么选择 XJY Editor？
@@ -65,7 +65,7 @@
   - **JSON**: Keeps exact lexical number literals (64-bit integers and exponents are never rounded by JavaScript floats).
   - **YAML 1.2**: AST-based editing preserves inline comments, block scalars and anchors/aliases.
   - **CSV / TSV**: Every field is preserved as exact text — leading zeros like `00123` and 18-digit IDs are never stripped or converted to `1.23E+17`. Unchanged rows are written back byte for byte.
-  - **SQLite**: In-browser WebAssembly SQLite engine with 64-bit integer safety, atomic transactions, foreign keys and triggers.
+  - **SQLite**: In-browser WebAssembly SQLite engine with 64-bit integer safety, multi-condition filtering & sorting, SQL query/execution tab, CSV import, visual table/index schema editing, atomic transactions, foreign keys and triggers.
   - **Excel (`.xlsx`)**: Surgical in-place cell updates that leave existing styles, charts, formulas and untouched sheets intact.
 - **Preserves Original Encoding & Line Endings**: Supports UTF-8, UTF-8 with BOM, UTF-16LE/BE and GBK/GB18030 with CRLF/LF preservation.
 - **Single-File Offline HTML Builds**: Download [`XJYEditor.html`](./XJYEditor.html), [`CSVEditor.html`](./CSVEditor.html), [`SQLiteEditor.html`](./SQLiteEditor.html), [`ExcelEditor.html`](./ExcelEditor.html) and [`XJYHelp.html`](./XJYHelp.html) directly from this repository to use on air-gapped or intranet machines without internet access.

@@ -13941,6 +13941,60 @@ var xjyM = globalThis.XJYI18n?.message || ((text) => text);
   'use strict';
   const en = () => g.XJYI18n?.locale === 'en',
     t = (zh, english) => (en() ? english : zh);
+  function initDraggableDialogs() {
+    if (g.__xjyDialogDragInitialized || typeof document === 'undefined') return;
+    g.__xjyDialogDragInitialized = true;
+    const state = new WeakMap();
+    const getPos = (dialog) => state.get(dialog) || { x: 0, y: 0 };
+    function reset(dialog) {
+      state.delete(dialog);
+      dialog.style.removeProperty('transform');
+    }
+    function move(dialog, dx, dy) {
+      const pos = getPos(dialog),
+        r = dialog.getBoundingClientRect(),
+        clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+      const x = clamp(pos.x + dx, pos.x + 120 - r.right, pos.x + innerWidth - 120 - r.left);
+      const y = clamp(
+        pos.y + dy,
+        pos.y + 8 - r.top,
+        pos.y + Math.max(8 - r.top, innerHeight - 8 - r.bottom),
+      );
+      state.set(dialog, { x, y });
+      dialog.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+    }
+    let active = null;
+    document.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || e.target.closest('button,select,input,textarea,a')) return;
+      const bar = e.target.closest('dialog .dialoghead, dialog .dialogtitle, #convertdialog > h2');
+      if (!bar) return;
+      const dialog = bar.closest('dialog');
+      if (!dialog?.open || dialog.classList.contains('query-draggable')) return;
+      e.preventDefault();
+      active = { dialog, bar, id: e.pointerId, x: e.clientX, y: e.clientY };
+      bar.setPointerCapture?.(e.pointerId);
+    });
+    document.addEventListener('pointermove', (e) => {
+      if (!active || active.id !== e.pointerId) return;
+      move(active.dialog, e.clientX - active.x, e.clientY - active.y);
+      active.x = e.clientX;
+      active.y = e.clientY;
+    });
+    for (const evt of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+      document.addEventListener(evt, (e) => {
+        if (active?.id === e.pointerId) active = null;
+      });
+    }
+    document.addEventListener(
+      'close',
+      (e) => {
+        if (e.target?.tagName === 'DIALOG' && !e.target.classList.contains('query-draggable'))
+          reset(e.target);
+      },
+      true,
+    );
+  }
+  initDraggableDialogs();
   function attach(adapter) {
     const button = document.createElement('button');
     button.id = 'convertfile';
@@ -13972,7 +14026,10 @@ var xjyM = globalThis.XJYI18n?.message || ((text) => text);
         return node;
       };
       dialog.replaceChildren();
-      el('h2', t('转换当前文档并导出', 'Convert current document')).id = 'converttitle';
+      dialog.style.removeProperty('transform');
+      const title = el('h2', t('转换当前文档并导出', 'Convert current document'));
+      title.id = 'converttitle';
+      title.style.cssText = 'cursor:move;user-select:none;touch-action:none;margin-top:0';
       el('p', snapshot.scope);
       el(
         'p',

@@ -542,6 +542,9 @@ dialog::backdrop {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  cursor: move;
+  user-select: none;
+  touch-action: none;
 }
 .dialoghead h2 {
   font-size: 18px;
@@ -550,6 +553,7 @@ dialog::backdrop {
 .dialoghead button {
   border: 0;
   font-size: 20px;
+  cursor: pointer;
 }
 .dialogactions {
   display: flex;
@@ -775,7 +779,8 @@ footer .type-legend [data-swatch] {
   width: 0;
 }
 #dataview,
-#schemaview {
+#schemaview,
+#sqlview {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -905,6 +910,345 @@ td:first-child input {
 }
 .pagination {
   padding: 5px 10px;
+}
+
+/* FR-080 multi-condition filter */
+.filtertools #conditions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.condition {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.condition select[data-role='op'] {
+  max-width: 110px;
+}
+.condition input[data-role='value'][hidden] {
+  display: none;
+}
+.condition .removecondition {
+  padding: 4px 8px;
+}
+th .sortbtn {
+  border: 0;
+  background: transparent;
+  padding: 0 4px;
+  margin-left: 4px;
+  font-size: 11px;
+  color: #8a9b8f;
+  cursor: pointer;
+}
+th .sortbtn[data-active='true'] {
+  color: #236b59;
+  font-weight: 700;
+}
+/* FR-081 SQL page */
+#sqltext {
+  min-height: 120px;
+  height: 28%;
+  resize: vertical;
+  white-space: pre;
+  overflow: auto;
+  tab-size: 2;
+  font:
+    13px/1.6 Consolas,
+    monospace;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+.sqlhint {
+  font-size: 12px;
+}
+.sqlresulthead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #fafcfb;
+  border: 1px solid var(--line);
+  border-top: 0;
+  font-size: 12px;
+}
+#sqlstale {
+  color: #9a6a1f;
+}
+#sqlresult {
+  flex: 1;
+  min-height: 120px;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-top: 0;
+  outline: none;
+}
+#sqlresult td {
+  user-select: text;
+}
+#sqlresult td:first-child {
+  user-select: none;
+}
+#sqlmessages {
+  margin: 0;
+  list-style: none;
+  padding: 6px 12px;
+  max-height: 120px;
+  overflow: auto;
+  background: #fafcfb;
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  font:
+    12px/1.6 Consolas,
+    monospace;
+  color: #4d5f55;
+}
+#sqlmessages li[data-error='true'] {
+  color: #b23b2e;
+}
+#sqlmessages:empty {
+  display: none;
+}
+/* FR-082 CSV import modal */
+#dialog.wide-dialog {
+  width: min(920px, 95vw);
+}
+#dialog.wide-dialog #dialogbody {
+  max-height: 70vh;
+}
+#dialogbody .imp-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+#dialogbody .imp-row label,
+#dialogbody .impcol-item label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  white-space: nowrap;
+}
+#dialogbody input[type='radio'] {
+  width: auto;
+}
+#dialogbody .imp-row input:not([type='checkbox']):not([type='radio']) {
+  width: 170px;
+}
+#dialogbody .imp-row select {
+  width: auto;
+  max-width: 180px;
+}
+.imp-colhead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 4px;
+  font-size: 12px;
+}
+.imp-colhead button {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.impcolumns {
+  max-height: 145px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 8px;
+  background: #fafcfb;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.impcol-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.impcol-src {
+  min-width: 110px;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #5c7165;
+  font-family: Consolas, monospace;
+}
+#dialogbody .impcol-item input:not([type='checkbox']) {
+  width: 180px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+#dialogbody .impcol-item select {
+  width: auto;
+  max-width: 160px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.impnotes {
+  margin: 6px 0 0;
+  padding: 6px 10px;
+  background: #f3f7f4;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #3d5a4b;
+}
+.impproblems {
+  margin: 6px 0 0;
+  padding: 6px 12px 6px 26px;
+  max-height: 90px;
+  overflow: auto;
+  background: #fdf2f0;
+  border: 1px solid #ecc6c0;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #a12c20;
+}
+.imppreview {
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  margin-top: 6px;
+}
+.imppreview th,
+.imppreview td {
+  min-width: 90px;
+  max-width: 220px;
+  width: auto;
+  height: 28px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.imppreview td[data-bad='true'] {
+  background: #fde8e5;
+  color: #a12c20;
+  font-weight: 600;
+}
+/* FR-083 / FR-084 Schema & index management */
+.sidebar-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.dbsidebar .sidebar-actions button {
+  border: 1px solid var(--line);
+  background: #fff;
+  text-align: center;
+  padding: 5px 6px;
+  font-size: 11px;
+  margin: 0;
+  border-radius: 6px;
+}
+.schemaobjects {
+  flex: 1;
+  min-height: 120px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.schemaobjects th,
+.schemaobjects td {
+  height: 32px;
+  padding: 6px 10px;
+  font-size: 12px;
+  user-select: text;
+}
+.schemaobjects td button {
+  padding: 3px 8px;
+  font-size: 11px;
+  margin-right: 4px;
+}
+#schemaview #schema {
+  flex: 0 0 38%;
+  min-height: 110px;
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+}
+.schcolumns {
+  max-height: 210px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px;
+  background: #fafcfb;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.schcol-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #e5ebe7;
+  border-radius: 6px;
+  font-size: 12px;
+}
+#dialogbody .schcol-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  white-space: nowrap;
+}
+#dialogbody .schcol-row input:not([type='checkbox']) {
+  width: 110px;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+#dialogbody .schcol-row input[data-sch-default],
+#dialogbody .schcol-row input[data-sch-check] {
+  width: 120px;
+}
+#dialogbody .schcol-row select {
+  width: auto;
+  max-width: 125px;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+.schcol-row button {
+  padding: 3px 7px;
+  font-size: 11px;
+}
+.schconstraints {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+.schtc-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+#dialogbody .schtc-row select {
+  width: auto;
+  max-width: 130px;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+#dialogbody .schtc-row input {
+  width: 150px;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+.schtc-row button {
+  padding: 3px 8px;
+  font-size: 11px;
 }
 </style>
     <style>#tableview,
@@ -1274,7 +1618,7 @@ safe-buffer/index.js:
   let sequence = 0;
   const clone = (v) => JSON.parse(JSON.stringify(v));
   const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-  const delimiters = [',', ';', '\t'];
+  const delimiters = [',', ';', '\t', '|'];
   function parse(text, delimiter = ',') {
     if (!delimiters.includes(delimiter)) throw Error('不支持的分隔符');
     const records = [];
@@ -3173,6 +3517,60 @@ safe-buffer/index.js:
   'use strict';
   const en = () => g.XJYI18n?.locale === 'en',
     t = (zh, english) => (en() ? english : zh);
+  function initDraggableDialogs() {
+    if (g.__xjyDialogDragInitialized || typeof document === 'undefined') return;
+    g.__xjyDialogDragInitialized = true;
+    const state = new WeakMap();
+    const getPos = (dialog) => state.get(dialog) || { x: 0, y: 0 };
+    function reset(dialog) {
+      state.delete(dialog);
+      dialog.style.removeProperty('transform');
+    }
+    function move(dialog, dx, dy) {
+      const pos = getPos(dialog),
+        r = dialog.getBoundingClientRect(),
+        clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+      const x = clamp(pos.x + dx, pos.x + 120 - r.right, pos.x + innerWidth - 120 - r.left);
+      const y = clamp(
+        pos.y + dy,
+        pos.y + 8 - r.top,
+        pos.y + Math.max(8 - r.top, innerHeight - 8 - r.bottom),
+      );
+      state.set(dialog, { x, y });
+      dialog.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+    }
+    let active = null;
+    document.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || e.target.closest('button,select,input,textarea,a')) return;
+      const bar = e.target.closest('dialog .dialoghead, dialog .dialogtitle, #convertdialog > h2');
+      if (!bar) return;
+      const dialog = bar.closest('dialog');
+      if (!dialog?.open || dialog.classList.contains('query-draggable')) return;
+      e.preventDefault();
+      active = { dialog, bar, id: e.pointerId, x: e.clientX, y: e.clientY };
+      bar.setPointerCapture?.(e.pointerId);
+    });
+    document.addEventListener('pointermove', (e) => {
+      if (!active || active.id !== e.pointerId) return;
+      move(active.dialog, e.clientX - active.x, e.clientY - active.y);
+      active.x = e.clientX;
+      active.y = e.clientY;
+    });
+    for (const evt of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+      document.addEventListener(evt, (e) => {
+        if (active?.id === e.pointerId) active = null;
+      });
+    }
+    document.addEventListener(
+      'close',
+      (e) => {
+        if (e.target?.tagName === 'DIALOG' && !e.target.classList.contains('query-draggable'))
+          reset(e.target);
+      },
+      true,
+    );
+  }
+  initDraggableDialogs();
   function attach(adapter) {
     const button = document.createElement('button');
     button.id = 'convertfile';
@@ -3204,7 +3602,10 @@ safe-buffer/index.js:
         return node;
       };
       dialog.replaceChildren();
-      el('h2', t('转换当前文档并导出', 'Convert current document')).id = 'converttitle';
+      dialog.style.removeProperty('transform');
+      const title = el('h2', t('转换当前文档并导出', 'Convert current document'));
+      title.id = 'converttitle';
+      title.style.cssText = 'cursor:move;user-select:none;touch-action:none;margin-top:0';
       el('p', snapshot.scope);
       el(
         'p',
