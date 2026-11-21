@@ -7,6 +7,8 @@
     <a href="https://xjyeditor.com/zh/">🇨🇳 中文官网</a> ·
     <a href="https://xjyeditor.com/en/">🌐 English Website</a> ·
     <a href="https://xjyeditor.com/app/">🚀 Launch Web App (在线使用)</a> ·
+    <a href="https://xjyeditor.com/app/cleaner">✦ Data Cleaner (数据清洗)</a> ·
+    <a href="https://xjyeditor.com/en/pricing/">⚡ Pro &amp; REST API</a> ·
     <a href="https://xjyeditor.com/zh/windows/">🪟 Windows Right-Click Helper (右键助手)</a> ·
     <a href="https://findchanged.com">🔍 FindChanged Diff</a>
   </p>
@@ -22,7 +24,7 @@
 
 **XJY Editor**（[https://xjyeditor.com](https://xjyeditor.com)）是一套完全在本地浏览器中运行的结构化文档与数据表格编辑器。无任何后端文件上传、无账号注册、无追踪脚本；同时提供**双击即用的单文件离线 HTML 版**（可直接拷入隔离内网使用）和 **Windows 资源管理器右键菜单助手**（支持 `Ctrl+S` 直接写回原文件并保留 GBK / UTF-16 编码与 CRLF 换行符）。
 
-### ✨ 四大工作台与核心亮点
+### ✨ 五大工作台与核心亮点
 
 | 工作台 | 支持格式 | 在线入口 | 离线单文件（本仓库直接下载） | 核心解决痛点 |
 | :--- | :--- | :--- | :--- | :--- |
@@ -30,6 +32,7 @@
 | **2. CSV / TSV 编辑器** | `.csv` / `.tsv` / `.txt` | [打开 CSV ↗](https://xjyeditor.com/app/csv) | [`CSVEditor.html`](./CSVEditor.html) | 所有字段按原文本保护，**绝不吞掉 `00123` 前导零、不把 18 位长编号转成科学计数法**；同时按语义分色显示文本、数值、日期与布尔值；未改动行按原始字节写回 |
 | **3. SQLite 编辑器** | `.sqlite` / `.sqlite3` / `.db` / `.db3` | [打开 SQLite ↗](https://xjyeditor.com/app/sqlite) | [`SQLiteEditor.html`](./SQLiteEditor.html) | 内置 WebAssembly SQLite 引擎，免装客户端直接按类型读写 `INTEGER`（64 位安全）、`REAL`、`TEXT`、`NULL`、`BLOB`；支持**多条件筛选排序、SQL 查询与执行、导入 CSV 建表/追加、新建/修改/删除表结构与索引**，全库原子事务与一步撤销 |
 | **4. Excel 编辑器** | `.xlsx`（在位编辑）/ `.xls`（只读预览） | [打开 Excel ↗](https://xjyeditor.com/app/excel) | [`ExcelEditor.html`](./ExcelEditor.html) | **外科手术式在位修改**：只更新你改动过的单元格，原工作簿中的样式、图表、公式与其他工作表原封不动 |
+| **5. 数据清洗工作台** | `.csv` / `.xlsx` / `.json` | [打开数据清洗 ↗](https://xjyeditor.com/app/cleaner) | [`DataCleaner.html`](./DataCleaner.html) | 可视化串联去重、空值填充、Excel 合并单元格向下填充（Fill Down）、清除不可见字符、全角转半角、JSON 嵌套拍平；清洗后一键跳转 [FindChanged.com](https://findchanged.com/zh/) 对比前后差异；支持导出可复用 Pipeline JSON 并接入 [Pro 云端 REST API](https://xjyeditor.com/zh/pricing/)（统计异常值、类型不符检测、值范围校验、PII 脱敏） |
 
 ### 🎨 为什么选择 XJY Editor？
 
@@ -50,7 +53,7 @@
 
 - **下载页面**：[https://xjyeditor.com/zh/windows/](https://xjyeditor.com/zh/windows/)（或直接下载本仓库中的 [`XJYEditorHelper.exe`](./XJYEditorHelper.exe)）
 - **当前版本**：`0.4.1`（大小：`6.7 MB`）
-- **SHA-256**：`29c5c7e15533ed166226da730b15791f6a13dd0d04a923a0c489b52a799b7462`
+- **SHA-256**：`ab1ab61ff562d4306d451077d566a13fa911a5a3084d46fa0538175d3ab2d50d`
 
 ---
 
@@ -68,7 +71,8 @@
   - **SQLite**: In-browser WebAssembly SQLite engine with 64-bit integer safety, multi-condition filtering & sorting, SQL query/execution tab, CSV import, visual table/index schema editing, atomic transactions, foreign keys and triggers.
   - **Excel (`.xlsx`)**: Surgical in-place cell updates that leave existing styles, charts, formulas and untouched sheets intact.
 - **Preserves Original Encoding & Line Endings**: Supports UTF-8, UTF-8 with BOM, UTF-16LE/BE and GBK/GB18030 with CRLF/LF preservation.
-- **Single-File Offline HTML Builds**: Download [`XJYEditor.html`](./XJYEditor.html), [`CSVEditor.html`](./CSVEditor.html), [`SQLiteEditor.html`](./SQLiteEditor.html), [`ExcelEditor.html`](./ExcelEditor.html) and [`XJYHelp.html`](./XJYHelp.html) directly from this repository to use on air-gapped or intranet machines without internet access.
+- **Visual Data Cleaner & REST API**: Build reusable cleaning pipelines for CSV, Excel (`.xlsx`) and JSON (deduplication, Fill Down for merged cells, invisible character cleanup, JSON flattening) locally in [`DataCleaner.html`](./DataCleaner.html) or [online](https://xjyeditor.com/app/cleaner), inspect before/after diffs in [FindChanged.com](https://findchanged.com/en/), or upgrade to [Pro & REST API](https://xjyeditor.com/en/pricing/) for statistical outlier detection (Z-score / IQR / MAD), data type mismatch quarantine, value range validation, PII masking and large-file programmatic execution.
+- **Single-File Offline HTML Builds**: Download [`XJYEditor.html`](./XJYEditor.html), [`CSVEditor.html`](./CSVEditor.html), [`SQLiteEditor.html`](./SQLiteEditor.html), [`ExcelEditor.html`](./ExcelEditor.html), [`DataCleaner.html`](./DataCleaner.html) and [`XJYHelp.html`](./XJYHelp.html) directly from this repository to use on air-gapped or intranet machines without internet access.
 - **Windows Right-Click Helper**: Right-click any supported file in Windows File Explorer to open it and press `Ctrl+S` to save straight back to disk ([Download details](https://xjyeditor.com/en/windows/)).
 
 ---

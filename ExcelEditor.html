@@ -732,6 +732,16 @@ footer .type-legend [data-swatch] {
   font-size: 10px;
   line-height: 1.3;
 }
+header .language-picker {
+  height: 26px;
+  padding: 2px 6px;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
 </style>
     <style>.dbworkspace {
   display: flex;
@@ -1334,15 +1344,172 @@ th .sortbtn[data-active='true'] {
   min-width: 140px;
 }
 </style>
+    <style>.xjy-fb-dialog {
+  width: min(500px, calc(100vw - 28px));
+  border: 1px solid #cddad4;
+  border-radius: 12px;
+  padding: 0;
+  color: #213b37;
+  background: #ffffff;
+  box-shadow: 0 18px 48px rgba(17, 45, 39, 0.22);
+  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  font-size: 14px;
+}
+
+.xjy-fb-dialog::backdrop {
+  background: rgba(16, 36, 32, 0.42);
+}
+
+.xjy-fb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e1ebe6;
+  background: #f8fbfa;
+  border-radius: 12px 12px 0 0;
+}
+
+.xjy-fb-head h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.xjy-fb-close {
+  border: none;
+  background: transparent;
+  color: #5f756e;
+  font-size: 20px;
+  line-height: 1;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.xjy-fb-close:hover {
+  background: #e6f2ee;
+  color: #16332e;
+}
+
+.xjy-fb-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.xjy-fb-note {
+  margin: 0;
+  font-size: 12px;
+  color: #526a63;
+  line-height: 1.5;
+}
+
+.xjy-fb-label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.xjy-fb-textarea {
+  width: 100%;
+  min-height: 112px;
+  resize: vertical;
+  padding: 9px 10px;
+  border: 1px solid #c5d4cd;
+  border-radius: 8px;
+  font: inherit;
+  color: #213b37;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.xjy-fb-textarea:focus {
+  outline: 2px solid #236b59;
+  outline-offset: 1px;
+}
+
+.xjy-fb-file {
+  font-size: 12px;
+  color: #526a63;
+}
+
+.xjy-fb-status {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.xjy-fb-status.ok {
+  background: #e6f2ee;
+  color: #164e3f;
+  border: 1px solid #b7d7cc;
+}
+
+.xjy-fb-status.err {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.xjy-fb-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid #e1ebe6;
+  background: #fafcfb;
+  border-radius: 0 0 12px 12px;
+}
+
+.xjy-fb-btn {
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 7px;
+  border: 1px solid #c5d4cd;
+  background: #ffffff;
+  color: #213b37;
+  cursor: pointer;
+}
+
+.xjy-fb-btn:hover:not(:disabled) {
+  background: #eef4f1;
+}
+
+.xjy-fb-btn.primary {
+  background: #236b59;
+  border-color: #236b59;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.xjy-fb-btn.primary:hover:not(:disabled) {
+  background: #195143;
+}
+
+.xjy-fb-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+</style>
   </head>
   <body>
     <header>
       <div class="brand">
-        <span class="mark">▦</span><strong>Excel 编辑器</strong><span class="badge">预览版</span>
+        <span class="mark">▦</span><strong>Excel 编辑器</strong>
       </div>
       <span class="local"
-        >● 工作簿只在本机处理 <a id="csvlink" href="csv.html">CSV ↗</a
+        >● 工作簿只在本机处理 <a id="cleanerlink" href="cleaner.html">数据清洗 ↗</a
+        ><a id="csvlink" href="csv.html">CSV ↗</a
         ><a id="sqlitelink" href="sqlite.html">SQLite ↗</a
+        ><a id="feedbacklink" href="#feedback" data-open-feedback>反馈</a
         ><a id="helplink" data-help="excel" href="help.html#excel" target="_blank" rel="noopener">帮助</a></span
       >
     </header>
@@ -1432,6 +1599,526 @@ th .sortbtn[data-active='true'] {
         </div>
       </form>
     </dialog>
+    <script>/* Bilingual UI (zh-CN / en) for companion editors: CSV, SQLite, Excel, and Data Cleaner.
+ * Never translates user data cells inside #grid table, #tableContainer table, #sourceeditor, #schema, or #sqlresult. */
+(function (global) {
+  'use strict';
+  const STORAGE_KEY = 'xjy-language-v1';
+
+  const EXACT = {
+    // Shared header & footer
+    'CSV 编辑器': 'CSV Editor',
+    'SQLite 编辑器': 'SQLite Editor',
+    'Excel 编辑器': 'Excel Editor',
+    数据清洗工作台: 'Data Cleaner Workbench',
+    'CSV 编辑器 · XJY Editor': 'CSV Editor · XJY Editor',
+    'SQLite 编辑器 · XJY Editor': 'SQLite Editor · XJY Editor',
+    'Excel 编辑器 · XJY Editor': 'Excel Editor · XJY Editor',
+    '数据清洗工作台 · XJY Editor': 'Data Cleaner Workbench · XJY Editor',
+    '● 文件只在本机处理': '● Files stay on your device',
+    '● 数据库只在本机处理': '● Databases stay on your device',
+    '● 工作簿只在本机处理': '● Workbooks stay on your device',
+    '● 免费基础规则在本地处理': '● Free rules run locally in browser',
+    '数据清洗 ↗': 'Data Cleaner ↗',
+    'SQLite 编辑器 ↗': 'SQLite Editor ↗',
+    'CSV 编辑器 ↗': 'CSV Editor ↗',
+    'Excel 编辑器 ↗': 'Excel Editor ↗',
+    'CSV ↗': 'CSV ↗',
+    'SQLite ↗': 'SQLite ↗',
+    'XJY 编辑器': 'XJY Editor',
+    反馈: 'Feedback',
+    帮助: 'Help',
+    撤销: 'Undo',
+    重做: 'Redo',
+    保存: 'Save',
+    取消: 'Cancel',
+    确定: 'OK',
+    关闭: 'Close',
+    就绪: 'Ready',
+    '转换并导出…': 'Convert and export…',
+    '辅助编辑…': 'Assisted editing…',
+    '# 索引': '# Index',
+    文本: 'Text',
+    数值: 'Number',
+    布尔: 'Boolean',
+    日期: 'Date',
+    空值: 'Empty',
+    空白: 'Blank',
+    二进制: 'BLOB',
+    公式: 'Formula',
+    数据类型底色图例: 'Data type color legend',
+    表格: 'Table',
+    源码: 'Source',
+    筛选: 'Filter',
+    清除: 'Clear',
+    清除筛选: 'Clear filter',
+    上一页: 'Previous',
+    下一页: 'Next',
+
+    // CSV Editor
+    '打开 CSV': 'Open CSV',
+    打开示例: 'Load sample',
+    解析设置: 'Parse settings',
+    复制选中内容: 'Copy selection',
+    剪切: 'Cut',
+    '导出 CSV…': 'Export CSV…',
+    '打开文件，改好几处。': 'Open a CSV file and edit in place.',
+    '拖入 CSV 或打开示例。前导零、长数字、日期和空格均按原文保留。':
+      'Drop a CSV or load the sample. Leading zeros, long IDs, dates and spaces stay intact.',
+    查找: 'Find',
+    输入要查找的文本: 'Text to find…',
+    上一个匹配: 'Previous match',
+    下一个匹配: 'Next match',
+    '替换…': 'Replace…',
+    筛选列: 'Filter column',
+    '包含文本…': 'Contains text…',
+    筛选内容: 'Filter text',
+    插入行: 'Insert row',
+    删除选中行: 'Delete selected rows',
+    插入列: 'Insert column',
+    删除选中列: 'Delete selected columns',
+    修改列名: 'Rename column',
+    清空选中内容: 'Clear selection',
+    应用并返回表格: 'Apply & return to table',
+    放弃源码修改: 'Discard source edits',
+    'Ctrl+D 多选相同文本 · Alt+点击添加光标': 'Ctrl+D select next match · Alt+Click add cursor',
+    '从一份 CSV 开始': 'Start with a CSV file',
+    '把文件拖到这里，或点击上方“打开 CSV”。': 'Drop a file here, or click “Open CSV” above.',
+    '支持逗号、分号和制表符 · 无需上传': 'Supports comma, semicolon & tab delimiters · No upload',
+    '拖动框选 · Ctrl 多选 · Shift 扩选 · 双击编辑':
+      'Drag to select · Ctrl multi-select · Shift range · Double-click to edit',
+    'CSV 数据表': 'CSV data table',
+
+    // SQLite Editor
+    打开数据库: 'Open database',
+    '导入 CSV…': 'Import CSV…',
+    '导出数据库…': 'Export database…',
+    表与视图: 'Tables & views',
+    '＋ 新建表': '+ New table',
+    新建数据表: 'Create new table',
+    修改表: 'Edit table',
+    修改当前表结构: 'Edit current table schema',
+    删除表: 'Drop table',
+    删除当前表: 'Drop current table',
+    '＋ 索引': '+ Index',
+    新建索引: 'Create new index',
+    打开数据库后选择数据表: 'Open a database to select a table',
+    '打开数据库，修改一条记录。': 'Open a SQLite database and edit records.',
+    '保留字段类型、主键、索引和触发器。修改完成后下载新文件。':
+      'Preserves column types, primary keys, indexes and triggers.',
+    数据: 'Data',
+    结构: 'Schema',
+    '＋ 条件': '+ Condition',
+    '再添加一个条件（多个条件同时满足）': 'Add another filter condition (AND)',
+    '添加记录…': 'Insert row…',
+    '删除选中记录…': 'Delete selected rows…',
+    '选择一份本地 SQLite 文件': 'Choose a local SQLite file',
+    '也可以拖入文件，或打开示例体验。': 'Drop a .sqlite / .db file here, or load the sample.',
+    'SQLite 数据表': 'SQLite data table',
+    '每页 100 条': '100 rows per page',
+    '新建表…': 'New table…',
+    '修改当前表…': 'Edit table…',
+    '删除当前表…': 'Drop table…',
+    '新建索引…': 'New index…',
+    '表、视图、索引与触发器；普通索引与触发器可直接删除':
+      'Tables, views, indexes & triggers; user indexes and triggers can be dropped directly',
+    执行全部: 'Run all',
+    执行当前语句: 'Run current statement',
+    'Shift+Enter：执行光标所在的语句': 'Shift+Enter: run statement at cursor',
+    执行选中: 'Run selection',
+    只执行选中的文字: 'Run selected SQL text only',
+    清空: 'Clear',
+    '查询不产生修改；含修改的整批作为一步，可撤销':
+      'SELECT queries do not mutate; write batches execute atomically with undo',
+    '输入 SQL，例如 SELECT * FROM 表名 WHERE …;\n多条语句用分号分隔。Ctrl+Enter 执行全部，Shift+Enter 执行光标所在语句。':
+      'Enter SQL, e.g. SELECT * FROM table_name WHERE …;\nSeparate statements with semicolons. Ctrl+Enter runs all, Shift+Enter runs statement at cursor.',
+    结果: 'Result',
+    尚未执行: 'Not run yet',
+    '数据库已变化，结果可能过期': 'Database changed; result may be stale',
+    复制结果: 'Copy result',
+    '导出结果 CSV…': 'Export result CSV…',
+    '双击编辑 · Ctrl 多选 · Shift 扩选 · 勾选多行删除':
+      'Double-click to edit · Ctrl multi-select · Shift range · Tick rows to delete',
+    包含: 'contains',
+    不包含: 'does not contain',
+    等于: 'equals',
+    不等于: 'not equal',
+    开头是: 'starts with',
+    结尾是: 'ends with',
+    为空: 'is NULL / empty',
+    不为空: 'is not NULL / empty',
+    '为 NULL': 'is NULL',
+    '不为 NULL': 'is not NULL',
+    为空文本: 'is empty text',
+    数据表: 'Table',
+    视图: 'View',
+    文件与编辑: 'File and editing',
+    'CSV 源码': 'CSV source',
+    筛选方式: 'Filter operator',
+    数据库对象列表: 'Database objects',
+    数据库结构: 'Database schema',
+    'SQL 语句': 'SQL statements',
+    'SQL 查询结果': 'SQL query result',
+    执行消息: 'Execution messages',
+    单元格地址: 'Cell address',
+    筛选列字母: 'Filter column letter',
+    筛选文本: 'Filter text',
+    数据清洗操作栏: 'Data cleaning toolbar',
+    '选择 Excel 工作表': 'Select Excel worksheet',
+    '在 FindChanged.com 中直观查看清洗前后的数据差异':
+      'Compare before and after cleaning in FindChanged.com',
+    清洗规则流水线: 'Cleaning rule pipeline',
+    选择要添加的清洗规则: 'Select a cleaning rule to add',
+    数据预览与清洗结果: 'Data preview and cleaned result',
+
+    // Excel Editor
+    打开工作簿: 'Open workbook',
+    清空内容: 'Clear cells',
+    '导出工作簿…': 'Export workbook…',
+    工作表: 'Worksheets',
+    打开工作簿后选择工作表: 'Open a workbook to select a sheet',
+    '打开工作簿，修改几处。': 'Open an Excel workbook and edit cells in place.',
+    '支持 .xlsx 在位编辑，保留原工作簿部件；.xls 只读预览。':
+      'In-place .xlsx editing preserves styles, charts & sheets; read-only .xls preview.',
+    定位: 'Go to',
+    前往: 'Go',
+    首行为表头: 'First row as header',
+    显示隐藏行列: 'Show hidden rows/cols',
+    '公式由Excel重算。浏览器展示缓存或公式文本，不计算公式结果。':
+      'Formulas are recalculated by Excel on next open. Browser shows cached values or formula text.',
+    从一份本地工作簿开始: 'Start with a local Excel workbook',
+    '拖入 .xlsx，或点击“打开示例”。': 'Drop an .xlsx file here, or click “Load sample”.',
+    'Excel 工作表': 'Excel worksheet',
+    双击单元格直接编辑: 'Double-click any cell to edit',
+    前30列: 'Prev 30 cols',
+    后30列: 'Next 30 cols',
+    '工作表 XML 源码': 'Worksheet XML source',
+    '只修改现有单元格值及普通公式，保留其他结构。':
+      'Modify existing cell values and formulas while keeping other XML structures intact.',
+    应用源码: 'Apply source',
+    'Ctrl 多选 · Shift 扩选 · 双击编辑 · Enter 提交 · Esc 取消':
+      'Ctrl multi-select · Shift range · Double-click to edit · Enter commit · Esc cancel',
+
+    // Data Cleaner Workbench
+    打开文件: 'Open file',
+    载入示例数据: 'Load sample data',
+    '导入配方 JSON': 'Import recipe JSON',
+    '导出配方 JSON': 'Export recipe JSON',
+    'Pro / API 设置': 'Pro / API settings',
+    '▶ 运行清洗': '▶ Run cleaning',
+    '在 FindChanged.com 对比清洗前后 ↗': 'Compare before/after in FindChanged.com ↗',
+    导出清洗结果: 'Export cleaned data',
+    导出异常脏行: 'Export quarantined rows',
+    清洗步骤流水线: 'Cleaning pipeline',
+    '免费版 · ≤8步 / ≤5000行': 'Free tier · ≤8 steps / ≤5,000 rows',
+    '＋ 添加': '+ Add',
+    '还没有清洗步骤。': 'No cleaning steps yet.',
+    '从上方选择规则添加，或点击「载入示例数据」快速体验。':
+      'Choose a rule above to add a step, or click “Load sample data” to try it out.',
+    '还没有清洗步骤。从上方选择规则添加，或点击「载入示例数据」快速体验。':
+      'No cleaning steps yet. Choose a rule above to add a step, or click “Load sample data” to try it out.',
+    清空步骤: 'Clear steps',
+    输入行数: 'Input rows',
+    输出行数: 'Output rows',
+    修改单元格: 'Modified cells',
+    删除行数: 'Dropped rows',
+    分流异常行: 'Quarantined rows',
+    原始数据: 'Original data',
+    清洗结果: 'Cleaned result',
+    '报告 & 配方 JSON': 'Report & Recipe JSON',
+    '拖入 CSV / Excel (.xlsx) / JSON 文件': 'Drop a CSV / Excel (.xlsx) / JSON file here',
+    '先用免费规则本地可视化调试清洗步骤，清洗完成后可一键跳转到 FindChanged.com 对比前后差异。':
+      'Build and test cleaning steps visually in your browser, then compare before/after in FindChanged.com.',
+    '免费体验支持 5,000 行 / 8 步以内；Pro 规则与云端 API 支持大文件、统计异常值与类型不符检测。':
+      'Free tier supports up to 5,000 rows / 8 steps locally; Pro rules & API unlock large files, outlier detection and PII masking.',
+    '就绪 · 请打开文件或载入示例': 'Ready · Open a file or load sample data',
+    未加载文件: 'No file loaded',
+    'Pro / 云端 API 设置': 'Pro / Cloud API Settings',
+    '不填 API Key 时默认使用免费本地模式（≤5,000 行 / ≤8 步，数据不出浏览器）。填入 Pro API Key 后将解锁统计异常值检测、类型不符分析、PII 脱敏、模糊去重与大文件云端 API 执行（纯内存处理不落盘）。':
+      'Without an API Key, the workbench runs in free local browser mode (≤5,000 rows / ≤8 steps). Enter a Pro API Key to unlock statistical outlier detection, type mismatch analysis, PII masking, fuzzy deduplication and large-file in-memory cloud execution.',
+    'API 地址': 'API Endpoint',
+    '粘贴你的 Pro API Key': 'Paste your Pro API Key',
+    '购买 Pro 额度包 ↗': 'Buy Pro quota pack ↗',
+    切回免费本地版: 'Switch to free local mode',
+    验证并连接: 'Verify & connect',
+    // Data Cleaner Rule Categories & Labels
+    '1. 文本与字符清洗': '1. Text & Whitespace Cleaning',
+    '2. 空值与行过滤': '2. Missing Values & Row Filtering',
+    '3. 去重': '3. Deduplication',
+    '4. 列结构操作': '4. Column Structure Operations',
+    '5. JSON 专项': '5. JSON Operations',
+    '6. 格式与类型标准化': '6. Format & Type Normalization',
+    '7. 校验与脱敏 (Pro)': '7. Validation & PII Masking (Pro)',
+    '8. 统计与类型分析 (Pro)': '8. Outliers & Type Analysis (Pro)',
+    去首尾空白: 'Trim leading/trailing whitespace',
+    合并连续空白: 'Collapse consecutive spaces',
+    '清除不可见/控制字符': 'Remove invisible/control characters',
+    全角转半角: 'Full-width to half-width',
+    大小写转换: 'Case transformation',
+    查找与替换: 'Find & replace',
+    正则提取: 'Regex extract',
+    '[PRO] 正则提取': '[PRO] Regex extract',
+    正则替换: 'Regex replace',
+    '[PRO] 正则替换': '[PRO] Regex replace',
+    删除空行: 'Drop empty rows',
+    空值填充: 'Fill missing values',
+    '向下填充 / 合并单元格补齐 (Fill Down)': 'Fill down empty/merged cells (Fill Down)',
+    '条件筛选/剔除行': 'Filter / drop rows by condition',
+    精确去重: 'Exact deduplication',
+    规范化去重: 'Normalized deduplication',
+    '[PRO] 规范化去重': '[PRO] Normalized deduplication',
+    模糊相似去重: 'Fuzzy deduplication',
+    '[PRO] 模糊相似去重': '[PRO] Fuzzy deduplication',
+    删除列: 'Drop columns',
+    保留列: 'Keep columns',
+    重命名列: 'Rename columns',
+    调整列顺序: 'Reorder columns',
+    拆分列: 'Split column',
+    合并列: 'Merge columns',
+    'JSON 嵌套拍平': 'Flatten nested JSON',
+    'JSON 数组展开 (Unwind)': 'Unwind JSON array (Unwind)',
+    '[PRO] JSON 数组展开 (Unwind)': '[PRO] Unwind JSON array (Unwind)',
+    '数字/金额清洗': 'Clean numbers & currency',
+    日期时间标准化: 'Normalize dates & timestamps',
+    '[PRO] 日期时间标准化': '[PRO] Normalize dates & timestamps',
+    '布尔/枚举值统一': 'Normalize booleans & enums',
+    '[PRO] 布尔/枚举值统一': '[PRO] Normalize booleans & enums',
+    '敏感信息脱敏 (PII)': 'Mask sensitive data (PII)',
+    '[PRO] 敏感信息脱敏 (PII)': '[PRO] Mask sensitive data (PII)',
+    格式校验与脏数据分流: 'Validate format & quarantine dirty rows',
+    '[PRO] 格式校验与脏数据分流': '[PRO] Validate format & quarantine dirty rows',
+    '统计异常值检测 (Z-score/IQR/MAD)': 'Detect statistical outliers (Z-score/IQR/MAD)',
+    '[PRO] 统计异常值检测 (Z-score/IQR/MAD)': '[PRO] Detect statistical outliers (Z-score/IQR/MAD)',
+    数据类型分析与类型不符检测: 'Detect data type mismatches',
+    '[PRO] 数据类型分析与类型不符检测': '[PRO] Detect data type mismatches',
+    '值范围校验 / 超限分流': 'Validate value range & quarantine',
+    '[PRO] 值范围校验 / 超限分流': '[PRO] Validate value range & quarantine',
+    作用列: 'Target column',
+    '全部列 (*)': 'All columns (*)',
+    '（请先载入数据）': '(Load data first)',
+    转换方式: 'Case mode',
+    '全部小写 (abc)': 'lowercase (abc)',
+    '全部大写 (ABC)': 'UPPERCASE (ABC)',
+    '首字母大写 (Abc)': 'Title Case (Abc)',
+    查找内容: 'Find text',
+    替换为: 'Replace with',
+    填充默认值: 'Default fill value',
+    重复保留策略: 'Keep strategy',
+    保留首次出现: 'Keep first occurrence',
+    保留最后一次出现: 'Keep last occurrence',
+    条件: 'Condition',
+    比较值: 'Compare value',
+    分隔符: 'Delimiter',
+    '目标列名（逗号分隔）': 'New column names (comma-separated)',
+    '参与合并的列（逗号分隔）': 'Columns to merge (comma-separated)',
+    连接符: 'Separator',
+    新列名: 'New column name',
+    启用: 'Enable',
+    删除步骤: 'Remove step',
+  };
+
+  const PATTERNS = [
+    [/^已打开 (.+)$/, (_, f) => `Opened ${f}`],
+    [/^已载入 (.+)$/, (_, f) => `Loaded ${f}`],
+    [
+      /^显示 (\d+) \/ 共 (\d+) 行 · (\d+) 列 · ([^·]+) · 没有未保存修改$/,
+      (_, a, b, c, enc) => `Showing ${a} / ${b} rows · ${c} cols · ${enc.trim()} · Saved`,
+    ],
+    [
+      /^显示 (\d+) \/ 共 (\d+) 行 · (\d+) 列 · ([^·]+) · 有未保存修改$/,
+      (_, a, b, c, enc) => `Showing ${a} / ${b} rows · ${c} cols · ${enc.trim()} · Unsaved changes`,
+    ],
+    [/^([^·]+) · ([^·]+) · 没有未保存修改$/, (_, a, b) => `${a.trim()} · ${b.trim()} · Saved`],
+    [
+      /^([^·]+) · ([^·]+) · 有未保存修改$/,
+      (_, a, b) => `${a.trim()} · ${b.trim()} · Unsaved changes`,
+    ],
+    [
+      /^显示 ([\d–-]+) \/ 筛选 (\d+) \/ 共 (\d+) 条 · 每页 (\d+) 条$/,
+      (_, r, f, t, p) => `Showing ${r} / Filtered ${f} / Total ${t} · ${p} per page`,
+    ],
+    [
+      /^已选 (\d+) 格 · Ctrl 多选 · Shift 扩选 · 双击编辑$/,
+      (_, n) => `Selected ${n} cells · Ctrl multi-select · Shift range · Double-click to edit`,
+    ],
+    [
+      /^已选 (\d+) 行 \/ (\d+) 格 · 双击编辑 · 勾选多行删除$/,
+      (_, r, c) => `Selected ${r} rows / ${c} cells · Double-click to edit · Tick rows to delete`,
+    ],
+    [/^(\d+) \/ (\d+) 步骤$/, (_, a, b) => `${a} / ${b} steps`],
+    [/^(\d+) 步骤 \(Pro 不限\)$/, (_, a) => `${a} steps (Pro unlimited)`],
+    [/^异常脏行 \((\d+)\)$/, (_, n) => `Quarantined (${n})`],
+    [/^(\d+) 行 × (\d+) 列$/, (_, r, c) => `${r} rows × ${c} cols`],
+  ];
+
+  let locale = 'zh-CN';
+  try {
+    const urlLang = new URLSearchParams(location.search).get('lang');
+    if (urlLang === 'en' || urlLang === 'zh-CN') {
+      locale = urlLang;
+      localStorage.setItem(STORAGE_KEY, locale);
+    } else {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved === 'en' || saved === 'zh-CN') locale = saved;
+    }
+  } catch (_) {}
+
+  const origText = new WeakMap();
+  const lastTranslated = new WeakMap();
+  const origAttrs = new WeakMap();
+  let applying = false;
+
+  function translateString(str) {
+    if (!str) return str;
+    const trimmed = str.trim();
+    if (!trimmed) return str;
+    if (Object.hasOwn(EXACT, trimmed)) {
+      return str.replace(trimmed, EXACT[trimmed]);
+    }
+    for (const [re, fn] of PATTERNS) {
+      const m = trimmed.match(re);
+      if (m) return str.replace(trimmed, fn(...m));
+    }
+    return str;
+  }
+
+  function isDataContainer(node) {
+    const el = node.nodeType === 1 ? node : node.parentElement;
+    if (!el) return false;
+    if (el.closest('.empty, .drop-empty, .pipeline-empty')) return false;
+    return !!el.closest(
+      '#grid table, #tableContainer table, #sourceeditor, #schema, #sqlresult table, #openpreview, #reportContainer pre',
+    );
+  }
+
+  function applyNode(node) {
+    if (isDataContainer(node)) return;
+    if (node.nodeType === 3) {
+      const cur = node.nodeValue;
+      if (locale === 'en') {
+        if (!origText.has(node) || cur !== lastTranslated.get(node)) {
+          origText.set(node, cur);
+        }
+        const source = origText.get(node);
+        const next = translateString(source);
+        if (next !== cur) {
+          lastTranslated.set(node, next);
+          node.nodeValue = next;
+        }
+      } else if (origText.has(node)) {
+        const orig = origText.get(node);
+        if (cur === lastTranslated.get(node) && cur !== orig) {
+          node.nodeValue = orig;
+        }
+      }
+      return;
+    }
+    if (node.nodeType !== 1) return;
+    if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE') return;
+    let attrMap = origAttrs.get(node);
+    for (const attr of ['placeholder', 'title', 'aria-label', 'label']) {
+      if (!node.hasAttribute(attr)) continue;
+      const val = node.getAttribute(attr);
+      if (locale === 'en') {
+        if (!attrMap) {
+          attrMap = {};
+          origAttrs.set(node, attrMap);
+        }
+        if (!(attr in attrMap) || val !== attrMap[attr + '_en']) {
+          attrMap[attr] = val;
+        }
+        const next = translateString(attrMap[attr]);
+        attrMap[attr + '_en'] = next;
+        if (next !== val) node.setAttribute(attr, next);
+      } else if (attrMap && attr in attrMap) {
+        if (val === attrMap[attr + '_en'] && val !== attrMap[attr]) {
+          node.setAttribute(attr, attrMap[attr]);
+        }
+      }
+    }
+    for (const child of node.childNodes) applyNode(child);
+  }
+
+  let origTitle = document.title;
+  let lastTitleEn = '';
+  function applyAll() {
+    if (applying) return;
+    applying = true;
+    try {
+      document.documentElement.lang = locale;
+      if (locale === 'en') {
+        if (document.title !== lastTitleEn) origTitle = document.title;
+        lastTitleEn = translateString(origTitle);
+        document.title = lastTitleEn;
+      } else if (document.title === lastTitleEn && origTitle) {
+        document.title = origTitle;
+      }
+      if (document.body) applyNode(document.body);
+      for (const picker of document.querySelectorAll('[data-language-picker]')) {
+        picker.value = locale;
+      }
+    } finally {
+      applying = false;
+    }
+  }
+
+  function setLocale(next) {
+    if (next !== 'zh-CN' && next !== 'en') return;
+    locale = next;
+    try {
+      localStorage.setItem(STORAGE_KEY, next);
+    } catch (_) {}
+    applyAll();
+    document.dispatchEvent(new CustomEvent('xjy-language-change', { detail: { locale } }));
+  }
+
+  if (!global.XJYI18n) {
+    global.XJYI18n = {
+      t: (_id, source) => (locale === 'en' ? translateString(source) : source),
+      message: (text) => (locale === 'en' ? translateString(text) : text),
+      setLocale,
+      get locale() {
+        return locale;
+      },
+      get missing() {
+        return [];
+      },
+    };
+  }
+
+  function mount() {
+    const host = document.querySelector('header .local, header .header-right');
+    if (host && !host.querySelector('[data-language-picker]')) {
+      const select = document.createElement('select');
+      select.dataset.languagePicker = '';
+      select.className = 'language-picker';
+      select.setAttribute('aria-label', 'Language');
+      select.innerHTML =
+        '<option value="zh-CN">简体中文</option><option value="en">English</option>';
+      select.value = locale;
+      select.onchange = () => setLocale(select.value);
+      host.append(select);
+    }
+    applyAll();
+    if (document.body) {
+      const observer = new MutationObserver(() => {
+        if (!applying) applyAll();
+      });
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mount);
+  } else {
+    mount();
+  }
+})(globalThis);
+</script>
     <script>var ExcelVendor=(()=>{var V0=Object.defineProperty;var Vl=Object.getOwnPropertyDescriptor;var Gl=Object.getOwnPropertyNames;var $l=Object.prototype.hasOwnProperty;var bs=(e,r)=>{for(var t in r)V0(e,t,{get:r[t],enumerable:!0})},Kl=(e,r,t,a)=>{if(r&&typeof r=="object"||typeof r=="function")for(let n of Gl(r))!$l.call(e,n)&&n!==t&&V0(e,n,{get:()=>r[n],enumerable:!(a=Vl(r,n))||a.enumerable});return e};var jl=e=>Kl(V0({},"__esModule",{value:!0}),e);var O4={};bs(O4,{XLSX:()=>ds,strFromU8:()=>As,strToU8:()=>U0,unzipSync:()=>bl,zipSync:()=>Dl});var ds={};bs(ds,{CFB:()=>Ce,SSF:()=>Ii,default:()=>u4,parse_xlscfb:()=>B0,parse_zip:()=>os,read:()=>ia,readFile:()=>Ti,readFileSync:()=>Ti,set_cptable:()=>Gf,set_fs:()=>ec,stream:()=>vl,utils:()=>dl,version:()=>l4,write:()=>$n,writeFile:()=>yi,writeFileAsync:()=>cl,writeFileSync:()=>yi,writeFileXLSX:()=>fl,writeXLSX:()=>M0});var wn={};wn.version="0.20.3";var Fr=1200,Ta=1252,Ue,Yl=[874,932,936,949,950,1250,1251,1252,1253,1254,1255,1256,1257,1258,1e4],Si={0:1252,1:65001,2:65001,77:1e4,128:932,129:949,130:1361,134:936,136:950,161:1253,162:1254,163:1258,177:1255,178:1256,186:1257,204:1251,222:874,238:1250,255:1252,69:6969},F0=function(e){Yl.indexOf(e)!=-1&&(Ta=Si[0]=e)};function Zl(){F0(1252)}var gt=function(e){Fr=e,F0(e)};function S0(){gt(1200),Zl()}function x0(e){for(var r=[],t=0,a=e.length;t<a;++t)r[t]=e.charCodeAt(t);return r}function zf(e){for(var r=[],t=0;t<e.length>>1;++t)r[t]=String.fromCharCode(e.charCodeAt(2*t)+(e.charCodeAt(2*t+1)<<8));return r.join("")}function Jl(e){for(var r=[],t=0;t<e.length>>1;++t)r[t]=String.fromCharCode(e[2*t]+(e[2*t+1]<<8));return r.join("")}function Vf(e){for(var r=[],t=0;t<e.length>>1;++t)r[t]=String.fromCharCode(e.charCodeAt(2*t+1)+(e.charCodeAt(2*t)<<8));return r.join("")}var Wa=function(e){var r=e.charCodeAt(0),t=e.charCodeAt(1);return r==255&&t==254?zf(e.slice(2)):r==254&&t==255?Vf(e.slice(2)):r==65279?e.slice(1):e},fn=function(r){return String.fromCharCode(r)},ui=function(r){return String.fromCharCode(r)};function Gf(e){Ue=e,gt=function(r){Fr=r,F0(r)},Wa=function(r){return r.charCodeAt(0)===255&&r.charCodeAt(1)===254?Ue.utils.decode(1200,x0(r.slice(2))):r},fn=function(t){return Fr===1200?String.fromCharCode(t):Ue.utils.decode(Fr,[t&255,t>>8])[0]},ui=function(t){return Ue.utils.decode(Ta,[t])[0]},wc()}var vr=null,Is=!0,Gr="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";function d0(e){for(var r="",t=0,a=0,n=0,i=0,s=0,f=0,c=0,o=0;o<e.length;)t=e.charCodeAt(o++),i=t>>2,a=e.charCodeAt(o++),s=(t&3)<<4|a>>4,n=e.charCodeAt(o++),f=(a&15)<<2|n>>6,c=n&63,isNaN(a)?f=c=64:isNaN(n)&&(c=64),r+=Gr.charAt(i)+Gr.charAt(s)+Gr.charAt(f)+Gr.charAt(c);return r}function ql(e){for(var r="",t=0,a=0,n=0,i=0,s=0,f=0,c=0,o=0;o<e.length;)t=e.charCodeAt(o++),t>255&&(t=95),i=t>>2,a=e.charCodeAt(o++),a>255&&(a=95),s=(t&3)<<4|a>>4,n=e.charCodeAt(o++),n>255&&(n=95),f=(a&15)<<2|n>>6,c=n&63,isNaN(a)?f=c=64:isNaN(n)&&(c=64),r+=Gr.charAt(i)+Gr.charAt(s)+Gr.charAt(f)+Gr.charAt(c);return r}function Ql(e){for(var r="",t=0,a=0,n=0,i=0,s=0,f=0,c=0,o=0;o<e.length;)t=e[o++],i=t>>2,a=e[o++],s=(t&3)<<4|a>>4,n=e[o++],f=(a&15)<<2|n>>6,c=n&63,isNaN(a)?f=c=64:isNaN(n)&&(c=64),r+=Gr.charAt(i)+Gr.charAt(s)+Gr.charAt(f)+Gr.charAt(c);return r}function ot(e){var r="",t=0,a=0,n=0,i=0,s=0,f=0,c=0;if(e.slice(0,5)=="data:"){var o=e.slice(0,1024).indexOf(";base64,");o>-1&&(e=e.slice(o+8))}e=e.replace(/[^\w\+\/\=]/g,"");for(var o=0;o<e.length;)i=Gr.indexOf(e.charAt(o++)),s=Gr.indexOf(e.charAt(o++)),t=i<<2|s>>4,r+=String.fromCharCode(t),f=Gr.indexOf(e.charAt(o++)),a=(s&15)<<4|f>>2,f!==64&&(r+=String.fromCharCode(a)),c=Gr.indexOf(e.charAt(o++)),n=(f&3)<<6|c,c!==64&&(r+=String.fromCharCode(n));return r}var He=(function(){return typeof Buffer<"u"&&typeof process<"u"&&typeof process.versions<"u"&&!!process.versions.node})(),Ut=(function(){if(typeof Buffer<"u"){var e=!Buffer.from;if(!e)try{Buffer.from("foo","utf8")}catch{e=!0}return e?function(r,t){return t?new Buffer(r,t):new Buffer(r)}:Buffer.from.bind(Buffer)}return function(){}})(),kn=(function(){if(typeof Buffer>"u")return!1;var e=Ut([65,0]);if(!e)return!1;var r=e.toString("utf16le");return r.length==1})();function sa(e){return He?Buffer.alloc?Buffer.alloc(e):new Buffer(e):typeof Uint8Array<"u"?new Uint8Array(e):new Array(e)}function Os(e){return He?Buffer.allocUnsafe?Buffer.allocUnsafe(e):new Buffer(e):typeof Uint8Array<"u"?new Uint8Array(e):new Array(e)}var Qr=function(r){return He?Ut(r,"binary"):r.split("").map(function(t){return t.charCodeAt(0)&255})};function Pn(e){if(typeof ArrayBuffer>"u")return Qr(e);for(var r=new ArrayBuffer(e.length),t=new Uint8Array(r),a=0;a!=e.length;++a)t[a]=e.charCodeAt(a)&255;return r}function Lt(e){if(Array.isArray(e))return e.map(function(a){return String.fromCharCode(a)}).join("");for(var r=[],t=0;t<e.length;++t)r[t]=String.fromCharCode(e[t]);return r.join("")}function eu(e){if(typeof Uint8Array>"u")throw new Error("Unsupported");return new Uint8Array(e)}function Ai(e){if(typeof ArrayBuffer>"u")throw new Error("Unsupported");if(e instanceof ArrayBuffer)return Ai(new Uint8Array(e));for(var r=new Array(e.length),t=0;t<e.length;++t)r[t]=e[t];return r}var dr=He?function(e){return Buffer.concat(e.map(function(r){return Buffer.isBuffer(r)?r:Ut(r)}))}:function(e){if(typeof Uint8Array<"u"){var r=0,t=0;for(r=0;r<e.length;++r)t+=e[r].length;var a=new Uint8Array(t),n=0;for(r=0,t=0;r<e.length;t+=n,++r)n=e[r].length,e[r]instanceof Uint8Array?a.set(e[r],t):typeof e[r]=="string"?a.set(new Uint8Array(Qr(e[r])),t):a.set(new Uint8Array(e[r]),t);return a}return[].concat.apply([],e.map(function(i){return Array.isArray(i)?i:[].slice.call(i)}))};function ru(e){for(var r=[],t=0,a=e.length+250,n=sa(e.length+255),i=0;i<e.length;++i){var s=e.charCodeAt(i);if(s<128)n[t++]=s;else if(s<2048)n[t++]=192|s>>6&31,n[t++]=128|s&63;else if(s>=55296&&s<57344){s=(s&1023)+64;var f=e.charCodeAt(++i)&1023;n[t++]=240|s>>8&7,n[t++]=128|s>>2&63,n[t++]=128|f>>6&15|(s&3)<<4,n[t++]=128|f&63}else n[t++]=224|s>>12&15,n[t++]=128|s>>6&63,n[t++]=128|s&63;t>a&&(r.push(n.slice(0,t)),t=0,n=sa(65535),a=65530)}return r.push(n.slice(0,t)),dr(r)}var rt=/\u0000/g,cn=/[\u0001-\u0006]/g;function Xa(e){for(var r="",t=e.length-1;t>=0;)r+=e.charAt(t--);return r}function yt(e,r){var t=""+e;return t.length>=r?t:Ke("0",r-t.length)+t}function Ci(e,r){var t=""+e;return t.length>=r?t:Ke(" ",r-t.length)+t}function v0(e,r){var t=""+e;return t.length>=r?t:t+Ke(" ",r-t.length)}function tu(e,r){var t=""+Math.round(e);return t.length>=r?t:Ke("0",r-t.length)+t}function au(e,r){var t=""+e;return t.length>=r?t:Ke("0",r-t.length)+t}var Ns=Math.pow(2,32);function Ma(e,r){if(e>Ns||e<-Ns)return tu(e,r);var t=Math.round(e);return au(t,r)}function m0(e,r){return r=r||0,e.length>=7+r&&(e.charCodeAt(r)|32)===103&&(e.charCodeAt(r+1)|32)===101&&(e.charCodeAt(r+2)|32)===110&&(e.charCodeAt(r+3)|32)===101&&(e.charCodeAt(r+4)|32)===114&&(e.charCodeAt(r+5)|32)===97&&(e.charCodeAt(r+6)|32)===108}var Rs=[["Sun","Sunday"],["Mon","Monday"],["Tue","Tuesday"],["Wed","Wednesday"],["Thu","Thursday"],["Fri","Friday"],["Sat","Saturday"]],G0=[["J","Jan","January"],["F","Feb","February"],["M","Mar","March"],["A","Apr","April"],["M","May","May"],["J","Jun","June"],["J","Jul","July"],["A","Aug","August"],["S","Sep","September"],["O","Oct","October"],["N","Nov","November"],["D","Dec","December"]];function nu(e){return e||(e={}),e[0]="General",e[1]="0",e[2]="0.00",e[3]="#,##0",e[4]="#,##0.00",e[9]="0%",e[10]="0.00%",e[11]="0.00E+00",e[12]="# ?/?",e[13]="# ??/??",e[14]="m/d/yy",e[15]="d-mmm-yy",e[16]="d-mmm",e[17]="mmm-yy",e[18]="h:mm AM/PM",e[19]="h:mm:ss AM/PM",e[20]="h:mm",e[21]="h:mm:ss",e[22]="m/d/yy h:mm",e[37]="#,##0 ;(#,##0)",e[38]="#,##0 ;[Red](#,##0)",e[39]="#,##0.00;(#,##0.00)",e[40]="#,##0.00;[Red](#,##0.00)",e[45]="mm:ss",e[46]="[h]:mm:ss",e[47]="mmss.0",e[48]="##0.0E+0",e[49]="@",e[56]='"\u4E0A\u5348/\u4E0B\u5348 "hh"\u6642"mm"\u5206"ss"\u79D2 "',e}var Fe={0:"General",1:"0",2:"0.00",3:"#,##0",4:"#,##0.00",9:"0%",10:"0.00%",11:"0.00E+00",12:"# ?/?",13:"# ??/??",14:"m/d/yy",15:"d-mmm-yy",16:"d-mmm",17:"mmm-yy",18:"h:mm AM/PM",19:"h:mm:ss AM/PM",20:"h:mm",21:"h:mm:ss",22:"m/d/yy h:mm",37:"#,##0 ;(#,##0)",38:"#,##0 ;[Red](#,##0)",39:"#,##0.00;(#,##0.00)",40:"#,##0.00;[Red](#,##0.00)",45:"mm:ss",46:"[h]:mm:ss",47:"mmss.0",48:"##0.0E+0",49:"@",56:'"\u4E0A\u5348/\u4E0B\u5348 "hh"\u6642"mm"\u5206"ss"\u79D2 "'},Ps={5:37,6:38,7:39,8:40,23:0,24:0,25:0,26:0,27:14,28:14,29:14,30:14,31:14,50:14,51:14,52:14,53:14,54:14,55:14,56:14,57:14,58:14,59:1,60:2,61:3,62:4,67:9,68:10,69:12,70:13,71:14,72:14,73:15,74:16,75:17,76:20,77:21,78:22,79:45,80:46,81:47,82:0},iu={5:'"$"#,##0_);\\("$"#,##0\\)',63:'"$"#,##0_);\\("$"#,##0\\)',6:'"$"#,##0_);[Red]\\("$"#,##0\\)',64:'"$"#,##0_);[Red]\\("$"#,##0\\)',7:'"$"#,##0.00_);\\("$"#,##0.00\\)',65:'"$"#,##0.00_);\\("$"#,##0.00\\)',8:'"$"#,##0.00_);[Red]\\("$"#,##0.00\\)',66:'"$"#,##0.00_);[Red]\\("$"#,##0.00\\)',41:'_(* #,##0_);_(* \\(#,##0\\);_(* "-"_);_(@_)',42:'_("$"* #,##0_);_("$"* \\(#,##0\\);_("$"* "-"_);_(@_)',43:'_(* #,##0.00_);_(* \\(#,##0.00\\);_(* "-"??_);_(@_)',44:'_("$"* #,##0.00_);_("$"* \\(#,##0.00\\);_("$"* "-"??_);_(@_)'};function p0(e,r,t){for(var a=e<0?-1:1,n=e*a,i=0,s=1,f=0,c=1,o=0,l=0,x=Math.floor(n);o<r&&(x=Math.floor(n),f=x*s+i,l=x*o+c,!(n-x<5e-8));)n=1/(n-x),i=s,s=f,c=o,o=l;if(l>r&&(o>r?(l=c,f=i):(l=o,f=s)),!t)return[0,a*f,l];var u=Math.floor(a*f/l);return[u,a*f-u*l,l]}function su(e){var r=e.toPrecision(16);if(r.indexOf("e")>-1){var t=r.slice(0,r.indexOf("e"));return t=t.indexOf(".")>-1?t.slice(0,t.slice(0,2)=="0."?17:16):t.slice(0,15)+Ke("0",t.length-15),t+r.slice(r.indexOf("e"))}var a=r.indexOf(".")>-1?r.slice(0,r.slice(0,2)=="0."?17:16):r.slice(0,15)+Ke("0",r.length-15);return Number(a)}function Ot(e,r,t){if(e>2958465||e<0)return null;e=su(e);var a=e|0,n=Math.floor(86400*(e-a)),i=0,s=[],f={D:a,T:n,u:86400*(e-a)-n,y:0,m:0,d:0,H:0,M:0,S:0,q:0};if(Math.abs(f.u)<1e-6&&(f.u=0),r&&r.date1904&&(a+=1462),f.u>.9999&&(f.u=0,++n==86400&&(f.T=n=0,++a,++f.D)),a===60)s=t?[1317,10,29]:[1900,2,29],i=3;else if(a===0)s=t?[1317,8,29]:[1900,1,0],i=6;else{a>60&&--a;var c=new Date(1900,0,1);c.setDate(c.getDate()+a-1),s=[c.getFullYear(),c.getMonth()+1,c.getDate()],i=c.getDay(),a<60&&(i=(i+6)%7),t&&(i=lu(c,s))}return f.y=s[0],f.m=s[1],f.d=s[2],f.S=n%60,n=Math.floor(n/60),f.M=n%60,n=Math.floor(n/60),f.H=n,f.q=i,f}function Di(e){return e.indexOf(".")==-1?e:e.replace(/(?:\.0*|(\.\d*[1-9])0+)$/,"$1")}function fu(e){return e.indexOf("E")==-1?e:e.replace(/(?:\.0*|(\.\d*[1-9])0+)[Ee]/,"$1E").replace(/(E[+-])(\d)$/,"$10$2")}function cu(e){var r=e<0?12:11,t=Di(e.toFixed(12));return t.length<=r||(t=e.toPrecision(10),t.length<=r)?t:e.toExponential(5)}function ou(e){var r=Di(e.toFixed(11));return r.length>(e<0?12:11)||r==="0"||r==="-0"?e.toPrecision(6):r}function En(e){if(!isFinite(e))return isNaN(e)?"#NUM!":"#DIV/0!";var r=Math.floor(Math.log(Math.abs(e))*Math.LOG10E),t;return r>=-4&&r<=-1?t=e.toPrecision(10+r):Math.abs(r)<=9?t=cu(e):r===10?t=e.toFixed(10).substr(0,12):t=ou(e),Di(fu(t.toUpperCase()))}function ya(e,r){switch(typeof e){case"string":return e;case"boolean":return e?"TRUE":"FALSE";case"number":return(e|0)===e?e.toString(10):En(e);case"undefined":return"";case"object":if(e==null)return"";if(e instanceof Date)return it(14,or(e,r&&r.date1904),r)}throw new Error("unsupported value in General format: "+e)}function lu(e,r){r[0]-=581;var t=e.getDay();return e<60&&(t=(t+6)%7),t}function uu(e,r,t,a){var n="",i=0,s=0,f=t.y,c,o=0;switch(e){case 98:f=t.y+543;case 121:switch(r.length){case 1:case 2:c=f%100,o=2;break;default:c=f%1e4,o=4;break}break;case 109:switch(r.length){case 1:case 2:c=t.m,o=r.length;break;case 3:return G0[t.m-1][1];case 5:return G0[t.m-1][0];default:return G0[t.m-1][2]}break;case 100:switch(r.length){case 1:case 2:c=t.d,o=r.length;break;case 3:return Rs[t.q][0];default:return Rs[t.q][1]}break;case 104:switch(r.length){case 1:case 2:c=1+(t.H+11)%12,o=r.length;break;default:throw"bad hour format: "+r}break;case 72:switch(r.length){case 1:case 2:c=t.H,o=r.length;break;default:throw"bad hour format: "+r}break;case 77:switch(r.length){case 1:case 2:c=t.M,o=r.length;break;default:throw"bad minute format: "+r}break;case 115:if(r!="s"&&r!="ss"&&r!=".0"&&r!=".00"&&r!=".000")throw"bad second format: "+r;return t.u===0&&(r=="s"||r=="ss")?yt(t.S,r.length):(a>=2?s=a===3?1e3:100:s=a===1?10:1,i=Math.round(s*(t.S+t.u)),i>=60*s&&(i=0),r==="s"?i===0?"0":""+i/s:(n=yt(i,2+a),r==="ss"?n.substr(0,2):"."+n.substr(2,r.length-1)));case 90:switch(r){case"[h]":case"[hh]":c=t.D*24+t.H;break;case"[m]":case"[mm]":c=(t.D*24+t.H)*60+t.M;break;case"[s]":case"[ss]":c=((t.D*24+t.H)*60+t.M)*60+(a==0?Math.round(t.S+t.u):t.S);break;default:throw"bad abstime format: "+r}o=r.length===3?1:2;break;case 101:c=f,o=1;break}var l=o>0?yt(c,o):"";return l}function Vt(e){var r=3;if(e.length<=r)return e;for(var t=e.length%r,a=e.substr(0,t);t!=e.length;t+=r)a+=(a.length>0?",":"")+e.substr(t,r);return a}var $f=/%/g;function hu(e,r,t){var a=r.replace($f,""),n=r.length-a.length;return Kt(e,a,t*Math.pow(10,2*n))+Ke("%",n)}function xu(e,r,t){for(var a=r.length-1;r.charCodeAt(a-1)===44;)--a;return Kt(e,r.substr(0,a),t/Math.pow(10,3*(r.length-a)))}function Kf(e,r){var t,a=e.indexOf("E")-e.indexOf(".")-1;if(e.match(/^#+0.0E\+0$/)){if(r==0)return"0.0E+0";if(r<0)return"-"+Kf(e,-r);var n=e.indexOf(".");n===-1&&(n=e.indexOf("E"));var i=Math.floor(Math.log(r)*Math.LOG10E)%n;if(i<0&&(i+=n),t=(r/Math.pow(10,i)).toPrecision(a+1+(n+i)%n),t.indexOf("e")===-1){var s=Math.floor(Math.log(r)*Math.LOG10E);for(t.indexOf(".")===-1?t=t.charAt(0)+"."+t.substr(1)+"E+"+(s-t.length+i):t+="E+"+(s-i);t.substr(0,2)==="0.";)t=t.charAt(0)+t.substr(2,n)+"."+t.substr(2+n),t=t.replace(/^0+([1-9])/,"$1").replace(/^0+\./,"0.");t=t.replace(/\+-/,"-")}t=t.replace(/^([+-]?)(\d*)\.(\d*)[Ee]/,function(f,c,o,l){return c+o+l.substr(0,(n+i)%n)+"."+l.substr(i)+"E"})}else t=r.toExponential(a);return e.match(/E\+00$/)&&t.match(/e[+-]\d$/)&&(t=t.substr(0,t.length-1)+"0"+t.charAt(t.length-1)),e.match(/E\-/)&&t.match(/e\+/)&&(t=t.replace(/e\+/,"e")),t.replace("e","E")}var jf=/# (\?+)( ?)\/( ?)(\d+)/;function du(e,r,t){var a=parseInt(e[4],10),n=Math.round(r*a),i=Math.floor(n/a),s=n-i*a,f=a;return t+(i===0?"":""+i)+" "+(s===0?Ke(" ",e[1].length+1+e[4].length):Ci(s,e[1].length)+e[2]+"/"+e[3]+yt(f,e[4].length))}function vu(e,r,t){return t+(r===0?"":""+r)+Ke(" ",e[1].length+2+e[4].length)}var Yf=/^#*0*\.([0#]+)/,Zf=/\)[^)]*[0#]/,Jf=/\(###\) ###\\?-####/;function qr(e){for(var r="",t,a=0;a!=e.length;++a)switch(t=e.charCodeAt(a)){case 35:break;case 63:r+=" ";break;case 48:r+="0";break;default:r+=String.fromCharCode(t)}return r}function Ls(e,r){var t=Math.pow(10,r);return""+Math.round(e*t)/t}function Bs(e,r){var t=e-Math.floor(e),a=Math.pow(10,r);return r<(""+Math.round(t*a)).length?0:Math.round(t*a)}function mu(e,r){return r<(""+Math.round((e-Math.floor(e))*Math.pow(10,r))).length?1:0}function pu(e){return e<2147483647&&e>-2147483648?""+(e>=0?e|0:e-1|0):""+Math.floor(e)}function dt(e,r,t){if(e.charCodeAt(0)===40&&!r.match(Zf)){var a=r.replace(/\( */,"").replace(/ \)/,"").replace(/\)/,"");return t>=0?dt("n",a,t):"("+dt("n",a,-t)+")"}if(r.charCodeAt(r.length-1)===44)return xu(e,r,t);if(r.indexOf("%")!==-1)return hu(e,r,t);if(r.indexOf("E")!==-1)return Kf(r,t);if(r.charCodeAt(0)===36)return"$"+dt(e,r.substr(r.charAt(1)==" "?2:1),t);var n,i,s,f,c=Math.abs(t),o=t<0?"-":"";if(r.match(/^00+$/))return o+Ma(c,r.length);if(r.match(/^[#?]+$/))return n=Ma(t,0),n==="0"&&(n=""),n.length>r.length?n:qr(r.substr(0,r.length-n.length))+n;if(i=r.match(jf))return du(i,c,o);if(r.match(/^#+0+$/))return o+Ma(c,r.length-r.indexOf("0"));if(i=r.match(Yf))return n=Ls(t,i[1].length).replace(/^([^\.]+)$/,"$1."+qr(i[1])).replace(/\.$/,"."+qr(i[1])).replace(/\.(\d*)$/,function(m,p){return"."+p+Ke("0",qr(i[1]).length-p.length)}),r.indexOf("0.")!==-1?n:n.replace(/^0\./,".");if(r=r.replace(/^#+([0.])/,"$1"),i=r.match(/^(0*)\.(#*)$/))return o+Ls(c,i[2].length).replace(/\.(\d*[1-9])0*$/,".$1").replace(/^(-?\d*)$/,"$1.").replace(/^0\./,i[1].length?"0.":".");if(i=r.match(/^#{1,3},##0(\.?)$/))return o+Vt(Ma(c,0));if(i=r.match(/^#,##0\.([#0]*0)$/))return t<0?"-"+dt(e,r,-t):Vt(""+(Math.floor(t)+mu(t,i[1].length)))+"."+yt(Bs(t,i[1].length),i[1].length);if(i=r.match(/^#,#*,#0/))return dt(e,r.replace(/^#,#*,/,""),t);if(i=r.match(/^([0#]+)(\\?-([0#]+))+$/))return n=Xa(dt(e,r.replace(/[\\-]/g,""),t)),s=0,Xa(Xa(r.replace(/\\/g,"")).replace(/[0#]/g,function(m){return s<n.length?n.charAt(s++):m==="0"?"0":""}));if(r.match(Jf))return n=dt(e,"##########",t),"("+n.substr(0,3)+") "+n.substr(3,3)+"-"+n.substr(6);var l="";if(i=r.match(/^([#0?]+)( ?)\/( ?)([#0?]+)/))return s=Math.min(i[4].length,7),f=p0(c,Math.pow(10,s)-1,!1),n=""+o,l=Kt("n",i[1],f[1]),l.charAt(l.length-1)==" "&&(l=l.substr(0,l.length-1)+"0"),n+=l+i[2]+"/"+i[3],l=v0(f[2],s),l.length<i[4].length&&(l=qr(i[4].substr(i[4].length-l.length))+l),n+=l,n;if(i=r.match(/^# ([#0?]+)( ?)\/( ?)([#0?]+)/))return s=Math.min(Math.max(i[1].length,i[4].length),7),f=p0(c,Math.pow(10,s)-1,!0),o+(f[0]||(f[1]?"":"0"))+" "+(f[1]?Ci(f[1],s)+i[2]+"/"+i[3]+v0(f[2],s):Ke(" ",2*s+1+i[2].length+i[3].length));if(i=r.match(/^[#0?]+$/))return n=Ma(t,0),r.length<=n.length?n:qr(r.substr(0,r.length-n.length))+n;if(i=r.match(/^([#0?]+)\.([#0]+)$/)){n=""+t.toFixed(Math.min(i[2].length,10)).replace(/([^0])0+$/,"$1"),s=n.indexOf(".");var x=r.indexOf(".")-s,u=r.length-n.length-x;return qr(r.substr(0,x)+n+r.substr(r.length-u))}if(i=r.match(/^00,000\.([#0]*0)$/))return s=Bs(t,i[1].length),t<0?"-"+dt(e,r,-t):Vt(pu(t)).replace(/^\d,\d{3}$/,"0$&").replace(/^\d*$/,function(m){return"00,"+(m.length<3?yt(0,3-m.length):"")+m})+"."+yt(s,i[1].length);switch(r){case"###,##0.00":return dt(e,"#,##0.00",t);case"###,###":case"##,###":case"#,###":var h=Vt(Ma(c,0));return h!=="0"?o+h:"";case"###,###.00":return dt(e,"###,##0.00",t).replace(/^0\./,".");case"#,###.00":return dt(e,"#,##0.00",t).replace(/^0\./,".");default:}throw new Error("unsupported format |"+r+"|")}function gu(e,r,t){for(var a=r.length-1;r.charCodeAt(a-1)===44;)--a;return Kt(e,r.substr(0,a),t/Math.pow(10,3*(r.length-a)))}function _u(e,r,t){var a=r.replace($f,""),n=r.length-a.length;return Kt(e,a,t*Math.pow(10,2*n))+Ke("%",n)}function qf(e,r){var t,a=e.indexOf("E")-e.indexOf(".")-1;if(e.match(/^#+0.0E\+0$/)){if(r==0)return"0.0E+0";if(r<0)return"-"+qf(e,-r);var n=e.indexOf(".");n===-1&&(n=e.indexOf("E"));var i=Math.floor(Math.log(r)*Math.LOG10E)%n;if(i<0&&(i+=n),t=(r/Math.pow(10,i)).toPrecision(a+1+(n+i)%n),!t.match(/[Ee]/)){var s=Math.floor(Math.log(r)*Math.LOG10E);t.indexOf(".")===-1?t=t.charAt(0)+"."+t.substr(1)+"E+"+(s-t.length+i):t+="E+"+(s-i),t=t.replace(/\+-/,"-")}t=t.replace(/^([+-]?)(\d*)\.(\d*)[Ee]/,function(f,c,o,l){return c+o+l.substr(0,(n+i)%n)+"."+l.substr(i)+"E"})}else t=r.toExponential(a);return e.match(/E\+00$/)&&t.match(/e[+-]\d$/)&&(t=t.substr(0,t.length-1)+"0"+t.charAt(t.length-1)),e.match(/E\-/)&&t.match(/e\+/)&&(t=t.replace(/e\+/,"e")),t.replace("e","E")}function bt(e,r,t){if(e.charCodeAt(0)===40&&!r.match(Zf)){var a=r.replace(/\( */,"").replace(/ \)/,"").replace(/\)/,"");return t>=0?bt("n",a,t):"("+bt("n",a,-t)+")"}if(r.charCodeAt(r.length-1)===44)return gu(e,r,t);if(r.indexOf("%")!==-1)return _u(e,r,t);if(r.indexOf("E")!==-1)return qf(r,t);if(r.charCodeAt(0)===36)return"$"+bt(e,r.substr(r.charAt(1)==" "?2:1),t);var n,i,s,f,c=Math.abs(t),o=t<0?"-":"";if(r.match(/^00+$/))return o+yt(c,r.length);if(r.match(/^[#?]+$/))return n=""+t,t===0&&(n=""),n.length>r.length?n:qr(r.substr(0,r.length-n.length))+n;if(i=r.match(jf))return vu(i,c,o);if(r.match(/^#+0+$/))return o+yt(c,r.length-r.indexOf("0"));if(i=r.match(Yf))return n=(""+t).replace(/^([^\.]+)$/,"$1."+qr(i[1])).replace(/\.$/,"."+qr(i[1])),n=n.replace(/\.(\d*)$/,function(m,p){return"."+p+Ke("0",qr(i[1]).length-p.length)}),r.indexOf("0.")!==-1?n:n.replace(/^0\./,".");if(r=r.replace(/^#+([0.])/,"$1"),i=r.match(/^(0*)\.(#*)$/))return o+(""+c).replace(/\.(\d*[1-9])0*$/,".$1").replace(/^(-?\d*)$/,"$1.").replace(/^0\./,i[1].length?"0.":".");if(i=r.match(/^#{1,3},##0(\.?)$/))return o+Vt(""+c);if(i=r.match(/^#,##0\.([#0]*0)$/))return t<0?"-"+bt(e,r,-t):Vt(""+t)+"."+Ke("0",i[1].length);if(i=r.match(/^#,#*,#0/))return bt(e,r.replace(/^#,#*,/,""),t);if(i=r.match(/^([0#]+)(\\?-([0#]+))+$/))return n=Xa(bt(e,r.replace(/[\\-]/g,""),t)),s=0,Xa(Xa(r.replace(/\\/g,"")).replace(/[0#]/g,function(m){return s<n.length?n.charAt(s++):m==="0"?"0":""}));if(r.match(Jf))return n=bt(e,"##########",t),"("+n.substr(0,3)+") "+n.substr(3,3)+"-"+n.substr(6);var l="";if(i=r.match(/^([#0?]+)( ?)\/( ?)([#0?]+)/))return s=Math.min(i[4].length,7),f=p0(c,Math.pow(10,s)-1,!1),n=""+o,l=Kt("n",i[1],f[1]),l.charAt(l.length-1)==" "&&(l=l.substr(0,l.length-1)+"0"),n+=l+i[2]+"/"+i[3],l=v0(f[2],s),l.length<i[4].length&&(l=qr(i[4].substr(i[4].length-l.length))+l),n+=l,n;if(i=r.match(/^# ([#0?]+)( ?)\/( ?)([#0?]+)/))return s=Math.min(Math.max(i[1].length,i[4].length),7),f=p0(c,Math.pow(10,s)-1,!0),o+(f[0]||(f[1]?"":"0"))+" "+(f[1]?Ci(f[1],s)+i[2]+"/"+i[3]+v0(f[2],s):Ke(" ",2*s+1+i[2].length+i[3].length));if(i=r.match(/^[#0?]+$/))return n=""+t,r.length<=n.length?n:qr(r.substr(0,r.length-n.length))+n;if(i=r.match(/^([#0]+)\.([#0]+)$/)){n=""+t.toFixed(Math.min(i[2].length,10)).replace(/([^0])0+$/,"$1"),s=n.indexOf(".");var x=r.indexOf(".")-s,u=r.length-n.length-x;return qr(r.substr(0,x)+n+r.substr(r.length-u))}if(i=r.match(/^00,000\.([#0]*0)$/))return t<0?"-"+bt(e,r,-t):Vt(""+t).replace(/^\d,\d{3}$/,"0$&").replace(/^\d*$/,function(m){return"00,"+(m.length<3?yt(0,3-m.length):"")+m})+"."+yt(0,i[1].length);switch(r){case"###,###":case"##,###":case"#,###":var h=Vt(""+c);return h!=="0"?o+h:"";default:if(r.match(/\.[0#?]*$/))return bt(e,r.slice(0,r.lastIndexOf(".")),t)+qr(r.slice(r.lastIndexOf(".")))}throw new Error("unsupported format |"+r+"|")}function Kt(e,r,t){return(t|0)===t?bt(e,r,t):dt(e,r,t)}function wu(e){for(var r=[],t=!1,a=0,n=0;a<e.length;++a)switch(e.charCodeAt(a)){case 34:t=!t;break;case 95:case 42:case 92:++a;break;case 59:r[r.length]=e.substr(n,a-n),n=a+1}if(r[r.length]=e.substr(n),t===!0)throw new Error("Format |"+e+"| unterminated string ");return r}var Qf=/\[[HhMmSs\u0E0A\u0E19\u0E17]*\]/;function lt(e){for(var r=0,t="",a="";r<e.length;)switch(t=e.charAt(r)){case"G":m0(e,r)&&(r+=6),r++;break;case'"':for(;e.charCodeAt(++r)!==34&&r<e.length;);++r;break;case"\\":r+=2;break;case"_":r+=2;break;case"@":++r;break;case"B":case"b":if(e.charAt(r+1)==="1"||e.charAt(r+1)==="2")return!0;case"M":case"D":case"Y":case"H":case"S":case"E":case"m":case"d":case"y":case"h":case"s":case"e":case"g":return!0;case"A":case"a":case"\u4E0A":if(e.substr(r,3).toUpperCase()==="A/P"||e.substr(r,5).toUpperCase()==="AM/PM"||e.substr(r,5).toUpperCase()==="\u4E0A\u5348/\u4E0B\u5348")return!0;++r;break;case"[":for(a=t;e.charAt(r++)!=="]"&&r<e.length;)a+=e.charAt(r);if(a.match(Qf))return!0;break;case".":case"0":case"#":for(;r<e.length&&("0#?.,E+-%".indexOf(t=e.charAt(++r))>-1||t=="\\"&&e.charAt(r+1)=="-"&&"0#".indexOf(e.charAt(r+2))>-1););break;case"?":for(;e.charAt(++r)===t;);break;case"*":++r,(e.charAt(r)==" "||e.charAt(r)=="*")&&++r;break;case"(":case")":++r;break;case"1":case"2":case"3":case"4":case"5":case"6":case"7":case"8":case"9":for(;r<e.length&&"0123456789".indexOf(e.charAt(++r))>-1;);break;case" ":++r;break;default:++r;break}return!1}function ku(e,r,t,a){for(var n=[],i="",s=0,f="",c="t",o,l,x,u="H";s<e.length;)switch(f=e.charAt(s)){case"G":if(!m0(e,s))throw new Error("unrecognized character "+f+" in "+e);n[n.length]={t:"G",v:"General"},s+=7;break;case'"':for(i="";(x=e.charCodeAt(++s))!==34&&s<e.length;)i+=String.fromCharCode(x);n[n.length]={t:"t",v:i},++s;break;case"\\":var h=e.charAt(++s),m=h==="("||h===")"?h:"t";n[n.length]={t:m,v:h},++s;break;case"_":n[n.length]={t:"t",v:" "},s+=2;break;case"@":n[n.length]={t:"T",v:r},++s;break;case"B":case"b":if(e.charAt(s+1)==="1"||e.charAt(s+1)==="2"){if(o==null&&(o=Ot(r,t,e.charAt(s+1)==="2"),o==null))return"";n[n.length]={t:"X",v:e.substr(s,2)},c=f,s+=2;break}case"M":case"D":case"Y":case"H":case"S":case"E":f=f.toLowerCase();case"m":case"d":case"y":case"h":case"s":case"e":case"g":if(r<0||o==null&&(o=Ot(r,t),o==null))return"";for(i=f;++s<e.length&&e.charAt(s).toLowerCase()===f;)i+=f;f==="m"&&c.toLowerCase()==="h"&&(f="M"),f==="h"&&(f=u),n[n.length]={t:f,v:i},c=f;break;case"A":case"a":case"\u4E0A":var p={t:f,v:f};if(o==null&&(o=Ot(r,t)),e.substr(s,3).toUpperCase()==="A/P"?(o!=null&&(p.v=o.H>=12?e.charAt(s+2):f),p.t="T",u="h",s+=3):e.substr(s,5).toUpperCase()==="AM/PM"?(o!=null&&(p.v=o.H>=12?"PM":"AM"),p.t="T",s+=5,u="h"):e.substr(s,5).toUpperCase()==="\u4E0A\u5348/\u4E0B\u5348"?(o!=null&&(p.v=o.H>=12?"\u4E0B\u5348":"\u4E0A\u5348"),p.t="T",s+=5,u="h"):(p.t="t",++s),o==null&&p.t==="T")return"";n[n.length]=p,c=f;break;case"[":for(i=f;e.charAt(s++)!=="]"&&s<e.length;)i+=e.charAt(s);if(i.slice(-1)!=="]")throw'unterminated "[" block: |'+i+"|";if(i.match(Qf)){if(o==null&&(o=Ot(r,t),o==null))return"";n[n.length]={t:"Z",v:i.toLowerCase()},c=i.charAt(1)}else i.indexOf("$")>-1&&(i=(i.match(/\$([^-\[\]]*)/)||[])[1]||"$",lt(e)||(n[n.length]={t:"t",v:i}));break;case".":if(o!=null){for(i=f;++s<e.length&&(f=e.charAt(s))==="0";)i+=f;n[n.length]={t:"s",v:i};break}case"0":case"#":for(i=f;++s<e.length&&"0#?.,E+-%".indexOf(f=e.charAt(s))>-1;)i+=f;n[n.length]={t:"n",v:i};break;case"?":for(i=f;e.charAt(++s)===f;)i+=f;n[n.length]={t:f,v:i},c=f;break;case"*":++s,(e.charAt(s)==" "||e.charAt(s)=="*")&&++s;break;case"(":case")":n[n.length]={t:a===1?"t":f,v:f},++s;break;case"1":case"2":case"3":case"4":case"5":case"6":case"7":case"8":case"9":for(i=f;s<e.length&&"0123456789".indexOf(e.charAt(++s))>-1;)i+=e.charAt(s);n[n.length]={t:"D",v:i};break;case" ":n[n.length]={t:f,v:f},++s;break;case"$":n[n.length]={t:"t",v:"$"},++s;break;default:if(",$-+/():!^&'~{}<>=\u20ACacfijklopqrtuvwxzP".indexOf(f)===-1)throw new Error("unrecognized character "+f+" in "+e);n[n.length]={t:"t",v:f},++s;break}var d=0,v=0,_;for(s=n.length-1,c="t";s>=0;--s)switch(n[s].t){case"h":case"H":n[s].t=u,c="h",d<1&&(d=1);break;case"s":(_=n[s].v.match(/\.0+$/))&&(v=Math.max(v,_[0].length-1),d=4),d<3&&(d=3);case"d":case"y":case"e":c=n[s].t;break;case"M":c=n[s].t,d<2&&(d=2);break;case"m":c==="s"&&(n[s].t="M",d<2&&(d=2));break;case"X":break;case"Z":d<1&&n[s].v.match(/[Hh]/)&&(d=1),d<2&&n[s].v.match(/[Mm]/)&&(d=2),d<3&&n[s].v.match(/[Ss]/)&&(d=3)}var g;switch(d){case 0:break;case 1:case 2:case 3:o.u>=.5&&(o.u=0,++o.S),o.S>=60&&(o.S=0,++o.M),o.M>=60&&(o.M=0,++o.H),o.H>=24&&(o.H=0,++o.D,g=Ot(o.D),g.u=o.u,g.S=o.S,g.M=o.M,g.H=o.H,o=g);break;case 4:switch(v){case 1:o.u=Math.round(o.u*10)/10;break;case 2:o.u=Math.round(o.u*100)/100;break;case 3:o.u=Math.round(o.u*1e3)/1e3;break}o.u>=1&&(o.u=0,++o.S),o.S>=60&&(o.S=0,++o.M),o.M>=60&&(o.M=0,++o.H),o.H>=24&&(o.H=0,++o.D,g=Ot(o.D),g.u=o.u,g.S=o.S,g.M=o.M,g.H=o.H,o=g);break}var k="",O;for(s=0;s<n.length;++s)switch(n[s].t){case"t":case"T":case" ":case"D":break;case"X":n[s].v="",n[s].t=";";break;case"d":case"m":case"y":case"h":case"H":case"M":case"s":case"e":case"b":case"Z":n[s].v=uu(n[s].t.charCodeAt(0),n[s].v,o,v),n[s].t="t";break;case"n":case"?":for(O=s+1;n[O]!=null&&((f=n[O].t)==="?"||f==="D"||(f===" "||f==="t")&&n[O+1]!=null&&(n[O+1].t==="?"||n[O+1].t==="t"&&n[O+1].v==="/")||n[s].t==="("&&(f===" "||f==="n"||f===")")||f==="t"&&(n[O].v==="/"||n[O].v===" "&&n[O+1]!=null&&n[O+1].t=="?"));)n[s].v+=n[O].v,n[O]={v:"",t:";"},++O;k+=n[s].v,s=O-1;break;case"G":n[s].t="t",n[s].v=ya(r,t);break}var B="",E,F;if(k.length>0){k.charCodeAt(0)==40?(E=r<0&&k.charCodeAt(0)===45?-r:r,F=Kt("n",k,E)):(E=r<0&&a>1?-r:r,F=Kt("n",k,E),E<0&&n[0]&&n[0].t=="t"&&(F=F.substr(1),n[0].v="-"+n[0].v)),O=F.length-1;var S=n.length;for(s=0;s<n.length;++s)if(n[s]!=null&&n[s].t!="t"&&n[s].v.indexOf(".")>-1){S=s;break}var L=n.length;if(S===n.length&&F.indexOf("E")===-1){for(s=n.length-1;s>=0;--s)n[s]==null||"n?".indexOf(n[s].t)===-1||(O>=n[s].v.length-1?(O-=n[s].v.length,n[s].v=F.substr(O+1,n[s].v.length)):O<0?n[s].v="":(n[s].v=F.substr(0,O+1),O=-1),n[s].t="t",L=s);O>=0&&L<n.length&&(n[L].v=F.substr(0,O+1)+n[L].v)}else if(S!==n.length&&F.indexOf("E")===-1){for(O=F.indexOf(".")-1,s=S;s>=0;--s)if(!(n[s]==null||"n?".indexOf(n[s].t)===-1)){for(l=n[s].v.indexOf(".")>-1&&s===S?n[s].v.indexOf(".")-1:n[s].v.length-1,B=n[s].v.substr(l+1);l>=0;--l)O>=0&&(n[s].v.charAt(l)==="0"||n[s].v.charAt(l)==="#")&&(B=F.charAt(O--)+B);n[s].v=B,n[s].t="t",L=s}for(O>=0&&L<n.length&&(n[L].v=F.substr(0,O+1)+n[L].v),O=F.indexOf(".")+1,s=S;s<n.length;++s)if(!(n[s]==null||"n?(".indexOf(n[s].t)===-1&&s!==S)){for(l=n[s].v.indexOf(".")>-1&&s===S?n[s].v.indexOf(".")+1:0,B=n[s].v.substr(0,l);l<n[s].v.length;++l)O<F.length&&(B+=F.charAt(O++));n[s].v=B,n[s].t="t",L=s}}}for(s=0;s<n.length;++s)n[s]!=null&&"n?".indexOf(n[s].t)>-1&&(E=a>1&&r<0&&s>0&&n[s-1].v==="-"?-r:r,n[s].v=Kt(n[s].t,n[s].v,E),n[s].t="t");var P="";for(s=0;s!==n.length;++s)n[s]!=null&&(P+=n[s].v);return P}var Ms=/\[(=|>[=]?|<[>=]?)(-?\d+(?:\.\d*)?)\]/;function Us(e,r){if(r==null)return!1;var t=parseFloat(r[2]);switch(r[1]){case"=":if(e==t)return!0;break;case">":if(e>t)return!0;break;case"<":if(e<t)return!0;break;case"<>":if(e!=t)return!0;break;case">=":if(e>=t)return!0;break;case"<=":if(e<=t)return!0;break}return!1}function Eu(e,r){var t=wu(e),a=t.length,n=t[a-1].indexOf("@");if(a<4&&n>-1&&--a,t.length>4)throw new Error("cannot find right format for |"+t.join("|")+"|");if(typeof r!="number")return[4,t.length===4||n>-1?t[t.length-1]:"@"];switch(typeof r=="number"&&!isFinite(r)&&(r=0),t.length){case 1:t=n>-1?["General","General","General",t[0]]:[t[0],t[0],t[0],"@"];break;case 2:t=n>-1?[t[0],t[0],t[0],t[1]]:[t[0],t[1],t[0],"@"];break;case 3:t=n>-1?[t[0],t[1],t[0],t[2]]:[t[0],t[1],t[2],"@"];break;case 4:break}var i=r>0?t[0]:r<0?t[1]:t[2];if(t[0].indexOf("[")===-1&&t[1].indexOf("[")===-1)return[a,i];if(t[0].match(/\[[=<>]/)!=null||t[1].match(/\[[=<>]/)!=null){var s=t[0].match(Ms),f=t[1].match(Ms);return Us(r,s)?[a,t[0]]:Us(r,f)?[a,t[1]]:[a,t[s!=null&&f!=null?2:1]]}return[a,i]}function it(e,r,t){t==null&&(t={});var a="";switch(typeof e){case"string":e=="m/d/yy"&&t.dateNF?a=t.dateNF:a=e;break;case"number":e==14&&t.dateNF?a=t.dateNF:a=(t.table!=null?t.table:Fe)[e],a==null&&(a=t.table&&t.table[Ps[e]]||Fe[Ps[e]]),a==null&&(a=iu[e]||"General");break}if(m0(a,0))return ya(r,t);r instanceof Date&&(r=or(r,t.date1904));var n=Eu(a,r);if(m0(n[1]))return ya(r,t);if(r===!0)r="TRUE";else if(r===!1)r="FALSE";else{if(r===""||r==null)return"";if(isNaN(r)&&n[1].indexOf("0")>-1)return"#NUM!";if(!isFinite(r)&&n[1].indexOf("0")>-1)return"#DIV/0!"}return ku(n[1],r,t,n[0])}function bi(e,r){if(typeof r!="number"){r=+r||-1;for(var t=0;t<392;++t){if(Fe[t]==null){r<0&&(r=t);continue}if(Fe[t]==e){r=t;break}}r<0&&(r=391)}return Fe[r]=e,r}function qa(e){for(var r=0;r!=392;++r)e[r]!==void 0&&bi(e[r],r)}function Ia(){Fe=nu()}var Ii={format:it,load:bi,_table:Fe,load_table:qa,parse_date_code:Ot,is_date:lt,get_table:function(){return Ii._table=Fe}},$0={5:'"$"#,##0_);\\("$"#,##0\\)',6:'"$"#,##0_);[Red]\\("$"#,##0\\)',7:'"$"#,##0.00_);\\("$"#,##0.00\\)',8:'"$"#,##0.00_);[Red]\\("$"#,##0.00\\)',23:"General",24:"General",25:"General",26:"General",27:"m/d/yy",28:"m/d/yy",29:"m/d/yy",30:"m/d/yy",31:"m/d/yy",32:"h:mm:ss",33:"h:mm:ss",34:"h:mm:ss",35:"h:mm:ss",36:"m/d/yy",41:'_(* #,##0_);_(* (#,##0);_(* "-"_);_(@_)',42:'_("$"* #,##0_);_("$"* (#,##0);_("$"* "-"_);_(@_)',43:'_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)',44:'_("$"* #,##0.00_);_("$"* (#,##0.00);_("$"* "-"??_);_(@_)',50:"m/d/yy",51:"m/d/yy",52:"m/d/yy",53:"m/d/yy",54:"m/d/yy",55:"m/d/yy",56:"m/d/yy",57:"m/d/yy",58:"m/d/yy",59:"0",60:"0.00",61:"#,##0",62:"#,##0.00",63:'"$"#,##0_);\\("$"#,##0\\)',64:'"$"#,##0_);[Red]\\("$"#,##0\\)',65:'"$"#,##0.00_);\\("$"#,##0.00\\)',66:'"$"#,##0.00_);[Red]\\("$"#,##0.00\\)',67:"0%",68:"0.00%",69:"# ?/?",70:"# ??/??",71:"m/d/yy",72:"m/d/yy",73:"d-mmm-yy",74:"d-mmm",75:"mmm-yy",76:"h:mm",77:"h:mm:ss",78:"m/d/yy h:mm",79:"mm:ss",80:"[h]:mm:ss",81:"mmss.0"},g0=/[dD]+|[mM]+|[yYeE]+|[Hh]+|[Ss]+/g;function Tu(e){var r=typeof e=="number"?Fe[e]:e;return r=r.replace(g0,"(\\d+)"),g0.lastIndex=0,new RegExp("^"+r+"$")}function yu(e,r,t){var a=-1,n=-1,i=-1,s=-1,f=-1,c=-1;(r.match(g0)||[]).forEach(function(x,u){var h=parseInt(t[u+1],10);switch(x.toLowerCase().charAt(0)){case"y":a=h;break;case"d":i=h;break;case"h":s=h;break;case"s":c=h;break;case"m":s>=0?f=h:n=h;break}}),g0.lastIndex=0,c>=0&&f==-1&&n>=0&&(f=n,n=-1);var o=(""+(a>=0?a:new Date().getFullYear())).slice(-4)+"-"+("00"+(n>=1?n:1)).slice(-2)+"-"+("00"+(i>=1?i:1)).slice(-2);o.length==7&&(o="0"+o),o.length==8&&(o="20"+o);var l=("00"+(s>=0?s:0)).slice(-2)+":"+("00"+(f>=0?f:0)).slice(-2)+":"+("00"+(c>=0?c:0)).slice(-2);return s==-1&&f==-1&&c==-1?o:a==-1&&n==-1&&i==-1?l:o+"T"+l}var Fu={"d.m":"d\\.m"};function jt(e,r){return bi(Fu[e]||e,r)}var Ws=(function(){var e={};e.version="1.2.0";function r(){for(var E=0,F=new Array(256),S=0;S!=256;++S)E=S,E=E&1?-306674912^E>>>1:E>>>1,E=E&1?-306674912^E>>>1:E>>>1,E=E&1?-306674912^E>>>1:E>>>1,E=E&1?-306674912^E>>>1:E>>>1,E=E&1?-306674912^E>>>1:E>>>1,E=E&1?-306674912^E>>>1:E>>>1,E=E&1?-306674912^E>>>1:E>>>1,E=E&1?-306674912^E>>>1:E>>>1,F[S]=E;return typeof Int32Array<"u"?new Int32Array(F):F}var t=r();function a(E){var F=0,S=0,L=0,P=typeof Int32Array<"u"?new Int32Array(4096):new Array(4096);for(L=0;L!=256;++L)P[L]=E[L];for(L=0;L!=256;++L)for(S=E[L],F=256+L;F<4096;F+=256)S=P[F]=S>>>8^E[S&255];var U=[];for(L=1;L!=16;++L)U[L-1]=typeof Int32Array<"u"&&typeof P.subarray=="function"?P.subarray(L*256,L*256+256):P.slice(L*256,L*256+256);return U}var n=a(t),i=n[0],s=n[1],f=n[2],c=n[3],o=n[4],l=n[5],x=n[6],u=n[7],h=n[8],m=n[9],p=n[10],d=n[11],v=n[12],_=n[13],g=n[14];function k(E,F){for(var S=F^-1,L=0,P=E.length;L<P;)S=S>>>8^t[(S^E.charCodeAt(L++))&255];return~S}function O(E,F){for(var S=F^-1,L=E.length-15,P=0;P<L;)S=g[E[P++]^S&255]^_[E[P++]^S>>8&255]^v[E[P++]^S>>16&255]^d[E[P++]^S>>>24]^p[E[P++]]^m[E[P++]]^h[E[P++]]^u[E[P++]]^x[E[P++]]^l[E[P++]]^o[E[P++]]^c[E[P++]]^f[E[P++]]^s[E[P++]]^i[E[P++]]^t[E[P++]];for(L+=15;P<L;)S=S>>>8^t[(S^E[P++])&255];return~S}function B(E,F){for(var S=F^-1,L=0,P=E.length,U=0,H=0;L<P;)U=E.charCodeAt(L++),U<128?S=S>>>8^t[(S^U)&255]:U<2048?(S=S>>>8^t[(S^(192|U>>6&31))&255],S=S>>>8^t[(S^(128|U&63))&255]):U>=55296&&U<57344?(U=(U&1023)+64,H=E.charCodeAt(L++)&1023,S=S>>>8^t[(S^(240|U>>8&7))&255],S=S>>>8^t[(S^(128|U>>2&63))&255],S=S>>>8^t[(S^(128|H>>6&15|(U&3)<<4))&255],S=S>>>8^t[(S^(128|H&63))&255]):(S=S>>>8^t[(S^(224|U>>12&15))&255],S=S>>>8^t[(S^(128|U>>6&63))&255],S=S>>>8^t[(S^(128|U&63))&255]);return~S}return e.table=t,e.bstr=k,e.buf=O,e.str=B,e})(),Ce=(function(){var r={};r.version="1.2.2";function t(w,b){for(var T=w.split("/"),y=b.split("/"),D=0,I=0,V=Math.min(T.length,y.length);D<V;++D){if(I=T[D].length-y[D].length)return I;if(T[D]!=y[D])return T[D]<y[D]?-1:1}return T.length-y.length}function a(w){if(w.charAt(w.length-1)=="/")return w.slice(0,-1).indexOf("/")===-1?w:a(w.slice(0,-1));var b=w.lastIndexOf("/");return b===-1?w:w.slice(0,b+1)}function n(w){if(w.charAt(w.length-1)=="/")return n(w.slice(0,-1));var b=w.lastIndexOf("/");return b===-1?w:w.slice(b+1)}function i(w,b){typeof b=="string"&&(b=new Date(b));var T=b.getHours();T=T<<6|b.getMinutes(),T=T<<5|b.getSeconds()>>>1,w.write_shift(2,T);var y=b.getFullYear()-1980;y=y<<4|b.getMonth()+1,y=y<<5|b.getDate(),w.write_shift(2,y)}function s(w){var b=w.read_shift(2)&65535,T=w.read_shift(2)&65535,y=new Date,D=T&31;T>>>=5;var I=T&15;T>>>=4,y.setMilliseconds(0),y.setFullYear(T+1980),y.setMonth(I-1),y.setDate(D);var V=b&31;b>>>=5;var Y=b&63;return b>>>=6,y.setHours(b),y.setMinutes(Y),y.setSeconds(V<<1),y}function f(w){Tr(w,0);for(var b={},T=0;w.l<=w.length-4;){var y=w.read_shift(2),D=w.read_shift(2),I=w.l+D,V={};switch(y){case 21589:T=w.read_shift(1),T&1&&(V.mtime=w.read_shift(4)),D>5&&(T&2&&(V.atime=w.read_shift(4)),T&4&&(V.ctime=w.read_shift(4))),V.mtime&&(V.mt=new Date(V.mtime*1e3));break;case 1:{var Y=w.read_shift(4),X=w.read_shift(4);V.usz=X*Math.pow(2,32)+Y,Y=w.read_shift(4),X=w.read_shift(4),V.csz=X*Math.pow(2,32)+Y}break}w.l=I,b[y]=V}return b}var c;function o(){return c||(c=Gt)}function l(w,b){if(w[0]==80&&w[1]==75)return Ds(w,b);if((w[0]|32)==109&&(w[1]|32)==105)return Ml(w,b);if(w.length<512)throw new Error("CFB file size "+w.length+" < 512");var T=3,y=512,D=0,I=0,V=0,Y=0,X=0,z=[],G=w.slice(0,512);Tr(G,0);var ie=x(G);switch(T=ie[0],T){case 3:y=512;break;case 4:y=4096;break;case 0:if(ie[1]==0)return Ds(w,b);default:throw new Error("Major Version: Expected 3 or 4 saw "+T)}y!==512&&(G=w.slice(0,y),Tr(G,28));var le=w.slice(0,y);u(G,T);var Te=G.read_shift(4,"i");if(T===3&&Te!==0)throw new Error("# Directory Sectors: Expected 0 saw "+Te);G.l+=4,V=G.read_shift(4,"i"),G.l+=4,G.chk("00100000","Mini Stream Cutoff Size: "),Y=G.read_shift(4,"i"),D=G.read_shift(4,"i"),X=G.read_shift(4,"i"),I=G.read_shift(4,"i");for(var xe=-1,ne=0;ne<109&&(xe=G.read_shift(4,"i"),!(xe<0));++ne)z[ne]=xe;var Ne=h(w,y);d(X,I,Ne,y,z);var nr=_(Ne,V,z,y);V<nr.length&&(nr[V].name="!Directory"),D>0&&Y!==H&&(nr[Y].name="!MiniFAT"),nr[z[0]].name="!FAT",nr.fat_addrs=z,nr.ssz=y;var tt={},gr=[],ft=[],an=[];g(V,nr,Ne,gr,D,tt,ft,Y),m(ft,an,gr),gr.shift();var nn={FileIndex:ft,FullPaths:an};return b&&b.raw&&(nn.raw={header:le,sectors:Ne}),nn}function x(w){if(w[w.l]==80&&w[w.l+1]==75)return[0,0];w.chk(ce,"Header Signature: "),w.l+=16;var b=w.read_shift(2,"u");return[w.read_shift(2,"u"),b]}function u(w,b){var T=9;switch(w.l+=2,T=w.read_shift(2)){case 9:if(b!=3)throw new Error("Sector Shift: Expected 9 saw "+T);break;case 12:if(b!=4)throw new Error("Sector Shift: Expected 12 saw "+T);break;default:throw new Error("Sector Shift: Expected 9 or 12 saw "+T)}w.chk("0600","Mini Sector Shift: "),w.chk("000000000000","Reserved: ")}function h(w,b){for(var T=Math.ceil(w.length/b)-1,y=[],D=1;D<T;++D)y[D-1]=w.slice(D*b,(D+1)*b);return y[T-1]=w.slice(T*b),y}function m(w,b,T){for(var y=0,D=0,I=0,V=0,Y=0,X=T.length,z=[],G=[];y<X;++y)z[y]=G[y]=y,b[y]=T[y];for(;Y<G.length;++Y)y=G[Y],D=w[y].L,I=w[y].R,V=w[y].C,z[y]===y&&(D!==-1&&z[D]!==D&&(z[y]=z[D]),I!==-1&&z[I]!==I&&(z[y]=z[I])),V!==-1&&(z[V]=y),D!==-1&&y!=z[y]&&(z[D]=z[y],G.lastIndexOf(D)<Y&&G.push(D)),I!==-1&&y!=z[y]&&(z[I]=z[y],G.lastIndexOf(I)<Y&&G.push(I));for(y=1;y<X;++y)z[y]===y&&(I!==-1&&z[I]!==I?z[y]=z[I]:D!==-1&&z[D]!==D&&(z[y]=z[D]));for(y=1;y<X;++y)if(w[y].type!==0){if(Y=y,Y!=z[Y])do Y=z[Y],b[y]=b[Y]+"/"+b[y];while(Y!==0&&z[Y]!==-1&&Y!=z[Y]);z[y]=-1}for(b[0]+="/",y=1;y<X;++y)w[y].type!==2&&(b[y]+="/")}function p(w,b,T){for(var y=w.start,D=w.size,I=[],V=y;T&&D>0&&V>=0;)I.push(b.slice(V*U,V*U+U)),D-=U,V=ma(T,V*4);return I.length===0?W(0):dr(I).slice(0,w.size)}function d(w,b,T,y,D){var I=H;if(w===H){if(b!==0)throw new Error("DIFAT chain shorter than expected")}else if(w!==-1){var V=T[w],Y=(y>>>2)-1;if(!V)return;for(var X=0;X<Y&&(I=ma(V,X*4))!==H;++X)D.push(I);b>=1&&d(ma(V,y-4),b-1,T,y,D)}}function v(w,b,T,y,D){var I=[],V=[];D||(D=[]);var Y=y-1,X=0,z=0;for(X=b;X>=0;){D[X]=!0,I[I.length]=X,V.push(w[X]);var G=T[Math.floor(X*4/y)];if(z=X*4&Y,y<4+z)throw new Error("FAT boundary crossed: "+X+" 4 "+y);if(!w[G])break;X=ma(w[G],z)}return{nodes:I,data:Js([V])}}function _(w,b,T,y){var D=w.length,I=[],V=[],Y=[],X=[],z=y-1,G=0,ie=0,le=0,Te=0;for(G=0;G<D;++G)if(Y=[],le=G+b,le>=D&&(le-=D),!V[le]){X=[];var xe=[];for(ie=le;ie>=0;){xe[ie]=!0,V[ie]=!0,Y[Y.length]=ie,X.push(w[ie]);var ne=T[Math.floor(ie*4/y)];if(Te=ie*4&z,y<4+Te)throw new Error("FAT boundary crossed: "+ie+" 4 "+y);if(!w[ne]||(ie=ma(w[ne],Te),xe[ie]))break}I[le]={nodes:Y,data:Js([X])}}return I}function g(w,b,T,y,D,I,V,Y){for(var X=0,z=y.length?2:0,G=b[w].data,ie=0,le=0,Te;ie<G.length;ie+=128){var xe=G.slice(ie,ie+128);Tr(xe,64),le=xe.read_shift(2),Te=b0(xe,0,le-z),y.push(Te);var ne={name:Te,type:xe.read_shift(1),color:xe.read_shift(1),L:xe.read_shift(4,"i"),R:xe.read_shift(4,"i"),C:xe.read_shift(4,"i"),clsid:xe.read_shift(16),state:xe.read_shift(4,"i"),start:0,size:0},Ne=xe.read_shift(2)+xe.read_shift(2)+xe.read_shift(2)+xe.read_shift(2);Ne!==0&&(ne.ct=k(xe,xe.l-8));var nr=xe.read_shift(2)+xe.read_shift(2)+xe.read_shift(2)+xe.read_shift(2);nr!==0&&(ne.mt=k(xe,xe.l-8)),ne.start=xe.read_shift(4,"i"),ne.size=xe.read_shift(4,"i"),ne.size<0&&ne.start<0&&(ne.size=ne.type=0,ne.start=H,ne.name=""),ne.type===5?(X=ne.start,D>0&&X!==H&&(b[X].name="!StreamData")):ne.size>=4096?(ne.storage="fat",b[ne.start]===void 0&&(b[ne.start]=v(T,ne.start,b.fat_addrs,b.ssz)),b[ne.start].name=ne.name,ne.content=b[ne.start].data.slice(0,ne.size)):(ne.storage="minifat",ne.size<0?ne.size=0:X!==H&&ne.start!==H&&b[X]&&(ne.content=p(ne,b[X].data,(b[Y]||{}).data))),ne.content&&Tr(ne.content,0),I[Te]=ne,V.push(ne)}}function k(w,b){return new Date((br(w,b+4)/1e7*Math.pow(2,32)+br(w,b)/1e7-11644473600)*1e3)}function O(w,b){return o(),l(c.readFileSync(w),b)}function B(w,b){var T=b&&b.type;switch(T||He&&Buffer.isBuffer(w)&&(T="buffer"),T||"base64"){case"file":return O(w,b);case"base64":return l(Qr(ot(w)),b);case"binary":return l(Qr(w),b)}return l(w,b)}function E(w,b){var T=b||{},y=T.root||"Root Entry";if(w.FullPaths||(w.FullPaths=[]),w.FileIndex||(w.FileIndex=[]),w.FullPaths.length!==w.FileIndex.length)throw new Error("inconsistent CFB structure");w.FullPaths.length===0&&(w.FullPaths[0]=y+"/",w.FileIndex[0]={name:y,type:5}),T.CLSID&&(w.FileIndex[0].clsid=T.CLSID),F(w)}function F(w){var b="Sh33tJ5";if(!Ce.find(w,"/"+b)){var T=W(4);T[0]=55,T[1]=T[3]=50,T[2]=54,w.FileIndex.push({name:b,type:2,content:T,size:4,L:69,R:69,C:69}),w.FullPaths.push(w.FullPaths[0]+b),S(w)}}function S(w,b){E(w);for(var T=!1,y=!1,D=w.FullPaths.length-1;D>=0;--D){var I=w.FileIndex[D];switch(I.type){case 0:y?T=!0:(w.FileIndex.pop(),w.FullPaths.pop());break;case 1:case 2:case 5:y=!0,isNaN(I.R*I.L*I.C)&&(T=!0),I.R>-1&&I.L>-1&&I.R==I.L&&(T=!0);break;default:T=!0;break}}if(!(!T&&!b)){var V=new Date(1987,1,19),Y=0,X=Object.create?Object.create(null):{},z=[];for(D=0;D<w.FullPaths.length;++D)X[w.FullPaths[D]]=!0,w.FileIndex[D].type!==0&&z.push([w.FullPaths[D],w.FileIndex[D]]);for(D=0;D<z.length;++D){var G=a(z[D][0]);for(y=X[G];!y;){for(;a(G)&&!X[a(G)];)G=a(G);z.push([G,{name:n(G).replace("/",""),type:1,clsid:ve,ct:V,mt:V,content:null}]),X[G]=!0,G=a(z[D][0]),y=X[G]}}for(z.sort(function(Te,xe){return t(Te[0],xe[0])}),w.FullPaths=[],w.FileIndex=[],D=0;D<z.length;++D)w.FullPaths[D]=z[D][0],w.FileIndex[D]=z[D][1];for(D=0;D<z.length;++D){var ie=w.FileIndex[D],le=w.FullPaths[D];if(ie.name=n(le).replace("/",""),ie.L=ie.R=ie.C=-(ie.color=1),ie.size=ie.content?ie.content.length:0,ie.start=0,ie.clsid=ie.clsid||ve,D===0)ie.C=z.length>1?1:-1,ie.size=0,ie.type=5;else if(le.slice(-1)=="/"){for(Y=D+1;Y<z.length&&a(w.FullPaths[Y])!=le;++Y);for(ie.C=Y>=z.length?-1:Y,Y=D+1;Y<z.length&&a(w.FullPaths[Y])!=a(le);++Y);ie.R=Y>=z.length?-1:Y,ie.type=1}else a(w.FullPaths[D+1]||"")==a(le)&&(ie.R=D+1),ie.type=2}}}function L(w,b){var T=b||{};if(T.fileType=="mad")return Ul(w,T);if(S(w),T.fileType==="zip")return Ol(w,T);var y=(function(Te){for(var xe=0,ne=0,Ne=0;Ne<Te.FileIndex.length;++Ne){var nr=Te.FileIndex[Ne];if(nr.content){var tt=nr.content.length;tt>0&&(tt<4096?xe+=tt+63>>6:ne+=tt+511>>9)}}for(var gr=Te.FullPaths.length+3>>2,ft=xe+7>>3,an=xe+127>>7,nn=ft+ne+gr+an,xa=nn+127>>7,z0=xa<=109?0:Math.ceil((xa-109)/127);nn+xa+z0+127>>7>xa;)z0=++xa<=109?0:Math.ceil((xa-109)/127);var Xt=[1,z0,xa,an,gr,ne,xe,0];return Te.FileIndex[0].size=xe<<6,Xt[7]=(Te.FileIndex[0].start=Xt[0]+Xt[1]+Xt[2]+Xt[3]+Xt[4]+Xt[5])+(Xt[6]+7>>3),Xt})(w),D=W(y[7]<<9),I=0,V=0;{for(I=0;I<8;++I)D.write_shift(1,J[I]);for(I=0;I<8;++I)D.write_shift(2,0);for(D.write_shift(2,62),D.write_shift(2,3),D.write_shift(2,65534),D.write_shift(2,9),D.write_shift(2,6),I=0;I<3;++I)D.write_shift(2,0);for(D.write_shift(4,0),D.write_shift(4,y[2]),D.write_shift(4,y[0]+y[1]+y[2]+y[3]-1),D.write_shift(4,0),D.write_shift(4,4096),D.write_shift(4,y[3]?y[0]+y[1]+y[2]-1:H),D.write_shift(4,y[3]),D.write_shift(-4,y[1]?y[0]-1:H),D.write_shift(4,y[1]),I=0;I<109;++I)D.write_shift(-4,I<y[2]?y[1]+I:-1)}if(y[1])for(V=0;V<y[1];++V){for(;I<236+V*127;++I)D.write_shift(-4,I<y[2]?y[1]+I:-1);D.write_shift(-4,V===y[1]-1?H:V+1)}var Y=function(Te){for(V+=Te;I<V-1;++I)D.write_shift(-4,I+1);Te&&(++I,D.write_shift(-4,H))};for(V=I=0,V+=y[1];I<V;++I)D.write_shift(-4,Z.DIFSECT);for(V+=y[2];I<V;++I)D.write_shift(-4,Z.FATSECT);Y(y[3]),Y(y[4]);for(var X=0,z=0,G=w.FileIndex[0];X<w.FileIndex.length;++X)G=w.FileIndex[X],G.content&&(z=G.content.length,!(z<4096)&&(G.start=V,Y(z+511>>9)));for(Y(y[6]+7>>3);D.l&511;)D.write_shift(-4,Z.ENDOFCHAIN);for(V=I=0,X=0;X<w.FileIndex.length;++X)G=w.FileIndex[X],G.content&&(z=G.content.length,!(!z||z>=4096)&&(G.start=V,Y(z+63>>6)));for(;D.l&511;)D.write_shift(-4,Z.ENDOFCHAIN);for(I=0;I<y[4]<<2;++I){var ie=w.FullPaths[I];if(!ie||ie.length===0){for(X=0;X<17;++X)D.write_shift(4,0);for(X=0;X<3;++X)D.write_shift(4,-1);for(X=0;X<12;++X)D.write_shift(4,0);continue}G=w.FileIndex[I],I===0&&(G.start=G.size?G.start-1:H);var le=I===0&&T.root||G.name;if(le.length>31&&(console.error("Name "+le+" will be truncated to "+le.slice(0,31)),le=le.slice(0,31)),z=2*(le.length+1),D.write_shift(64,le,"utf16le"),D.write_shift(2,z),D.write_shift(1,G.type),D.write_shift(1,G.color),D.write_shift(-4,G.L),D.write_shift(-4,G.R),D.write_shift(-4,G.C),G.clsid)D.write_shift(16,G.clsid,"hex");else for(X=0;X<4;++X)D.write_shift(4,0);D.write_shift(4,G.state||0),D.write_shift(4,0),D.write_shift(4,0),D.write_shift(4,0),D.write_shift(4,0),D.write_shift(4,G.start),D.write_shift(4,G.size),D.write_shift(4,0)}for(I=1;I<w.FileIndex.length;++I)if(G=w.FileIndex[I],G.size>=4096)if(D.l=G.start+1<<9,He&&Buffer.isBuffer(G.content))G.content.copy(D,D.l,0,G.size),D.l+=G.size+511&-512;else{for(X=0;X<G.size;++X)D.write_shift(1,G.content[X]);for(;X&511;++X)D.write_shift(1,0)}for(I=1;I<w.FileIndex.length;++I)if(G=w.FileIndex[I],G.size>0&&G.size<4096)if(He&&Buffer.isBuffer(G.content))G.content.copy(D,D.l,0,G.size),D.l+=G.size+63&-64;else{for(X=0;X<G.size;++X)D.write_shift(1,G.content[X]);for(;X&63;++X)D.write_shift(1,0)}if(He)D.l=D.length;else for(;D.l<D.length;)D.write_shift(1,0);return D}function P(w,b){var T=w.FullPaths.map(function(X){return X.toUpperCase()}),y=T.map(function(X){var z=X.split("/");return z[z.length-(X.slice(-1)=="/"?2:1)]}),D=!1;b.charCodeAt(0)===47?(D=!0,b=T[0].slice(0,-1)+b):D=b.indexOf("/")!==-1;var I=b.toUpperCase(),V=D===!0?T.indexOf(I):y.indexOf(I);if(V!==-1)return w.FileIndex[V];var Y=!I.match(cn);for(I=I.replace(rt,""),Y&&(I=I.replace(cn,"!")),V=0;V<T.length;++V)if((Y?T[V].replace(cn,"!"):T[V]).replace(rt,"")==I||(Y?y[V].replace(cn,"!"):y[V]).replace(rt,"")==I)return w.FileIndex[V];return null}var U=64,H=-2,ce="d0cf11e0a1b11ae1",J=[208,207,17,224,161,177,26,225],ve="00000000000000000000000000000000",Z={MAXREGSECT:-6,DIFSECT:-4,FATSECT:-3,ENDOFCHAIN:H,FREESECT:-1,HEADER_SIGNATURE:ce,HEADER_MINOR_VERSION:"3e00",MAXREGSID:-6,NOSTREAM:-1,HEADER_CLSID:ve,EntryTypes:["unknown","storage","stream","lockbytes","property","root"]};function me(w,b,T){o();var y=L(w,T);c.writeFileSync(b,y)}function ke(w){for(var b=new Array(w.length),T=0;T<w.length;++T)b[T]=String.fromCharCode(w[T]);return b.join("")}function ae(w,b){var T=L(w,b);switch(b&&b.type||"buffer"){case"file":return o(),c.writeFileSync(b.filename,T),T;case"binary":return typeof T=="string"?T:ke(T);case"base64":return d0(typeof T=="string"?T:ke(T));case"buffer":if(He)return Buffer.isBuffer(T)?T:Ut(T);case"array":return typeof T=="string"?Qr(T):T}return T}var Ae;function K(w){try{var b=w.InflateRaw,T=new b;if(T._processChunk(new Uint8Array([3,0]),T._finishFlushFlag),T.bytesRead)Ae=w;else throw new Error("zlib does not expose bytesRead")}catch(y){console.error("cannot use native zlib: "+(y.message||y))}}function re(w,b){if(!Ae)return tn(w,b);var T=Ae.InflateRaw,y=new T,D=y._processChunk(w.slice(w.l),y._finishFlushFlag);return w.l+=y.bytesRead,D}function ee(w){return Ae?Ae.deflateRawSync(w):st(w)}var ue=[16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15],se=[3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258],ge=[1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577];function A(w){var b=(w<<1|w<<11)&139536|(w<<5|w<<15)&558144;return(b>>16|b>>8|b)&255}for(var M=typeof Uint8Array<"u",R=M?new Uint8Array(256):[],N=0;N<256;++N)R[N]=A(N);function j(w,b){var T=R[w&255];return b<=8?T>>>8-b:(T=T<<8|R[w>>8&255],b<=16?T>>>16-b:(T=T<<8|R[w>>16&255],T>>>24-b))}function C(w,b){var T=b&7,y=b>>>3;return(w[y]|(T<=6?0:w[y+1]<<8))>>>T&3}function _e(w,b){var T=b&7,y=b>>>3;return(w[y]|(T<=5?0:w[y+1]<<8))>>>T&7}function pe(w,b){var T=b&7,y=b>>>3;return(w[y]|(T<=4?0:w[y+1]<<8))>>>T&15}function te(w,b){var T=b&7,y=b>>>3;return(w[y]|(T<=3?0:w[y+1]<<8))>>>T&31}function De(w,b){var T=b&7,y=b>>>3;return(w[y]|(T<=1?0:w[y+1]<<8))>>>T&127}function We(w,b,T){var y=b&7,D=b>>>3,I=(1<<T)-1,V=w[D]>>>y;return T<8-y||(V|=w[D+1]<<8-y,T<16-y)||(V|=w[D+2]<<16-y,T<24-y)||(V|=w[D+3]<<24-y),V&I}function we(w,b,T){var y=b&7,D=b>>>3;return y<=5?w[D]|=(T&7)<<y:(w[D]|=T<<y&255,w[D+1]=(T&7)>>8-y),b+3}function qe(w,b,T){var y=b&7,D=b>>>3;return T=(T&1)<<y,w[D]|=T,b+1}function tr(w,b,T){var y=b&7,D=b>>>3;return T<<=y,w[D]|=T&255,T>>>=8,w[D+1]=T,b+8}function cr(w,b,T){var y=b&7,D=b>>>3;return T<<=y,w[D]|=T&255,T>>>=8,w[D+1]=T&255,w[D+2]=T>>>8,b+16}function Lr(w,b){var T=w.length,y=2*T>b?2*T:b+5,D=0;if(T>=b)return w;if(He){var I=Os(y);if(w.copy)w.copy(I);else for(;D<w.length;++D)I[D]=w[D];return I}else if(M){var V=new Uint8Array(y);if(V.set)V.set(w);else for(;D<T;++D)V[D]=w[D];return V}return w.length=y,w}function he(w){for(var b=new Array(w),T=0;T<w;++T)b[T]=0;return b}function de(w,b,T){var y=1,D=0,I=0,V=0,Y=0,X=w.length,z=M?new Uint16Array(32):he(32);for(I=0;I<32;++I)z[I]=0;for(I=X;I<T;++I)w[I]=0;X=w.length;var G=M?new Uint16Array(X):he(X);for(I=0;I<X;++I)z[D=w[I]]++,y<D&&(y=D),G[I]=0;for(z[0]=0,I=1;I<=y;++I)z[I+16]=Y=Y+z[I-1]<<1;for(I=0;I<X;++I)Y=w[I],Y!=0&&(G[I]=z[Y+16]++);var ie=0;for(I=0;I<X;++I)if(ie=w[I],ie!=0)for(Y=j(G[I],y)>>y-ie,V=(1<<y+4-ie)-1;V>=0;--V)b[Y|V<<ie]=ie&15|I<<4;return y}var ht=M?new Uint16Array(512):he(512),Br=M?new Uint16Array(32):he(32);if(!M){for(var pr=0;pr<512;++pr)ht[pr]=0;for(pr=0;pr<32;++pr)Br[pr]=0}(function(){for(var w=[],b=0;b<32;b++)w.push(5);de(w,Br,32);var T=[];for(b=0;b<=143;b++)T.push(8);for(;b<=255;b++)T.push(9);for(;b<=279;b++)T.push(7);for(;b<=287;b++)T.push(8);de(T,ht,288)})();var Zr=(function(){for(var b=M?new Uint8Array(32768):[],T=0,y=0;T<ge.length-1;++T)for(;y<ge[T+1];++y)b[y]=T;for(;y<32768;++y)b[y]=29;var D=M?new Uint8Array(259):[];for(T=0,y=0;T<se.length-1;++T)for(;y<se[T+1];++y)D[y]=T;function I(Y,X){for(var z=0;z<Y.length;){var G=Math.min(65535,Y.length-z),ie=z+G==Y.length;for(X.write_shift(1,+ie),X.write_shift(2,G),X.write_shift(2,~G&65535);G-- >0;)X[X.l++]=Y[z++]}return X.l}function V(Y,X){for(var z=0,G=0,ie=M?new Uint16Array(32768):[];G<Y.length;){var le=Math.min(65535,Y.length-G);if(le<10){for(z=we(X,z,+(G+le==Y.length)),z&7&&(z+=8-(z&7)),X.l=z/8|0,X.write_shift(2,le),X.write_shift(2,~le&65535);le-- >0;)X[X.l++]=Y[G++];z=X.l*8;continue}z=we(X,z,+(G+le==Y.length)+2);for(var Te=0;le-- >0;){var xe=Y[G];Te=(Te<<5^xe)&32767;var ne=-1,Ne=0;if((ne=ie[Te])&&(ne|=G&-32768,ne>G&&(ne-=32768),ne<G))for(;Y[ne+Ne]==Y[G+Ne]&&Ne<250;)++Ne;if(Ne>2){xe=D[Ne],xe<=22?z=tr(X,z,R[xe+1]>>1)-1:(tr(X,z,3),z+=5,tr(X,z,R[xe-23]>>5),z+=3);var nr=xe<8?0:xe-4>>2;nr>0&&(cr(X,z,Ne-se[xe]),z+=nr),xe=b[G-ne],z=tr(X,z,R[xe]>>3),z-=3;var tt=xe<4?0:xe-2>>1;tt>0&&(cr(X,z,G-ne-ge[xe]),z+=tt);for(var gr=0;gr<Ne;++gr)ie[Te]=G&32767,Te=(Te<<5^Y[G])&32767,++G;le-=Ne-1}else xe<=143?xe=xe+48:z=qe(X,z,1),z=tr(X,z,R[xe]),ie[Te]=G&32767,++G}z=tr(X,z,0)-1}return X.l=(z+7)/8|0,X.l}return function(X,z){return X.length<8?I(X,z):V(X,z)}})();function st(w){var b=W(50+Math.floor(w.length*1.1)),T=Zr(w,b);return b.slice(0,T)}var Ie=M?new Uint16Array(32768):he(32768),be=M?new Uint16Array(32768):he(32768),ar=M?new Uint16Array(128):he(128),sr=1,Qn=1;function aa(w,b){var T=te(w,b)+257;b+=5;var y=te(w,b)+1;b+=5;var D=pe(w,b)+4;b+=4;for(var I=0,V=M?new Uint8Array(19):he(19),Y=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],X=1,z=M?new Uint8Array(8):he(8),G=M?new Uint8Array(8):he(8),ie=V.length,le=0;le<D;++le)V[ue[le]]=I=_e(w,b),X<I&&(X=I),z[I]++,b+=3;var Te=0;for(z[0]=0,le=1;le<=X;++le)G[le]=Te=Te+z[le-1]<<1;for(le=0;le<ie;++le)(Te=V[le])!=0&&(Y[le]=G[Te]++);var xe=0;for(le=0;le<ie;++le)if(xe=V[le],xe!=0){Te=R[Y[le]]>>8-xe;for(var ne=(1<<7-xe)-1;ne>=0;--ne)ar[Te|ne<<xe]=xe&7|le<<3}var Ne=[];for(X=1;Ne.length<T+y;)switch(Te=ar[De(w,b)],b+=Te&7,Te>>>=3){case 16:for(I=3+C(w,b),b+=2,Te=Ne[Ne.length-1];I-- >0;)Ne.push(Te);break;case 17:for(I=3+_e(w,b),b+=3;I-- >0;)Ne.push(0);break;case 18:for(I=11+De(w,b),b+=7;I-- >0;)Ne.push(0);break;default:Ne.push(Te),X<Te&&(X=Te);break}var nr=Ne.slice(0,T),tt=Ne.slice(T);for(le=T;le<286;++le)nr[le]=0;for(le=y;le<30;++le)tt[le]=0;return sr=de(nr,Ie,286),Qn=de(tt,be,30),b}function ha(w,b){if(w[0]==3&&!(w[1]&3))return[sa(b),2];for(var T=0,y=0,D=Os(b||1<<18),I=0,V=D.length>>>0,Y=0,X=0;(y&1)==0;){if(y=_e(w,T),T+=3,y>>>1)y>>1==1?(Y=9,X=5):(T=aa(w,T),Y=sr,X=Qn);else{T&7&&(T+=8-(T&7));var z=w[T>>>3]|w[(T>>>3)+1]<<8;if(T+=32,z>0)for(!b&&V<I+z&&(D=Lr(D,I+z),V=D.length);z-- >0;)D[I++]=w[T>>>3],T+=8;continue}for(;;){!b&&V<I+32767&&(D=Lr(D,I+32767),V=D.length);var G=We(w,T,Y),ie=y>>>1==1?ht[G]:Ie[G];if(T+=ie&15,ie>>>=4,(ie>>>8&255)===0)D[I++]=ie;else{if(ie==256)break;ie-=257;var le=ie<8?0:ie-4>>2;le>5&&(le=0);var Te=I+se[ie];le>0&&(Te+=We(w,T,le),T+=le),G=We(w,T,X),ie=y>>>1==1?Br[G]:be[G],T+=ie&15,ie>>>=4;var xe=ie<4?0:ie-2>>1,ne=ge[ie];for(xe>0&&(ne+=We(w,T,xe),T+=xe),!b&&V<Te&&(D=Lr(D,Te+100),V=D.length);I<Te;)D[I]=D[I-ne],++I}}}return b?[D,T+7>>>3]:[D.slice(0,I),T+7>>>3]}function tn(w,b){var T=w.slice(w.l||0),y=ha(T,b);return w.l+=y[1],y[0]}function Cs(w,b){if(w)typeof console<"u"&&console.error(b);else throw new Error(b)}function Ds(w,b){var T=w;Tr(T,0);var y=[],D=[],I={FileIndex:y,FullPaths:D};E(I,{root:b.root});for(var V=T.length-4;(T[V]!=80||T[V+1]!=75||T[V+2]!=5||T[V+3]!=6)&&V>=0;)--V;T.l=V+4,T.l+=4;var Y=T.read_shift(2);T.l+=6;var X=T.read_shift(4);for(T.l=X,V=0;V<Y;++V){T.l+=20;var z=T.read_shift(4),G=T.read_shift(4),ie=T.read_shift(2),le=T.read_shift(2),Te=T.read_shift(2);T.l+=8;var xe=T.read_shift(4),ne=f(T.slice(T.l+ie,T.l+ie+le));T.l+=ie+le+Te;var Ne=T.l;T.l=xe+4,ne&&ne[1]&&((ne[1]||{}).usz&&(G=ne[1].usz),(ne[1]||{}).csz&&(z=ne[1].csz)),Il(T,z,G,I,ne),T.l=Ne}return I}function Il(w,b,T,y,D){w.l+=2;var I=w.read_shift(2),V=w.read_shift(2),Y=s(w);if(I&8257)throw new Error("Unsupported ZIP encryption");for(var X=w.read_shift(4),z=w.read_shift(4),G=w.read_shift(4),ie=w.read_shift(2),le=w.read_shift(2),Te="",xe=0;xe<ie;++xe)Te+=String.fromCharCode(w[w.l++]);if(le){var ne=f(w.slice(w.l,w.l+le));(ne[21589]||{}).mt&&(Y=ne[21589].mt),(ne[1]||{}).usz&&(G=ne[1].usz),(ne[1]||{}).csz&&(z=ne[1].csz),D&&((D[21589]||{}).mt&&(Y=D[21589].mt),(D[1]||{}).usz&&(G=D[1].usz),(D[1]||{}).csz&&(z=D[1].csz))}w.l+=le;var Ne=w.slice(w.l,w.l+z);switch(V){case 8:Ne=re(w,G);break;case 0:w.l+=z;break;default:throw new Error("Unsupported ZIP Compression method "+V)}var nr=!1;I&8&&(X=w.read_shift(4),X==134695760&&(X=w.read_shift(4),nr=!0),z=w.read_shift(4),G=w.read_shift(4)),z!=b&&Cs(nr,"Bad compressed size: "+b+" != "+z),G!=T&&Cs(nr,"Bad uncompressed size: "+T+" != "+G),X0(y,Te,Ne,{unsafe:!0,mt:Y})}function Ol(w,b){var T=b||{},y=[],D=[],I=W(1),V=T.compression?8:0,Y=0,X=!1;X&&(Y|=8);var z=0,G=0,ie=0,le=0,Te=w.FullPaths[0],xe=Te,ne=w.FileIndex[0],Ne=[],nr=0;for(z=1;z<w.FullPaths.length;++z)if(xe=w.FullPaths[z].slice(Te.length),ne=w.FileIndex[z],!(!ne.size||!ne.content||Array.isArray(ne.content)&&ne.content.length==0||xe=="Sh33tJ5")){var tt=ie,gr=W(xe.length);for(G=0;G<xe.length;++G)gr.write_shift(1,xe.charCodeAt(G)&127);gr=gr.slice(0,gr.l),Ne[le]=typeof ne.content=="string"?Ws.bstr(ne.content,0):Ws.buf(ne.content,0);var ft=typeof ne.content=="string"?Qr(ne.content):ne.content;V==8&&(ft=ee(ft)),I=W(30),I.write_shift(4,67324752),I.write_shift(2,20),I.write_shift(2,Y),I.write_shift(2,V),ne.mt?i(I,ne.mt):I.write_shift(4,0),I.write_shift(-4,Y&8?0:Ne[le]),I.write_shift(4,Y&8?0:ft.length),I.write_shift(4,Y&8?0:ne.content.length),I.write_shift(2,gr.length),I.write_shift(2,0),ie+=I.length,y.push(I),ie+=gr.length,y.push(gr),ie+=ft.length,y.push(ft),Y&8&&(I=W(12),I.write_shift(-4,Ne[le]),I.write_shift(4,ft.length),I.write_shift(4,ne.content.length),ie+=I.l,y.push(I)),I=W(46),I.write_shift(4,33639248),I.write_shift(2,0),I.write_shift(2,20),I.write_shift(2,Y),I.write_shift(2,V),I.write_shift(4,0),I.write_shift(-4,Ne[le]),I.write_shift(4,ft.length),I.write_shift(4,ne.content.length),I.write_shift(2,gr.length),I.write_shift(2,0),I.write_shift(2,0),I.write_shift(2,0),I.write_shift(2,0),I.write_shift(4,0),I.write_shift(4,tt),nr+=I.l,D.push(I),nr+=gr.length,D.push(gr),++le}return I=W(22),I.write_shift(4,101010256),I.write_shift(2,0),I.write_shift(2,0),I.write_shift(2,le),I.write_shift(2,le),I.write_shift(4,nr),I.write_shift(4,ie),I.write_shift(2,0),dr([dr(y),dr(D),I])}var e0={htm:"text/html",xml:"text/xml",gif:"image/gif",jpg:"image/jpeg",png:"image/png",mso:"application/x-mso",thmx:"application/vnd.ms-officetheme",sh33tj5:"application/octet-stream"};function Nl(w,b){if(w.ctype)return w.ctype;var T=w.name||"",y=T.match(/\.([^\.]+)$/);return y&&e0[y[1]]||b&&(y=(T=b).match(/[\.\\]([^\.\\])+$/),y&&e0[y[1]])?e0[y[1]]:"application/octet-stream"}function Rl(w){for(var b=d0(w),T=[],y=0;y<b.length;y+=76)T.push(b.slice(y,y+76));return T.join(`\r
 `)+`\r
 `}function Pl(w){var b=w.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7E-\xFF=]/g,function(z){var G=z.charCodeAt(0).toString(16).toUpperCase();return"="+(G.length==1?"0"+G:G)});b=b.replace(/ $/mg,"=20").replace(/\t$/mg,"=09"),b.charAt(0)==`
@@ -2990,7 +3677,90 @@ safe-buffer/index.js:
       },
     };
   }
-  global.ExplorerEditAssist = { pattern, patternKind, infer, makeRule, apply, create, MAX_SAMPLE };
+  const MASKS = [
+    {
+      id: 'mask-email',
+      zh: '脱敏邮箱地址（z***@example.com）',
+      en: 'Mask email addresses (z***@example.com)',
+    },
+    {
+      id: 'mask-ipv4',
+      zh: '脱敏 IPv4 地址（192.168.*.*）',
+      en: 'Mask IPv4 addresses (192.168.*.*)',
+    },
+    {
+      id: 'mask-phone',
+      zh: '脱敏手机号 / 证件长数字（138****5678）',
+      en: 'Mask phone numbers & long numeric IDs (138****5678)',
+    },
+    {
+      id: 'mask-secret',
+      zh: '脱敏 Token / Bearer / 密钥参数（token=***）',
+      en: 'Mask Bearer tokens, API keys & passwords (token=***)',
+    },
+    {
+      id: 'mask-url-query',
+      zh: '脱敏 URL 查询参数值（?user=***&code=***）',
+      en: 'Mask URL query parameter values (?user=***&code=***)',
+    },
+    {
+      id: 'clean-log-prefix',
+      zh: '剥离行首日志时间戳与级别前缀',
+      en: 'Strip leading log timestamp & level prefix',
+    },
+  ];
+  function applyMask(value, maskId) {
+    if (typeof value !== 'string' || !value) return null;
+    let out = value;
+    if (maskId === 'mask-email') {
+      out = value.replace(
+        /([A-Za-z0-9._%+-])([A-Za-z0-9._%+-]*)(@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/g,
+        (_, first, _rest, domain) => first + '***' + domain,
+      );
+    } else if (maskId === 'mask-ipv4') {
+      out = value.replace(
+        /\b((?:25[0-5]|2[0-4]\d|1?\d?\d)\.(?:25[0-5]|2[0-4]\d|1?\d?\d))\.(?:25[0-5]|2[0-4]\d|1?\d?\d)\.(?:25[0-5]|2[0-4]\d|1?\d?\d)\b/g,
+        '$1.*.*',
+      );
+    } else if (maskId === 'mask-phone') {
+      out = value.replace(
+        /\b(\+?\d{2,3}[-\s]?)?(\d{3})\d{4,11}(\d{4})\b/g,
+        (_, pre, head, tail) => (pre || '') + head + '****' + tail,
+      );
+    } else if (maskId === 'mask-secret') {
+      out = value
+        .replace(/\b(Bearer\s+)[A-Za-z0-9._~+/=-]{4,}/gi, '$1***')
+        .replace(
+          /\b((?:access_)?token|api[_-]?key|secret|password|passwd|pwd|session(?:_id)?)(\s*[:=]\s*["']?)([^"'\s,&;]+)(["']?)/gi,
+          '$1$2***$4',
+        );
+    } else if (maskId === 'mask-url-query') {
+      out = value.replace(
+        /(\?[A-Za-z0-9_.-]+=)([^&#\s]+)((?:&[A-Za-z0-9_.-]+=[^&#\s]+)*)/g,
+        (_, firstKey, _firstVal, rest) =>
+          firstKey + '***' + rest.replace(/(&[A-Za-z0-9_.-]+=)([^&#\s]+)/g, '$1***'),
+      );
+    } else if (maskId === 'clean-log-prefix') {
+      out = value.replace(
+        /^\s*(?:\[\s*\d{4}[-/]\d{2}[-/]\d{2}[T\s]\d{2}:\d{2}:\d{2}(?:[.,]\d+)?(?:Z|[+-]\d{2}:?\d{2})?\s*\]|\d{4}[-/]\d{2}[-/]\d{2}[T\s]\d{2}:\d{2}:\d{2}(?:[.,]\d+)?(?:Z|[+-]\d{2}:?\d{2})?)\s*(?:[-|]?\s*(?:\[\s*(?:INFO|WARN|WARNING|ERROR|DEBUG|TRACE|FATAL)\s*\]|\b(?:INFO|WARN|WARNING|ERROR|DEBUG|TRACE|FATAL)\b)\s*[:|-]?\s*)?/i,
+        '',
+      );
+    } else {
+      return null;
+    }
+    return out === value ? null : out;
+  }
+  global.ExplorerEditAssist = {
+    pattern,
+    patternKind,
+    infer,
+    makeRule,
+    apply,
+    MASKS,
+    applyMask,
+    create,
+    MAX_SAMPLE,
+  };
 })(globalThis);
 </script>
     <script>(function (global) {
@@ -3306,7 +4076,31 @@ safe-buffer/index.js:
       warnings.add('XML 按 @属性、#text、同名元素数组映射；空元素为 null，单个元素不表示数组');
       return object([[doc.documentElement.nodeName, element(doc.documentElement)]]);
     }
-    if (format === 'json') JSON.parse(text); // Syntax only; never use rounded values.
+    if (format === 'json') {
+      try {
+        JSON.parse(text); // Syntax only; never use rounded values.
+      } catch (e) {
+        const lines = text
+          .split(/\r\n|\r|\n/)
+          .map((l) => l.trim())
+          .filter(Boolean);
+        if (
+          lines.length >= 2 &&
+          lines.every((l) => {
+            try {
+              JSON.parse(l);
+              return true;
+            } catch {
+              return false;
+            }
+          })
+        ) {
+          text = '[\n' + lines.join(',\n') + '\n]';
+        } else {
+          throw e;
+        }
+      }
+    }
     const docs = g.YAML.parseAllDocuments(text, {
       intAsBigInt: true,
       keepSourceTokens: true,
@@ -3748,6 +4542,532 @@ safe-buffer/index.js:
   g.ExplorerConvertUI = { attach };
 })(globalThis);
 </script>
+    <script>/* FindChanged v1 transport. Content is sent only to the explicitly selected origin/window. */
+(function (global) {
+  'use strict';
+  const MAX_BYTES = 5 * 1024 * 1024,
+    MAX_LINES = 100000;
+  const statuses = new Set(['ok', 'stale', 'notFound', 'busy']);
+  function originOf(address) {
+    const url = new URL(address);
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password)
+      throw Error('address');
+    return url.origin;
+  }
+  function tooLarge(text) {
+    if (text.length > MAX_BYTES || new TextEncoder().encode(text).length > MAX_BYTES) return true;
+    let lines = 1;
+    for (let i = 0; i < text.length; i++) if (text[i] === '\n' && ++lines > MAX_LINES) return true;
+    return false;
+  }
+  function offsetOf(text, pos) {
+    if (
+      !pos ||
+      !Number.isSafeInteger(pos.line) ||
+      !Number.isSafeInteger(pos.column) ||
+      pos.line < 1 ||
+      pos.column < 1
+    )
+      return -1;
+    let start = 0;
+    for (let line = 1; line < pos.line; line++) {
+      const end = text.indexOf('\n', start);
+      if (end < 0) return -1;
+      start = end + 1;
+    }
+    let end = text.indexOf('\n', start);
+    if (end < 0) end = text.length;
+    if (end > start && text[end - 1] === '\r') end--;
+    const offset = start + pos.column - 1;
+    return offset <= end ? offset : -1;
+  }
+  function rangeOffset(text, range) {
+    if (!range || typeof range !== 'object') return -1;
+    const from = offsetOf(text, range.from),
+      to = offsetOf(text, range.to);
+    return from >= 0 && to >= from ? from : -1;
+  }
+  function fileName(name, fallback) {
+    return (
+      String(name || fallback)
+        .split(/[\\/]/)
+        .pop()
+        .replace(/[\u0000-\u001f]/g, '')
+        .trim()
+        .slice(0, 255) || fallback
+    );
+  }
+  function side(c) {
+    return {
+      name: fileName(c.filename, 'document.' + c.format),
+      label: c.label.slice(0, 200),
+      format: c.format,
+      text: c.text,
+    };
+  }
+  function downloadNames(left, right) {
+    const suffix = (name, which) => {
+      const dot = name.lastIndexOf('.');
+      return dot > 0 ? name.slice(0, dot) + '-' + which + name.slice(dot) : name + '-' + which;
+    };
+    return left.name === right.name
+      ? [suffix(left.name, 'left'), suffix(right.name, 'right')]
+      : [left.name, right.name];
+  }
+  function manifest(h) {
+    const info = (s) => ({ name: s.name, label: s.label, format: s.format });
+    const nodeInfo = (s) => ({
+      session: s.session,
+      revision: s.revision,
+      node: s.node,
+      path: s.path,
+    });
+    return {
+      version: 1,
+      id: h.id,
+      session: h.session,
+      revision: h.revision,
+      node: h.node,
+      folder: h.folder,
+      origin: h.origin,
+      target: h.target,
+      choices: h.choices,
+      left: info(h.left),
+      right: info(h.right),
+      ...(h.mode === 'nodes'
+        ? {
+            mode: 'nodes',
+            nodeSources: {
+              left: nodeInfo(h.nodeSources.left),
+              right: nodeInfo(h.nodeSources.right),
+            },
+          }
+        : {}),
+    };
+  }
+  function create(api) {
+    const win = api.window;
+    let handoff = null,
+      peer = null,
+      timer = null,
+      status = 'prepared',
+      reason = '';
+    function change(next, why = '') {
+      status = next;
+      reason = why;
+      api.onStatus?.(status, reason);
+    }
+    function stopTimer() {
+      if (timer !== null) win.clearTimeout(timer);
+      timer = null;
+    }
+    function post(message) {
+      if (!peer || peer.closed) return false;
+      try {
+        peer.postMessage(message, handoff.origin);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+    function set(next) {
+      stopTimer();
+      peer = null;
+      handoff = next;
+      change(tooLarge(next.left.text) || tooLarge(next.right.text) ? 'tooLarge' : 'prepared');
+    }
+    function open() {
+      if (!handoff) return false;
+      stopTimer();
+      peer = null;
+      if (tooLarge(handoff.left.text) || tooLarge(handoff.right.text)) {
+        change('tooLarge');
+        return false;
+      }
+      try {
+        peer = win.open(handoff.target, '_blank');
+      } catch {
+        peer = null;
+      }
+      if (!peer) {
+        change('blocked');
+        return false;
+      }
+      change('waiting');
+      timer = win.setTimeout(() => {
+        timer = null;
+        change('timeout');
+      }, 15000);
+      return true;
+    }
+    function receive(ev) {
+      if (!handoff || !peer || peer.closed || ev.source !== peer || ev.origin !== handoff.origin)
+        return;
+      const m = ev.data;
+      if (!m || typeof m !== 'object' || Array.isArray(m)) return;
+      if (m.type === 'fc-xjy-ready') {
+        if (m.version !== 1) {
+          stopTimer();
+          change('rejected', 'version');
+          return;
+        }
+        stopTimer();
+        change('waiting');
+        timer = win.setTimeout(() => {
+          timer = null;
+          change('timeout');
+        }, 15000);
+        if (
+          !post({
+            type: 'xjy-compare',
+            version: 1,
+            id: handoff.id,
+            left: handoff.left,
+            right: handoff.right,
+          })
+        )
+          change('unavailable');
+        return;
+      }
+      if (m.version !== 1) return;
+      if (m.type === 'fc-xjy-rejected') {
+        if (m.id !== undefined && m.id !== handoff.id) return;
+        if (!['version', 'invalid', 'tooLarge'].includes(m.reason)) return;
+        stopTimer();
+        change('rejected', m.reason);
+      } else if (m.id === handoff.id && m.type === 'fc-xjy-accepted') {
+        stopTimer();
+        change('accepted');
+      } else if (
+        m.id === handoff.id &&
+        m.type === 'fc-xjy-locate' &&
+        Number.isSafeInteger(m.request) &&
+        m.request >= 0
+      ) {
+        let result;
+        try {
+          result = m.left || m.right ? api.locate(handoff, m) : 'notFound';
+        } catch {
+          result = 'notFound';
+        }
+        post({
+          type: 'xjy-locate-result',
+          version: 1,
+          id: handoff.id,
+          request: m.request,
+          status: statuses.has(result) ? result : 'notFound',
+        });
+      }
+    }
+    win.addEventListener('message', receive);
+    return {
+      set,
+      open,
+      state: () => ({ status, reason }),
+      dispose() {
+        stopTimer();
+        peer = null;
+        handoff = null;
+        win.removeEventListener('message', receive);
+      },
+    };
+  }
+  function inferFormat(name, explicit) {
+    const f = String(explicit || '')
+      .toLowerCase()
+      .trim();
+    if (
+      [
+        'xml',
+        'kml',
+        'json',
+        'jsonl',
+        'ndjson',
+        'yaml',
+        'yml',
+        'csv',
+        'tsv',
+        'xlsx',
+        'xls',
+        'sqlite',
+        'db',
+      ].includes(f)
+    ) {
+      if (f === 'kml') return 'xml';
+      if (f === 'ndjson') return 'jsonl';
+      if (f === 'yml') return 'yaml';
+      if (f === 'db') return 'sqlite';
+      return f;
+    }
+    const lower = String(name || '').toLowerCase();
+    if (/\.(?:xml|kml|mfcribbon-ms|ribbon-ms)$/.test(lower)) return 'xml';
+    if (/\.(?:jsonl|ndjson)$/.test(lower)) return 'jsonl';
+    if (/\.json$/.test(lower)) return 'json';
+    if (/\.ya?ml$/.test(lower)) return 'yaml';
+    if (/\.tsv$/.test(lower)) return 'tsv';
+    if (/\.csv$/.test(lower)) return 'csv';
+    if (/\.xlsx$/.test(lower)) return 'xlsx';
+    if (/\.xls$/.test(lower)) return 'xls';
+    if (/\.(?:sqlite|sqlite3|db|db3)$/.test(lower)) return 'sqlite';
+    return '';
+  }
+  function toBytes(raw) {
+    if (!raw) return null;
+    if (raw instanceof Uint8Array) return raw;
+    if (raw instanceof ArrayBuffer) return new Uint8Array(raw);
+    if (ArrayBuffer.isView(raw)) return new Uint8Array(raw.buffer, raw.byteOffset, raw.byteLength);
+    if (Array.isArray(raw)) return new Uint8Array(raw);
+    if (typeof raw === 'string') {
+      try {
+        const bin = atob(raw);
+        const out = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+        return out;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+  /**
+   * Inbound handoff receiver: FindChanged.com -> XJY Editor (v1).
+   * When opened by FindChanged via window.open, announces 'xjy-fc-ready', accepts 'fc-xjy-open',
+   * loads the file into the editor, supports 'fc-xjy-locate', and provides sendBack() ('xjy-fc-apply').
+   */
+  function createInbound(api) {
+    const win = api.window || global;
+    const editor = api.editor || 'xjy';
+    const acceptedFormats = new Set(api.formats || ['xml', 'json', 'jsonl', 'yaml']);
+    let current = null;
+    let applyBtn = null;
+
+    const isEn = () =>
+      (global.XJYI18n?.locale || win.document?.documentElement?.lang || '')
+        .toLowerCase()
+        .startsWith('en');
+    const labelText = () => (isEn() ? 'Apply to FindChanged ↗' : '回传到 FindChanged ↗');
+
+    function ensureButton() {
+      if (applyBtn || !api.mountAfter || !win.document) return;
+      applyBtn = win.document.createElement('button');
+      applyBtn.id = 'fcapplyback';
+      applyBtn.type = 'button';
+      applyBtn.className = 'primary';
+      applyBtn.hidden = true;
+      applyBtn.textContent = labelText();
+      applyBtn.onclick = () => sendBack();
+      api.mountAfter.after(applyBtn);
+      win.document.addEventListener('xjy-language-change', () => {
+        if (applyBtn) applyBtn.textContent = labelText();
+      });
+    }
+    ensureButton();
+
+    function reply(targetWin, origin, msg) {
+      if (!targetWin || targetWin.closed) return false;
+      const targetOrigin = origin && origin !== 'null' ? origin : '*';
+      try {
+        targetWin.postMessage(msg, targetOrigin);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    async function handleOpen(ev, m) {
+      const id = typeof m.id === 'string' && m.id.length >= 1 && m.id.length <= 100 ? m.id : '';
+      if (m.version !== 1) {
+        reply(ev.source, ev.origin, {
+          type: 'xjy-fc-rejected',
+          version: 1,
+          id: id || undefined,
+          reason: 'version',
+        });
+        return;
+      }
+      const f = m.file;
+      if (!id || !f || typeof f !== 'object') {
+        reply(ev.source, ev.origin, {
+          type: 'xjy-fc-rejected',
+          version: 1,
+          id: id || undefined,
+          reason: 'invalid',
+        });
+        return;
+      }
+      const fmt = inferFormat(f.name, f.format);
+      if (!fmt || !acceptedFormats.has(fmt)) {
+        reply(ev.source, ev.origin, {
+          type: 'xjy-fc-rejected',
+          version: 1,
+          id,
+          reason: 'unsupportedFormat',
+        });
+        return;
+      }
+      const text = typeof f.text === 'string' ? f.text : null;
+      const bytes = toBytes(f.bytes) || (text !== null ? new TextEncoder().encode(text) : null);
+      if (text === null && !bytes) {
+        reply(ev.source, ev.origin, { type: 'xjy-fc-rejected', version: 1, id, reason: 'invalid' });
+        return;
+      }
+      if ((text !== null && tooLarge(text)) || (bytes && bytes.byteLength > MAX_BYTES * 2)) {
+        reply(ev.source, ev.origin, {
+          type: 'xjy-fc-rejected',
+          version: 1,
+          id,
+          reason: 'tooLarge',
+        });
+        return;
+      }
+      const decodedText = text !== null ? text : new TextDecoder('utf-8').decode(bytes);
+      const payload = {
+        id,
+        origin: ev.origin,
+        source: ev.source,
+        side: f.side === 'left' || f.side === 'right' ? f.side : null,
+        name: fileName(f.name, 'document.' + fmt),
+        label: typeof f.label === 'string' ? f.label.slice(0, 200) : '',
+        format: fmt,
+        text: decodedText,
+        bytes,
+        locate: f.locate || m.locate || null,
+        recipe: m.recipe || null,
+      };
+      try {
+        await api.onOpen(payload);
+      } catch {
+        reply(ev.source, ev.origin, { type: 'xjy-fc-rejected', version: 1, id, reason: 'invalid' });
+        return;
+      }
+      current = payload;
+      ensureButton();
+      if (applyBtn) {
+        applyBtn.hidden = false;
+        applyBtn.textContent = labelText();
+      }
+      reply(ev.source, ev.origin, { type: 'xjy-fc-accepted', version: 1, id });
+    }
+
+    function receive(ev) {
+      if (!ev.source || (win.opener && ev.source !== win.opener && ev.source !== current?.source))
+        return;
+      const m = ev.data;
+      if (!m || typeof m !== 'object' || Array.isArray(m)) return;
+      if (m.type === 'fc-xjy-open') {
+        handleOpen(ev, m);
+      } else if (m.type === 'fc-xjy-ping') {
+        reply(ev.source, ev.origin, { type: 'xjy-fc-ready', version: 1, editor });
+      } else if (
+        current &&
+        m.version === 1 &&
+        m.id === current.id &&
+        m.type === 'fc-xjy-locate' &&
+        Number.isSafeInteger(m.request) &&
+        m.request >= 0
+      ) {
+        let status = 'notFound';
+        try {
+          status = api.onLocate ? api.onLocate(current, m) : 'notFound';
+        } catch {
+          status = 'notFound';
+        }
+        reply(ev.source, ev.origin, {
+          type: 'xjy-locate-result',
+          version: 1,
+          id: current.id,
+          request: m.request,
+          status: statuses.has(status) ? status : 'notFound',
+        });
+      } else if (current && m.version === 1 && m.id === current.id && m.type === 'fc-xjy-applied') {
+        api.onApplied?.(current);
+      }
+    }
+
+    function sendBack() {
+      if (!current || !current.source || current.source.closed) {
+        api.onNotify?.(
+          isEn()
+            ? 'The original FindChanged tab is no longer open.'
+            : '原 FindChanged 标签页已关闭，无法直接回传。',
+        );
+        return false;
+      }
+      let snap;
+      try {
+        snap = api.getCurrent?.();
+      } catch (e) {
+        api.onNotify?.(e.message);
+        return false;
+      }
+      if (!snap) return false;
+      const ok = reply(current.source, current.origin, {
+        type: 'xjy-fc-apply',
+        version: 1,
+        id: current.id,
+        side: current.side || 'right',
+        file: {
+          name: fileName(snap.name || current.name, current.name),
+          format: snap.format || current.format,
+          ...(typeof snap.text === 'string' ? { text: snap.text } : {}),
+          ...(snap.bytes ? { bytes: snap.bytes } : {}),
+        },
+      });
+      if (ok) {
+        api.onNotify?.(
+          isEn()
+            ? 'Sent updated content back to FindChanged.'
+            : '已将修改后的内容回传到 FindChanged。',
+        );
+        try {
+          current.source.focus();
+        } catch {}
+      }
+      return ok;
+    }
+
+    win.addEventListener('message', receive);
+    if (win.opener && !win.opener.closed) {
+      try {
+        win.opener.postMessage({ type: 'xjy-fc-ready', version: 1, editor }, '*');
+      } catch {}
+    }
+
+    return {
+      session: () => current,
+      sendBack,
+      announce() {
+        if (win.opener && !win.opener.closed) {
+          try {
+            win.opener.postMessage({ type: 'xjy-fc-ready', version: 1, editor }, '*');
+            return true;
+          } catch {}
+        }
+        return false;
+      },
+      dispose() {
+        win.removeEventListener('message', receive);
+        current = null;
+      },
+    };
+  }
+  global.ExplorerFindChanged = {
+    create,
+    createInbound,
+    inferFormat,
+    toBytes,
+    originOf,
+    tooLarge,
+    offsetOf,
+    rangeOffset,
+    side,
+    downloadNames,
+    manifest,
+    MAX_BYTES,
+    MAX_LINES,
+  };
+})(globalThis);
+</script>
     <script>/* Session-local file records and saving, matching FindChanged's file save:
  * write back to the opened file when a handle is available, otherwise download with the
  * same name; keep the original encoding, BOM and line endings; ask before overwriting a
@@ -4059,6 +5379,271 @@ safe-buffer/index.js:
     document.addEventListener('DOMContentLoaded', () => wire());
   else wire();
   window.XJYHelp = { url, wire };
+})();
+</script>
+    <script>/* XJY Editor — Shared BugTS Feedback Modal (compatible with feedback.findchanged.com/api/v1/feedback) */
+(function () {
+  'use strict';
+
+  const FEEDBACK_URL = 'https://feedback.findchanged.com/api/v1/feedback';
+  const APP_VERSION = 'xjy-0.12.0';
+  const MAX_DESCRIPTION = 10000;
+  const MAX_ATTACHMENTS = 3;
+  const MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024;
+  const ALLOWED_EXTS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.csv', '.txt', '.xlsx', '.xls'];
+  const TIMEOUT_MS = 30000;
+
+  const isEn = () => (document.documentElement.lang || '').toLowerCase().startsWith('en');
+
+  const T = {
+    zh: {
+      title: '意见反馈',
+      note: '仅发送你填写的描述和主动添加的附件，不会上传你在编辑器中打开的任何文件。',
+      offlineNote:
+        '当前为离线本地文件（file://），无法直接提交在线反馈。请发送邮件至 contact@xjyeditor.com，或在 https://xjyeditor.com 上提交。',
+      descLabel: '问题描述或功能建议',
+      descPlaceholder: '请描述你遇到的问题、期望的功能，或对数据清洗规则的建议…',
+      attachLabel: '附件（可选，最多 3 个，每个 ≤ 5MB，支持图片/CSV/Excel/TXT）',
+      cancel: '取消',
+      submit: '提交反馈',
+      submitting: '正在提交…',
+      done: '已收到反馈，编号：',
+      errEmpty: '请先填写反馈内容。',
+      errTooLong: '反馈内容超过 10,000 字上限。',
+      errTooMany: '最多只能添加 3 个附件。',
+      errType: '不支持的附件格式（仅支持 png/jpg/gif/webp/csv/txt/xlsx/xls）。',
+      errSize: '单个附件不能超过 5 MB。',
+      errRate: '提交过于频繁，请稍后再试。',
+      errTimeout: '提交超时，请重试（重复提交会自动去重）。',
+      errNetwork: '网络请求失败，请检查网络连接或发送邮件至 contact@xjyeditor.com。',
+      errGeneric: '提交失败：',
+    },
+    en: {
+      title: 'Send Feedback',
+      note: 'Only your description and files you explicitly attach are sent. Files you open in the editor are never uploaded.',
+      offlineNote:
+        'You are viewing an offline local file (file://). Please email contact@xjyeditor.com or submit feedback on https://xjyeditor.com.',
+      descLabel: 'Issue or suggestion',
+      descPlaceholder:
+        'Describe a bug, feature request, or data cleaning rule you would like to see…',
+      attachLabel: 'Attachments (optional, up to 3 files, ≤ 5 MB each: images, CSV, Excel, TXT)',
+      cancel: 'Cancel',
+      submit: 'Submit Feedback',
+      submitting: 'Submitting…',
+      done: 'Feedback received! Ticket ID: ',
+      errEmpty: 'Please enter your feedback first.',
+      errTooLong: 'Description exceeds 10,000 characters.',
+      errTooMany: 'You can attach at most 3 files.',
+      errType: 'Unsupported attachment type (allowed: png, jpg, gif, webp, csv, txt, xlsx, xls).',
+      errSize: 'Each attachment must be 5 MB or smaller.',
+      errRate: 'Too many submissions. Please try again later.',
+      errTimeout: 'Request timed out. You can retry safely (duplicates are prevented).',
+      errNetwork: 'Network error. Please check your connection or email contact@xjyeditor.com.',
+      errGeneric: 'Submission failed: ',
+    },
+  };
+
+  function msg() {
+    return isEn() ? T.en : T.zh;
+  }
+
+  function newUuid() {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    return 'xjy-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+  }
+
+  function getVisitorId() {
+    const key = 'xjyeditor.visitor';
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved && /^[A-Za-z0-9_-]{8,64}$/.test(saved)) return saved;
+      const id = newUuid();
+      localStorage.setItem(key, id);
+      return id;
+    } catch (_) {
+      return newUuid();
+    }
+  }
+
+  let dialogEl = null;
+  let requestId = newUuid();
+
+  function ensureDialog() {
+    if (dialogEl) return dialogEl;
+    const t = msg();
+    const dlg = document.createElement('dialog');
+    dlg.id = 'xjy-feedback-dialog';
+    dlg.className = 'xjy-fb-dialog';
+    dlg.setAttribute('aria-labelledby', 'xjy-fb-title');
+
+    const head = document.createElement('div');
+    head.className = 'xjy-fb-head';
+    const h3 = document.createElement('h3');
+    h3.id = 'xjy-fb-title';
+    h3.textContent = t.title;
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'xjy-fb-close';
+    closeBtn.setAttribute('aria-label', t.cancel);
+    closeBtn.textContent = '×';
+    head.append(h3, closeBtn);
+
+    const body = document.createElement('div');
+    body.className = 'xjy-fb-body';
+
+    const note = document.createElement('p');
+    note.className = 'xjy-fb-note';
+    const isOffline = location.protocol === 'file:';
+    note.textContent = isOffline ? t.offlineNote : t.note;
+
+    const descLabel = document.createElement('label');
+    descLabel.className = 'xjy-fb-label';
+    descLabel.textContent = t.descLabel;
+    const textarea = document.createElement('textarea');
+    textarea.id = 'xjy-fb-desc';
+    textarea.className = 'xjy-fb-textarea';
+    textarea.placeholder = t.descPlaceholder;
+    textarea.maxLength = MAX_DESCRIPTION;
+    descLabel.appendChild(textarea);
+
+    const attachLabel = document.createElement('label');
+    attachLabel.className = 'xjy-fb-label';
+    attachLabel.textContent = t.attachLabel;
+    const fileInput = document.createElement('input');
+    fileInput.id = 'xjy-fb-files';
+    fileInput.className = 'xjy-fb-file';
+    fileInput.type = 'file';
+    fileInput.multiple = true;
+    fileInput.accept = ALLOWED_EXTS.join(',');
+    attachLabel.appendChild(fileInput);
+
+    const status = document.createElement('p');
+    status.id = 'xjy-fb-status';
+    status.className = 'xjy-fb-status';
+    status.hidden = true;
+    status.setAttribute('role', 'status');
+
+    body.append(note, descLabel, attachLabel, status);
+
+    const foot = document.createElement('div');
+    foot.className = 'xjy-fb-foot';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'xjy-fb-btn';
+    cancelBtn.textContent = t.cancel;
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'button';
+    submitBtn.id = 'xjy-fb-submit';
+    submitBtn.className = 'xjy-fb-btn primary';
+    submitBtn.textContent = t.submit;
+    if (isOffline) submitBtn.disabled = true;
+    foot.append(cancelBtn, submitBtn);
+
+    dlg.append(head, body, foot);
+    document.body.appendChild(dlg);
+
+    function setStatus(text, kind) {
+      if (!text) {
+        status.hidden = true;
+        status.textContent = '';
+        return;
+      }
+      status.hidden = false;
+      status.className = 'xjy-fb-status ' + kind;
+      status.textContent = text;
+    }
+
+    const close = () => dlg.close();
+    closeBtn.addEventListener('click', close);
+    cancelBtn.addEventListener('click', close);
+    dlg.addEventListener('click', (e) => {
+      if (e.target === dlg) close();
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const m = msg();
+      const desc = textarea.value.trim();
+      const files = Array.from(fileInput.files || []);
+      if (!desc) return setStatus(m.errEmpty, 'err');
+      if (Array.from(desc).length > MAX_DESCRIPTION) return setStatus(m.errTooLong, 'err');
+      if (files.length > MAX_ATTACHMENTS) return setStatus(m.errTooMany, 'err');
+      for (const f of files) {
+        const dot = f.name.lastIndexOf('.');
+        if (dot < 0 || !ALLOWED_EXTS.includes(f.name.slice(dot).toLowerCase())) {
+          return setStatus(m.errType, 'err');
+        }
+        if (f.size > MAX_ATTACHMENT_SIZE) return setStatus(m.errSize, 'err');
+      }
+
+      const form = new FormData();
+      form.set('request_id', requestId);
+      form.set('visitor_id', getVisitorId());
+      form.set('description', desc);
+      form.set('app_version', APP_VERSION);
+      form.set('locale', document.documentElement.lang || (isEn() ? 'en' : 'zh-CN'));
+      form.set('page', ('xjyeditor.com' + (location.pathname || '/')).slice(0, 200));
+      form.set('context', JSON.stringify({ product: 'xjyeditor' }));
+      for (const f of files) form.append('attachments', f, f.name);
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = m.submitting;
+      setStatus('', '');
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+      try {
+        const res = await fetch(FEEDBACK_URL, {
+          method: 'POST',
+          body: form,
+          credentials: 'omit',
+          signal: controller.signal,
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.number) {
+          setStatus(m.done + data.number, 'ok');
+          textarea.value = '';
+          fileInput.value = '';
+          requestId = newUuid();
+        } else if (data.error === 'rate_limited' || res.status === 429) {
+          setStatus(m.errRate, 'err');
+        } else {
+          setStatus(m.errGeneric + (data.error || res.status), 'err');
+        }
+      } catch (_) {
+        setStatus(controller.signal.aborted ? m.errTimeout : m.errNetwork, 'err');
+      } finally {
+        clearTimeout(timer);
+        submitBtn.disabled = false;
+        submitBtn.textContent = m.submit;
+      }
+    });
+
+    dialogEl = dlg;
+    return dlg;
+  }
+
+  function openFeedback() {
+    const dlg = ensureDialog();
+    const status = dlg.querySelector('#xjy-fb-status');
+    if (status && status.classList.contains('ok')) {
+      status.hidden = true;
+    }
+    if (typeof dlg.showModal === 'function') dlg.showModal();
+    else dlg.setAttribute('open', '');
+    const ta = dlg.querySelector('#xjy-fb-desc');
+    if (ta) ta.focus();
+  }
+
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest?.('[data-open-feedback]');
+    if (!trigger) return;
+    e.preventDefault();
+    openFeedback();
+  });
+
+  window.XJYFeedback = { open: openFeedback, url: FEEDBACK_URL };
 })();
 </script>
     <script>(function () {
@@ -4911,6 +6496,26 @@ safe-buffer/index.js:
       };
     },
   });
+  const inboundFC =
+    globalThis.ExplorerFindChanged?.createInbound?.({
+      window,
+      editor: 'excel',
+      formats: ['xlsx', 'xls'],
+      mountAfter: $('download'),
+      onNotify: report,
+      async onOpen(p) {
+        await openFile(new File([p.bytes], p.name));
+      },
+      getCurrent() {
+        if (!editor.finish()) throw Error('请先完成当前单元格编辑');
+        guard();
+        return {
+          name: doc.filename,
+          format: /\.xls$/i.test(doc.filename) ? 'xls' : 'xlsx',
+          bytes: doc.bytes(),
+        };
+      },
+    }) || null;
   globalThis.ExcelEditor = {
     get document() {
       return doc;
@@ -4922,6 +6527,7 @@ safe-buffer/index.js:
     render,
     copyText,
     saver,
+    inboundFC,
     /** Open a file with an optional handle to write back to (used by the helper). */
     open: (file, handle) => openFile(file, handle),
     get selection() {

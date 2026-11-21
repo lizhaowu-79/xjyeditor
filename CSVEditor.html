@@ -732,15 +732,182 @@ footer .type-legend [data-swatch] {
   font-size: 10px;
   line-height: 1.3;
 }
+header .language-picker {
+  height: 26px;
+  padding: 2px 6px;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+</style>
+    <style>.xjy-fb-dialog {
+  width: min(500px, calc(100vw - 28px));
+  border: 1px solid #cddad4;
+  border-radius: 12px;
+  padding: 0;
+  color: #213b37;
+  background: #ffffff;
+  box-shadow: 0 18px 48px rgba(17, 45, 39, 0.22);
+  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  font-size: 14px;
+}
+
+.xjy-fb-dialog::backdrop {
+  background: rgba(16, 36, 32, 0.42);
+}
+
+.xjy-fb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e1ebe6;
+  background: #f8fbfa;
+  border-radius: 12px 12px 0 0;
+}
+
+.xjy-fb-head h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.xjy-fb-close {
+  border: none;
+  background: transparent;
+  color: #5f756e;
+  font-size: 20px;
+  line-height: 1;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.xjy-fb-close:hover {
+  background: #e6f2ee;
+  color: #16332e;
+}
+
+.xjy-fb-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.xjy-fb-note {
+  margin: 0;
+  font-size: 12px;
+  color: #526a63;
+  line-height: 1.5;
+}
+
+.xjy-fb-label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.xjy-fb-textarea {
+  width: 100%;
+  min-height: 112px;
+  resize: vertical;
+  padding: 9px 10px;
+  border: 1px solid #c5d4cd;
+  border-radius: 8px;
+  font: inherit;
+  color: #213b37;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.xjy-fb-textarea:focus {
+  outline: 2px solid #236b59;
+  outline-offset: 1px;
+}
+
+.xjy-fb-file {
+  font-size: 12px;
+  color: #526a63;
+}
+
+.xjy-fb-status {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.xjy-fb-status.ok {
+  background: #e6f2ee;
+  color: #164e3f;
+  border: 1px solid #b7d7cc;
+}
+
+.xjy-fb-status.err {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.xjy-fb-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid #e1ebe6;
+  background: #fafcfb;
+  border-radius: 0 0 12px 12px;
+}
+
+.xjy-fb-btn {
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 7px;
+  border: 1px solid #c5d4cd;
+  background: #ffffff;
+  color: #213b37;
+  cursor: pointer;
+}
+
+.xjy-fb-btn:hover:not(:disabled) {
+  background: #eef4f1;
+}
+
+.xjy-fb-btn.primary {
+  background: #236b59;
+  border-color: #236b59;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.xjy-fb-btn.primary:hover:not(:disabled) {
+  background: #195143;
+}
+
+.xjy-fb-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
 </style>
   </head>
   <body>
     <header>
       <div class="brand">
-        <span class="mark">▦</span><strong>CSV 编辑器</strong><span class="badge">预览版</span>
+        <span class="mark">▦</span><strong>CSV 编辑器</strong>
       </div>
       <span class="local"
-        >● 文件只在本机处理 <a id="sqlitelink" href="sqlite.html">SQLite 编辑器 ↗</a
+        >● 文件只在本机处理 <a id="cleanerlink" href="cleaner.html">数据清洗 ↗</a
+        ><a id="sqlitelink" href="sqlite.html">SQLite 编辑器 ↗</a
+        ><a id="feedbacklink" href="#feedback" data-open-feedback>反馈</a
         ><a id="helplink" data-help="csv" href="help.html#csv" target="_blank" rel="noopener">帮助</a></span
       >
     </header>
@@ -823,6 +990,526 @@ footer .type-legend [data-swatch] {
         </div>
       </form>
     </dialog>
+    <script>/* Bilingual UI (zh-CN / en) for companion editors: CSV, SQLite, Excel, and Data Cleaner.
+ * Never translates user data cells inside #grid table, #tableContainer table, #sourceeditor, #schema, or #sqlresult. */
+(function (global) {
+  'use strict';
+  const STORAGE_KEY = 'xjy-language-v1';
+
+  const EXACT = {
+    // Shared header & footer
+    'CSV 编辑器': 'CSV Editor',
+    'SQLite 编辑器': 'SQLite Editor',
+    'Excel 编辑器': 'Excel Editor',
+    数据清洗工作台: 'Data Cleaner Workbench',
+    'CSV 编辑器 · XJY Editor': 'CSV Editor · XJY Editor',
+    'SQLite 编辑器 · XJY Editor': 'SQLite Editor · XJY Editor',
+    'Excel 编辑器 · XJY Editor': 'Excel Editor · XJY Editor',
+    '数据清洗工作台 · XJY Editor': 'Data Cleaner Workbench · XJY Editor',
+    '● 文件只在本机处理': '● Files stay on your device',
+    '● 数据库只在本机处理': '● Databases stay on your device',
+    '● 工作簿只在本机处理': '● Workbooks stay on your device',
+    '● 免费基础规则在本地处理': '● Free rules run locally in browser',
+    '数据清洗 ↗': 'Data Cleaner ↗',
+    'SQLite 编辑器 ↗': 'SQLite Editor ↗',
+    'CSV 编辑器 ↗': 'CSV Editor ↗',
+    'Excel 编辑器 ↗': 'Excel Editor ↗',
+    'CSV ↗': 'CSV ↗',
+    'SQLite ↗': 'SQLite ↗',
+    'XJY 编辑器': 'XJY Editor',
+    反馈: 'Feedback',
+    帮助: 'Help',
+    撤销: 'Undo',
+    重做: 'Redo',
+    保存: 'Save',
+    取消: 'Cancel',
+    确定: 'OK',
+    关闭: 'Close',
+    就绪: 'Ready',
+    '转换并导出…': 'Convert and export…',
+    '辅助编辑…': 'Assisted editing…',
+    '# 索引': '# Index',
+    文本: 'Text',
+    数值: 'Number',
+    布尔: 'Boolean',
+    日期: 'Date',
+    空值: 'Empty',
+    空白: 'Blank',
+    二进制: 'BLOB',
+    公式: 'Formula',
+    数据类型底色图例: 'Data type color legend',
+    表格: 'Table',
+    源码: 'Source',
+    筛选: 'Filter',
+    清除: 'Clear',
+    清除筛选: 'Clear filter',
+    上一页: 'Previous',
+    下一页: 'Next',
+
+    // CSV Editor
+    '打开 CSV': 'Open CSV',
+    打开示例: 'Load sample',
+    解析设置: 'Parse settings',
+    复制选中内容: 'Copy selection',
+    剪切: 'Cut',
+    '导出 CSV…': 'Export CSV…',
+    '打开文件，改好几处。': 'Open a CSV file and edit in place.',
+    '拖入 CSV 或打开示例。前导零、长数字、日期和空格均按原文保留。':
+      'Drop a CSV or load the sample. Leading zeros, long IDs, dates and spaces stay intact.',
+    查找: 'Find',
+    输入要查找的文本: 'Text to find…',
+    上一个匹配: 'Previous match',
+    下一个匹配: 'Next match',
+    '替换…': 'Replace…',
+    筛选列: 'Filter column',
+    '包含文本…': 'Contains text…',
+    筛选内容: 'Filter text',
+    插入行: 'Insert row',
+    删除选中行: 'Delete selected rows',
+    插入列: 'Insert column',
+    删除选中列: 'Delete selected columns',
+    修改列名: 'Rename column',
+    清空选中内容: 'Clear selection',
+    应用并返回表格: 'Apply & return to table',
+    放弃源码修改: 'Discard source edits',
+    'Ctrl+D 多选相同文本 · Alt+点击添加光标': 'Ctrl+D select next match · Alt+Click add cursor',
+    '从一份 CSV 开始': 'Start with a CSV file',
+    '把文件拖到这里，或点击上方“打开 CSV”。': 'Drop a file here, or click “Open CSV” above.',
+    '支持逗号、分号和制表符 · 无需上传': 'Supports comma, semicolon & tab delimiters · No upload',
+    '拖动框选 · Ctrl 多选 · Shift 扩选 · 双击编辑':
+      'Drag to select · Ctrl multi-select · Shift range · Double-click to edit',
+    'CSV 数据表': 'CSV data table',
+
+    // SQLite Editor
+    打开数据库: 'Open database',
+    '导入 CSV…': 'Import CSV…',
+    '导出数据库…': 'Export database…',
+    表与视图: 'Tables & views',
+    '＋ 新建表': '+ New table',
+    新建数据表: 'Create new table',
+    修改表: 'Edit table',
+    修改当前表结构: 'Edit current table schema',
+    删除表: 'Drop table',
+    删除当前表: 'Drop current table',
+    '＋ 索引': '+ Index',
+    新建索引: 'Create new index',
+    打开数据库后选择数据表: 'Open a database to select a table',
+    '打开数据库，修改一条记录。': 'Open a SQLite database and edit records.',
+    '保留字段类型、主键、索引和触发器。修改完成后下载新文件。':
+      'Preserves column types, primary keys, indexes and triggers.',
+    数据: 'Data',
+    结构: 'Schema',
+    '＋ 条件': '+ Condition',
+    '再添加一个条件（多个条件同时满足）': 'Add another filter condition (AND)',
+    '添加记录…': 'Insert row…',
+    '删除选中记录…': 'Delete selected rows…',
+    '选择一份本地 SQLite 文件': 'Choose a local SQLite file',
+    '也可以拖入文件，或打开示例体验。': 'Drop a .sqlite / .db file here, or load the sample.',
+    'SQLite 数据表': 'SQLite data table',
+    '每页 100 条': '100 rows per page',
+    '新建表…': 'New table…',
+    '修改当前表…': 'Edit table…',
+    '删除当前表…': 'Drop table…',
+    '新建索引…': 'New index…',
+    '表、视图、索引与触发器；普通索引与触发器可直接删除':
+      'Tables, views, indexes & triggers; user indexes and triggers can be dropped directly',
+    执行全部: 'Run all',
+    执行当前语句: 'Run current statement',
+    'Shift+Enter：执行光标所在的语句': 'Shift+Enter: run statement at cursor',
+    执行选中: 'Run selection',
+    只执行选中的文字: 'Run selected SQL text only',
+    清空: 'Clear',
+    '查询不产生修改；含修改的整批作为一步，可撤销':
+      'SELECT queries do not mutate; write batches execute atomically with undo',
+    '输入 SQL，例如 SELECT * FROM 表名 WHERE …;\n多条语句用分号分隔。Ctrl+Enter 执行全部，Shift+Enter 执行光标所在语句。':
+      'Enter SQL, e.g. SELECT * FROM table_name WHERE …;\nSeparate statements with semicolons. Ctrl+Enter runs all, Shift+Enter runs statement at cursor.',
+    结果: 'Result',
+    尚未执行: 'Not run yet',
+    '数据库已变化，结果可能过期': 'Database changed; result may be stale',
+    复制结果: 'Copy result',
+    '导出结果 CSV…': 'Export result CSV…',
+    '双击编辑 · Ctrl 多选 · Shift 扩选 · 勾选多行删除':
+      'Double-click to edit · Ctrl multi-select · Shift range · Tick rows to delete',
+    包含: 'contains',
+    不包含: 'does not contain',
+    等于: 'equals',
+    不等于: 'not equal',
+    开头是: 'starts with',
+    结尾是: 'ends with',
+    为空: 'is NULL / empty',
+    不为空: 'is not NULL / empty',
+    '为 NULL': 'is NULL',
+    '不为 NULL': 'is not NULL',
+    为空文本: 'is empty text',
+    数据表: 'Table',
+    视图: 'View',
+    文件与编辑: 'File and editing',
+    'CSV 源码': 'CSV source',
+    筛选方式: 'Filter operator',
+    数据库对象列表: 'Database objects',
+    数据库结构: 'Database schema',
+    'SQL 语句': 'SQL statements',
+    'SQL 查询结果': 'SQL query result',
+    执行消息: 'Execution messages',
+    单元格地址: 'Cell address',
+    筛选列字母: 'Filter column letter',
+    筛选文本: 'Filter text',
+    数据清洗操作栏: 'Data cleaning toolbar',
+    '选择 Excel 工作表': 'Select Excel worksheet',
+    '在 FindChanged.com 中直观查看清洗前后的数据差异':
+      'Compare before and after cleaning in FindChanged.com',
+    清洗规则流水线: 'Cleaning rule pipeline',
+    选择要添加的清洗规则: 'Select a cleaning rule to add',
+    数据预览与清洗结果: 'Data preview and cleaned result',
+
+    // Excel Editor
+    打开工作簿: 'Open workbook',
+    清空内容: 'Clear cells',
+    '导出工作簿…': 'Export workbook…',
+    工作表: 'Worksheets',
+    打开工作簿后选择工作表: 'Open a workbook to select a sheet',
+    '打开工作簿，修改几处。': 'Open an Excel workbook and edit cells in place.',
+    '支持 .xlsx 在位编辑，保留原工作簿部件；.xls 只读预览。':
+      'In-place .xlsx editing preserves styles, charts & sheets; read-only .xls preview.',
+    定位: 'Go to',
+    前往: 'Go',
+    首行为表头: 'First row as header',
+    显示隐藏行列: 'Show hidden rows/cols',
+    '公式由Excel重算。浏览器展示缓存或公式文本，不计算公式结果。':
+      'Formulas are recalculated by Excel on next open. Browser shows cached values or formula text.',
+    从一份本地工作簿开始: 'Start with a local Excel workbook',
+    '拖入 .xlsx，或点击“打开示例”。': 'Drop an .xlsx file here, or click “Load sample”.',
+    'Excel 工作表': 'Excel worksheet',
+    双击单元格直接编辑: 'Double-click any cell to edit',
+    前30列: 'Prev 30 cols',
+    后30列: 'Next 30 cols',
+    '工作表 XML 源码': 'Worksheet XML source',
+    '只修改现有单元格值及普通公式，保留其他结构。':
+      'Modify existing cell values and formulas while keeping other XML structures intact.',
+    应用源码: 'Apply source',
+    'Ctrl 多选 · Shift 扩选 · 双击编辑 · Enter 提交 · Esc 取消':
+      'Ctrl multi-select · Shift range · Double-click to edit · Enter commit · Esc cancel',
+
+    // Data Cleaner Workbench
+    打开文件: 'Open file',
+    载入示例数据: 'Load sample data',
+    '导入配方 JSON': 'Import recipe JSON',
+    '导出配方 JSON': 'Export recipe JSON',
+    'Pro / API 设置': 'Pro / API settings',
+    '▶ 运行清洗': '▶ Run cleaning',
+    '在 FindChanged.com 对比清洗前后 ↗': 'Compare before/after in FindChanged.com ↗',
+    导出清洗结果: 'Export cleaned data',
+    导出异常脏行: 'Export quarantined rows',
+    清洗步骤流水线: 'Cleaning pipeline',
+    '免费版 · ≤8步 / ≤5000行': 'Free tier · ≤8 steps / ≤5,000 rows',
+    '＋ 添加': '+ Add',
+    '还没有清洗步骤。': 'No cleaning steps yet.',
+    '从上方选择规则添加，或点击「载入示例数据」快速体验。':
+      'Choose a rule above to add a step, or click “Load sample data” to try it out.',
+    '还没有清洗步骤。从上方选择规则添加，或点击「载入示例数据」快速体验。':
+      'No cleaning steps yet. Choose a rule above to add a step, or click “Load sample data” to try it out.',
+    清空步骤: 'Clear steps',
+    输入行数: 'Input rows',
+    输出行数: 'Output rows',
+    修改单元格: 'Modified cells',
+    删除行数: 'Dropped rows',
+    分流异常行: 'Quarantined rows',
+    原始数据: 'Original data',
+    清洗结果: 'Cleaned result',
+    '报告 & 配方 JSON': 'Report & Recipe JSON',
+    '拖入 CSV / Excel (.xlsx) / JSON 文件': 'Drop a CSV / Excel (.xlsx) / JSON file here',
+    '先用免费规则本地可视化调试清洗步骤，清洗完成后可一键跳转到 FindChanged.com 对比前后差异。':
+      'Build and test cleaning steps visually in your browser, then compare before/after in FindChanged.com.',
+    '免费体验支持 5,000 行 / 8 步以内；Pro 规则与云端 API 支持大文件、统计异常值与类型不符检测。':
+      'Free tier supports up to 5,000 rows / 8 steps locally; Pro rules & API unlock large files, outlier detection and PII masking.',
+    '就绪 · 请打开文件或载入示例': 'Ready · Open a file or load sample data',
+    未加载文件: 'No file loaded',
+    'Pro / 云端 API 设置': 'Pro / Cloud API Settings',
+    '不填 API Key 时默认使用免费本地模式（≤5,000 行 / ≤8 步，数据不出浏览器）。填入 Pro API Key 后将解锁统计异常值检测、类型不符分析、PII 脱敏、模糊去重与大文件云端 API 执行（纯内存处理不落盘）。':
+      'Without an API Key, the workbench runs in free local browser mode (≤5,000 rows / ≤8 steps). Enter a Pro API Key to unlock statistical outlier detection, type mismatch analysis, PII masking, fuzzy deduplication and large-file in-memory cloud execution.',
+    'API 地址': 'API Endpoint',
+    '粘贴你的 Pro API Key': 'Paste your Pro API Key',
+    '购买 Pro 额度包 ↗': 'Buy Pro quota pack ↗',
+    切回免费本地版: 'Switch to free local mode',
+    验证并连接: 'Verify & connect',
+    // Data Cleaner Rule Categories & Labels
+    '1. 文本与字符清洗': '1. Text & Whitespace Cleaning',
+    '2. 空值与行过滤': '2. Missing Values & Row Filtering',
+    '3. 去重': '3. Deduplication',
+    '4. 列结构操作': '4. Column Structure Operations',
+    '5. JSON 专项': '5. JSON Operations',
+    '6. 格式与类型标准化': '6. Format & Type Normalization',
+    '7. 校验与脱敏 (Pro)': '7. Validation & PII Masking (Pro)',
+    '8. 统计与类型分析 (Pro)': '8. Outliers & Type Analysis (Pro)',
+    去首尾空白: 'Trim leading/trailing whitespace',
+    合并连续空白: 'Collapse consecutive spaces',
+    '清除不可见/控制字符': 'Remove invisible/control characters',
+    全角转半角: 'Full-width to half-width',
+    大小写转换: 'Case transformation',
+    查找与替换: 'Find & replace',
+    正则提取: 'Regex extract',
+    '[PRO] 正则提取': '[PRO] Regex extract',
+    正则替换: 'Regex replace',
+    '[PRO] 正则替换': '[PRO] Regex replace',
+    删除空行: 'Drop empty rows',
+    空值填充: 'Fill missing values',
+    '向下填充 / 合并单元格补齐 (Fill Down)': 'Fill down empty/merged cells (Fill Down)',
+    '条件筛选/剔除行': 'Filter / drop rows by condition',
+    精确去重: 'Exact deduplication',
+    规范化去重: 'Normalized deduplication',
+    '[PRO] 规范化去重': '[PRO] Normalized deduplication',
+    模糊相似去重: 'Fuzzy deduplication',
+    '[PRO] 模糊相似去重': '[PRO] Fuzzy deduplication',
+    删除列: 'Drop columns',
+    保留列: 'Keep columns',
+    重命名列: 'Rename columns',
+    调整列顺序: 'Reorder columns',
+    拆分列: 'Split column',
+    合并列: 'Merge columns',
+    'JSON 嵌套拍平': 'Flatten nested JSON',
+    'JSON 数组展开 (Unwind)': 'Unwind JSON array (Unwind)',
+    '[PRO] JSON 数组展开 (Unwind)': '[PRO] Unwind JSON array (Unwind)',
+    '数字/金额清洗': 'Clean numbers & currency',
+    日期时间标准化: 'Normalize dates & timestamps',
+    '[PRO] 日期时间标准化': '[PRO] Normalize dates & timestamps',
+    '布尔/枚举值统一': 'Normalize booleans & enums',
+    '[PRO] 布尔/枚举值统一': '[PRO] Normalize booleans & enums',
+    '敏感信息脱敏 (PII)': 'Mask sensitive data (PII)',
+    '[PRO] 敏感信息脱敏 (PII)': '[PRO] Mask sensitive data (PII)',
+    格式校验与脏数据分流: 'Validate format & quarantine dirty rows',
+    '[PRO] 格式校验与脏数据分流': '[PRO] Validate format & quarantine dirty rows',
+    '统计异常值检测 (Z-score/IQR/MAD)': 'Detect statistical outliers (Z-score/IQR/MAD)',
+    '[PRO] 统计异常值检测 (Z-score/IQR/MAD)': '[PRO] Detect statistical outliers (Z-score/IQR/MAD)',
+    数据类型分析与类型不符检测: 'Detect data type mismatches',
+    '[PRO] 数据类型分析与类型不符检测': '[PRO] Detect data type mismatches',
+    '值范围校验 / 超限分流': 'Validate value range & quarantine',
+    '[PRO] 值范围校验 / 超限分流': '[PRO] Validate value range & quarantine',
+    作用列: 'Target column',
+    '全部列 (*)': 'All columns (*)',
+    '（请先载入数据）': '(Load data first)',
+    转换方式: 'Case mode',
+    '全部小写 (abc)': 'lowercase (abc)',
+    '全部大写 (ABC)': 'UPPERCASE (ABC)',
+    '首字母大写 (Abc)': 'Title Case (Abc)',
+    查找内容: 'Find text',
+    替换为: 'Replace with',
+    填充默认值: 'Default fill value',
+    重复保留策略: 'Keep strategy',
+    保留首次出现: 'Keep first occurrence',
+    保留最后一次出现: 'Keep last occurrence',
+    条件: 'Condition',
+    比较值: 'Compare value',
+    分隔符: 'Delimiter',
+    '目标列名（逗号分隔）': 'New column names (comma-separated)',
+    '参与合并的列（逗号分隔）': 'Columns to merge (comma-separated)',
+    连接符: 'Separator',
+    新列名: 'New column name',
+    启用: 'Enable',
+    删除步骤: 'Remove step',
+  };
+
+  const PATTERNS = [
+    [/^已打开 (.+)$/, (_, f) => `Opened ${f}`],
+    [/^已载入 (.+)$/, (_, f) => `Loaded ${f}`],
+    [
+      /^显示 (\d+) \/ 共 (\d+) 行 · (\d+) 列 · ([^·]+) · 没有未保存修改$/,
+      (_, a, b, c, enc) => `Showing ${a} / ${b} rows · ${c} cols · ${enc.trim()} · Saved`,
+    ],
+    [
+      /^显示 (\d+) \/ 共 (\d+) 行 · (\d+) 列 · ([^·]+) · 有未保存修改$/,
+      (_, a, b, c, enc) => `Showing ${a} / ${b} rows · ${c} cols · ${enc.trim()} · Unsaved changes`,
+    ],
+    [/^([^·]+) · ([^·]+) · 没有未保存修改$/, (_, a, b) => `${a.trim()} · ${b.trim()} · Saved`],
+    [
+      /^([^·]+) · ([^·]+) · 有未保存修改$/,
+      (_, a, b) => `${a.trim()} · ${b.trim()} · Unsaved changes`,
+    ],
+    [
+      /^显示 ([\d–-]+) \/ 筛选 (\d+) \/ 共 (\d+) 条 · 每页 (\d+) 条$/,
+      (_, r, f, t, p) => `Showing ${r} / Filtered ${f} / Total ${t} · ${p} per page`,
+    ],
+    [
+      /^已选 (\d+) 格 · Ctrl 多选 · Shift 扩选 · 双击编辑$/,
+      (_, n) => `Selected ${n} cells · Ctrl multi-select · Shift range · Double-click to edit`,
+    ],
+    [
+      /^已选 (\d+) 行 \/ (\d+) 格 · 双击编辑 · 勾选多行删除$/,
+      (_, r, c) => `Selected ${r} rows / ${c} cells · Double-click to edit · Tick rows to delete`,
+    ],
+    [/^(\d+) \/ (\d+) 步骤$/, (_, a, b) => `${a} / ${b} steps`],
+    [/^(\d+) 步骤 \(Pro 不限\)$/, (_, a) => `${a} steps (Pro unlimited)`],
+    [/^异常脏行 \((\d+)\)$/, (_, n) => `Quarantined (${n})`],
+    [/^(\d+) 行 × (\d+) 列$/, (_, r, c) => `${r} rows × ${c} cols`],
+  ];
+
+  let locale = 'zh-CN';
+  try {
+    const urlLang = new URLSearchParams(location.search).get('lang');
+    if (urlLang === 'en' || urlLang === 'zh-CN') {
+      locale = urlLang;
+      localStorage.setItem(STORAGE_KEY, locale);
+    } else {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved === 'en' || saved === 'zh-CN') locale = saved;
+    }
+  } catch (_) {}
+
+  const origText = new WeakMap();
+  const lastTranslated = new WeakMap();
+  const origAttrs = new WeakMap();
+  let applying = false;
+
+  function translateString(str) {
+    if (!str) return str;
+    const trimmed = str.trim();
+    if (!trimmed) return str;
+    if (Object.hasOwn(EXACT, trimmed)) {
+      return str.replace(trimmed, EXACT[trimmed]);
+    }
+    for (const [re, fn] of PATTERNS) {
+      const m = trimmed.match(re);
+      if (m) return str.replace(trimmed, fn(...m));
+    }
+    return str;
+  }
+
+  function isDataContainer(node) {
+    const el = node.nodeType === 1 ? node : node.parentElement;
+    if (!el) return false;
+    if (el.closest('.empty, .drop-empty, .pipeline-empty')) return false;
+    return !!el.closest(
+      '#grid table, #tableContainer table, #sourceeditor, #schema, #sqlresult table, #openpreview, #reportContainer pre',
+    );
+  }
+
+  function applyNode(node) {
+    if (isDataContainer(node)) return;
+    if (node.nodeType === 3) {
+      const cur = node.nodeValue;
+      if (locale === 'en') {
+        if (!origText.has(node) || cur !== lastTranslated.get(node)) {
+          origText.set(node, cur);
+        }
+        const source = origText.get(node);
+        const next = translateString(source);
+        if (next !== cur) {
+          lastTranslated.set(node, next);
+          node.nodeValue = next;
+        }
+      } else if (origText.has(node)) {
+        const orig = origText.get(node);
+        if (cur === lastTranslated.get(node) && cur !== orig) {
+          node.nodeValue = orig;
+        }
+      }
+      return;
+    }
+    if (node.nodeType !== 1) return;
+    if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE') return;
+    let attrMap = origAttrs.get(node);
+    for (const attr of ['placeholder', 'title', 'aria-label', 'label']) {
+      if (!node.hasAttribute(attr)) continue;
+      const val = node.getAttribute(attr);
+      if (locale === 'en') {
+        if (!attrMap) {
+          attrMap = {};
+          origAttrs.set(node, attrMap);
+        }
+        if (!(attr in attrMap) || val !== attrMap[attr + '_en']) {
+          attrMap[attr] = val;
+        }
+        const next = translateString(attrMap[attr]);
+        attrMap[attr + '_en'] = next;
+        if (next !== val) node.setAttribute(attr, next);
+      } else if (attrMap && attr in attrMap) {
+        if (val === attrMap[attr + '_en'] && val !== attrMap[attr]) {
+          node.setAttribute(attr, attrMap[attr]);
+        }
+      }
+    }
+    for (const child of node.childNodes) applyNode(child);
+  }
+
+  let origTitle = document.title;
+  let lastTitleEn = '';
+  function applyAll() {
+    if (applying) return;
+    applying = true;
+    try {
+      document.documentElement.lang = locale;
+      if (locale === 'en') {
+        if (document.title !== lastTitleEn) origTitle = document.title;
+        lastTitleEn = translateString(origTitle);
+        document.title = lastTitleEn;
+      } else if (document.title === lastTitleEn && origTitle) {
+        document.title = origTitle;
+      }
+      if (document.body) applyNode(document.body);
+      for (const picker of document.querySelectorAll('[data-language-picker]')) {
+        picker.value = locale;
+      }
+    } finally {
+      applying = false;
+    }
+  }
+
+  function setLocale(next) {
+    if (next !== 'zh-CN' && next !== 'en') return;
+    locale = next;
+    try {
+      localStorage.setItem(STORAGE_KEY, next);
+    } catch (_) {}
+    applyAll();
+    document.dispatchEvent(new CustomEvent('xjy-language-change', { detail: { locale } }));
+  }
+
+  if (!global.XJYI18n) {
+    global.XJYI18n = {
+      t: (_id, source) => (locale === 'en' ? translateString(source) : source),
+      message: (text) => (locale === 'en' ? translateString(text) : text),
+      setLocale,
+      get locale() {
+        return locale;
+      },
+      get missing() {
+        return [];
+      },
+    };
+  }
+
+  function mount() {
+    const host = document.querySelector('header .local, header .header-right');
+    if (host && !host.querySelector('[data-language-picker]')) {
+      const select = document.createElement('select');
+      select.dataset.languagePicker = '';
+      select.className = 'language-picker';
+      select.setAttribute('aria-label', 'Language');
+      select.innerHTML =
+        '<option value="zh-CN">简体中文</option><option value="en">English</option>';
+      select.value = locale;
+      select.onchange = () => setLocale(select.value);
+      host.append(select);
+    }
+    applyAll();
+    if (document.body) {
+      const observer = new MutationObserver(() => {
+        if (!applying) applyAll();
+      });
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mount);
+  } else {
+    mount();
+  }
+})(globalThis);
+</script>
     <script>var CsvVendor=(()=>{var lu=Object.create;var bn=Object.defineProperty;var au=Object.getOwnPropertyDescriptor;var hu=Object.getOwnPropertyNames;var cu=Object.getPrototypeOf,fu=Object.prototype.hasOwnProperty;var V=(i,e)=>()=>{try{return e||i((e={exports:{}}).exports,e),e.exports}catch(t){throw e=0,t}},uu=(i,e)=>{for(var t in e)bn(i,t,{get:e[t],enumerable:!0})},Hl=(i,e,t,n)=>{if(e&&typeof e=="object"||typeof e=="function")for(let r of hu(e))!fu.call(i,r)&&r!==t&&bn(i,r,{get:()=>e[r],enumerable:!(n=au(e,r))||n.enumerable});return i};var Wl=(i,e,t)=>(t=i!=null?lu(cu(i)):{},Hl(e||!i||!i.__esModule?bn(t,"default",{value:i,enumerable:!0}):t,i)),du=i=>Hl(bn({},"__esModule",{value:!0}),i);var Ul=V(yn=>{"use strict";yn.byteLength=gu;yn.toByteArray=bu;yn.fromByteArray=xu;var Ge=[],Se=[],pu=typeof Uint8Array<"u"?Uint8Array:Array,Hr="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";for(Dt=0,Vl=Hr.length;Dt<Vl;++Dt)Ge[Dt]=Hr[Dt],Se[Hr.charCodeAt(Dt)]=Dt;var Dt,Vl;Se[45]=62;Se[95]=63;function _l(i){var e=i.length;if(e%4>0)throw new Error("Invalid string. Length must be a multiple of 4");var t=i.indexOf("=");t===-1&&(t=e);var n=t===e?0:4-t%4;return[t,n]}function gu(i){var e=_l(i),t=e[0],n=e[1];return(t+n)*3/4-n}function mu(i,e,t){return(e+t)*3/4-t}function bu(i){var e,t=_l(i),n=t[0],r=t[1],s=new pu(mu(i,n,r)),o=0,l=r>0?n-4:n,a;for(a=0;a<l;a+=4)e=Se[i.charCodeAt(a)]<<18|Se[i.charCodeAt(a+1)]<<12|Se[i.charCodeAt(a+2)]<<6|Se[i.charCodeAt(a+3)],s[o++]=e>>16&255,s[o++]=e>>8&255,s[o++]=e&255;return r===2&&(e=Se[i.charCodeAt(a)]<<2|Se[i.charCodeAt(a+1)]>>4,s[o++]=e&255),r===1&&(e=Se[i.charCodeAt(a)]<<10|Se[i.charCodeAt(a+1)]<<4|Se[i.charCodeAt(a+2)]>>2,s[o++]=e>>8&255,s[o++]=e&255),s}function yu(i){return Ge[i>>18&63]+Ge[i>>12&63]+Ge[i>>6&63]+Ge[i&63]}function wu(i,e,t){for(var n,r=[],s=e;s<t;s+=3)n=(i[s]<<16&16711680)+(i[s+1]<<8&65280)+(i[s+2]&255),r.push(yu(n));return r.join("")}function xu(i){for(var e,t=i.length,n=t%3,r=[],s=16383,o=0,l=t-n;o<l;o+=s)r.push(wu(i,o,o+s>l?l:o+s));return n===1?(e=i[t-1],r.push(Ge[e>>2]+Ge[e<<4&63]+"==")):n===2&&(e=(i[t-2]<<8)+i[t-1],r.push(Ge[e>>10]+Ge[e>>4&63]+Ge[e<<2&63]+"=")),r.join("")}});var zl=V(Wr=>{Wr.read=function(i,e,t,n,r){var s,o,l=r*8-n-1,a=(1<<l)-1,h=a>>1,c=-7,f=t?r-1:0,u=t?-1:1,d=i[e+f];for(f+=u,s=d&(1<<-c)-1,d>>=-c,c+=l;c>0;s=s*256+i[e+f],f+=u,c-=8);for(o=s&(1<<-c)-1,s>>=-c,c+=n;c>0;o=o*256+i[e+f],f+=u,c-=8);if(s===0)s=1-h;else{if(s===a)return o?NaN:(d?-1:1)*(1/0);o=o+Math.pow(2,n),s=s-h}return(d?-1:1)*o*Math.pow(2,s-n)};Wr.write=function(i,e,t,n,r,s){var o,l,a,h=s*8-r-1,c=(1<<h)-1,f=c>>1,u=r===23?Math.pow(2,-24)-Math.pow(2,-77):0,d=n?0:s-1,p=n?1:-1,g=e<0||e===0&&1/e<0?1:0;for(e=Math.abs(e),isNaN(e)||e===1/0?(l=isNaN(e)?1:0,o=c):(o=Math.floor(Math.log(e)/Math.LN2),e*(a=Math.pow(2,-o))<1&&(o--,a*=2),o+f>=1?e+=u/a:e+=u*Math.pow(2,1-f),e*a>=2&&(o++,a/=2),o+f>=c?(l=0,o=c):o+f>=1?(l=(e*a-1)*Math.pow(2,r),o=o+f):(l=e*Math.pow(2,f-1)*Math.pow(2,r),o=0));r>=8;i[t+d]=l&255,d+=p,l/=256,r-=8);for(o=o<<r|l,h+=r;h>0;i[t+d]=o&255,d+=p,o/=256,h-=8);i[t+d-p]|=g*128}});var vn=V(ri=>{"use strict";var Vr=Ul(),ii=zl(),ql=typeof Symbol=="function"&&typeof Symbol.for=="function"?Symbol.for("nodejs.util.inspect.custom"):null;ri.Buffer=b;ri.SlowBuffer=Bu;ri.INSPECT_MAX_BYTES=50;var wn=2147483647;ri.kMaxLength=wn;b.TYPED_ARRAY_SUPPORT=vu();!b.TYPED_ARRAY_SUPPORT&&typeof console<"u"&&typeof console.error=="function"&&console.error("This browser lacks typed array (Uint8Array) support which is required by `buffer` v5.x. Use `buffer` v4.x if you require old browser support.");function vu(){try{let i=new Uint8Array(1),e={foo:function(){return 42}};return Object.setPrototypeOf(e,Uint8Array.prototype),Object.setPrototypeOf(i,e),i.foo()===42}catch{return!1}}Object.defineProperty(b.prototype,"parent",{enumerable:!0,get:function(){if(b.isBuffer(this))return this.buffer}});Object.defineProperty(b.prototype,"offset",{enumerable:!0,get:function(){if(b.isBuffer(this))return this.byteOffset}});function at(i){if(i>wn)throw new RangeError('The value "'+i+'" is invalid for option "size"');let e=new Uint8Array(i);return Object.setPrototypeOf(e,b.prototype),e}function b(i,e,t){if(typeof i=="number"){if(typeof e=="string")throw new TypeError('The "string" argument must be of type string. Received type number');return qr(i)}return Gl(i,e,t)}b.poolSize=8192;function Gl(i,e,t){if(typeof i=="string")return Su(i,e);if(ArrayBuffer.isView(i))return Cu(i);if(i==null)throw new TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type "+typeof i);if(Ye(i,ArrayBuffer)||i&&Ye(i.buffer,ArrayBuffer)||typeof SharedArrayBuffer<"u"&&(Ye(i,SharedArrayBuffer)||i&&Ye(i.buffer,SharedArrayBuffer)))return Ur(i,e,t);if(typeof i=="number")throw new TypeError('The "value" argument must not be of type number. Received type number');let n=i.valueOf&&i.valueOf();if(n!=null&&n!==i)return b.from(n,e,t);let r=Au(i);if(r)return r;if(typeof Symbol<"u"&&Symbol.toPrimitive!=null&&typeof i[Symbol.toPrimitive]=="function")return b.from(i[Symbol.toPrimitive]("string"),e,t);throw new TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type "+typeof i)}b.from=function(i,e,t){return Gl(i,e,t)};Object.setPrototypeOf(b.prototype,Uint8Array.prototype);Object.setPrototypeOf(b,Uint8Array);function Yl(i){if(typeof i!="number")throw new TypeError('"size" argument must be of type number');if(i<0)throw new RangeError('The value "'+i+'" is invalid for option "size"')}function ku(i,e,t){return Yl(i),i<=0?at(i):e!==void 0?typeof t=="string"?at(i).fill(e,t):at(i).fill(e):at(i)}b.alloc=function(i,e,t){return ku(i,e,t)};function qr(i){return Yl(i),at(i<0?0:jr(i)|0)}b.allocUnsafe=function(i){return qr(i)};b.allocUnsafeSlow=function(i){return qr(i)};function Su(i,e){if((typeof e!="string"||e==="")&&(e="utf8"),!b.isEncoding(e))throw new TypeError("Unknown encoding: "+e);let t=Jl(i,e)|0,n=at(t),r=n.write(i,e);return r!==t&&(n=n.slice(0,r)),n}function _r(i){let e=i.length<0?0:jr(i.length)|0,t=at(e);for(let n=0;n<e;n+=1)t[n]=i[n]&255;return t}function Cu(i){if(Ye(i,Uint8Array)){let e=new Uint8Array(i);return Ur(e.buffer,e.byteOffset,e.byteLength)}return _r(i)}function Ur(i,e,t){if(e<0||i.byteLength<e)throw new RangeError('"offset" is outside of buffer bounds');if(i.byteLength<e+(t||0))throw new RangeError('"length" is outside of buffer bounds');let n;return e===void 0&&t===void 0?n=new Uint8Array(i):t===void 0?n=new Uint8Array(i,e):n=new Uint8Array(i,e,t),Object.setPrototypeOf(n,b.prototype),n}function Au(i){if(b.isBuffer(i)){let e=jr(i.length)|0,t=at(e);return t.length===0||i.copy(t,0,0,e),t}if(i.length!==void 0)return typeof i.length!="number"||$r(i.length)?at(0):_r(i);if(i.type==="Buffer"&&Array.isArray(i.data))return _r(i.data)}function jr(i){if(i>=wn)throw new RangeError("Attempt to allocate Buffer larger than maximum size: 0x"+wn.toString(16)+" bytes");return i|0}function Bu(i){return+i!=i&&(i=0),b.alloc(+i)}b.isBuffer=function(e){return e!=null&&e._isBuffer===!0&&e!==b.prototype};b.compare=function(e,t){if(Ye(e,Uint8Array)&&(e=b.from(e,e.offset,e.byteLength)),Ye(t,Uint8Array)&&(t=b.from(t,t.offset,t.byteLength)),!b.isBuffer(e)||!b.isBuffer(t))throw new TypeError('The "buf1", "buf2" arguments must be one of type Buffer or Uint8Array');if(e===t)return 0;let n=e.length,r=t.length;for(let s=0,o=Math.min(n,r);s<o;++s)if(e[s]!==t[s]){n=e[s],r=t[s];break}return n<r?-1:r<n?1:0};b.isEncoding=function(e){switch(String(e).toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"latin1":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return!0;default:return!1}};b.concat=function(e,t){if(!Array.isArray(e))throw new TypeError('"list" argument must be an Array of Buffers');if(e.length===0)return b.alloc(0);let n;if(t===void 0)for(t=0,n=0;n<e.length;++n)t+=e[n].length;let r=b.allocUnsafe(t),s=0;for(n=0;n<e.length;++n){let o=e[n];if(Ye(o,Uint8Array))s+o.length>r.length?(b.isBuffer(o)||(o=b.from(o)),o.copy(r,s)):Uint8Array.prototype.set.call(r,o,s);else if(b.isBuffer(o))o.copy(r,s);else throw new TypeError('"list" argument must be an Array of Buffers');s+=o.length}return r};function Jl(i,e){if(b.isBuffer(i))return i.length;if(ArrayBuffer.isView(i)||Ye(i,ArrayBuffer))return i.byteLength;if(typeof i!="string")throw new TypeError('The "string" argument must be one of type string, Buffer, or ArrayBuffer. Received type '+typeof i);let t=i.length,n=arguments.length>2&&arguments[2]===!0;if(!n&&t===0)return 0;let r=!1;for(;;)switch(e){case"ascii":case"latin1":case"binary":return t;case"utf8":case"utf-8":return zr(i).length;case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return t*2;case"hex":return t>>>1;case"base64":return sa(i).length;default:if(r)return n?-1:zr(i).length;e=(""+e).toLowerCase(),r=!0}}b.byteLength=Jl;function Mu(i,e,t){let n=!1;if((e===void 0||e<0)&&(e=0),e>this.length||((t===void 0||t>this.length)&&(t=this.length),t<=0)||(t>>>=0,e>>>=0,t<=e))return"";for(i||(i="utf8");;)switch(i){case"hex":return Nu(this,e,t);case"utf8":case"utf-8":return Ql(this,e,t);case"ascii":return Pu(this,e,t);case"latin1":case"binary":return Fu(this,e,t);case"base64":return Lu(this,e,t);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return Hu(this,e,t);default:if(n)throw new TypeError("Unknown encoding: "+i);i=(i+"").toLowerCase(),n=!0}}b.prototype._isBuffer=!0;function Ot(i,e,t){let n=i[e];i[e]=i[t],i[t]=n}b.prototype.swap16=function(){let e=this.length;if(e%2!==0)throw new RangeError("Buffer size must be a multiple of 16-bits");for(let t=0;t<e;t+=2)Ot(this,t,t+1);return this};b.prototype.swap32=function(){let e=this.length;if(e%4!==0)throw new RangeError("Buffer size must be a multiple of 32-bits");for(let t=0;t<e;t+=4)Ot(this,t,t+3),Ot(this,t+1,t+2);return this};b.prototype.swap64=function(){let e=this.length;if(e%8!==0)throw new RangeError("Buffer size must be a multiple of 64-bits");for(let t=0;t<e;t+=8)Ot(this,t,t+7),Ot(this,t+1,t+6),Ot(this,t+2,t+5),Ot(this,t+3,t+4);return this};b.prototype.toString=function(){let e=this.length;return e===0?"":arguments.length===0?Ql(this,0,e):Mu.apply(this,arguments)};b.prototype.toLocaleString=b.prototype.toString;b.prototype.equals=function(e){if(!b.isBuffer(e))throw new TypeError("Argument must be a Buffer");return this===e?!0:b.compare(this,e)===0};b.prototype.inspect=function(){let e="",t=ri.INSPECT_MAX_BYTES;return e=this.toString("hex",0,t).replace(/(.{2})/g,"$1 ").trim(),this.length>t&&(e+=" ... "),"<Buffer "+e+">"};ql&&(b.prototype[ql]=b.prototype.inspect);b.prototype.compare=function(e,t,n,r,s){if(Ye(e,Uint8Array)&&(e=b.from(e,e.offset,e.byteLength)),!b.isBuffer(e))throw new TypeError('The "target" argument must be one of type Buffer or Uint8Array. Received type '+typeof e);if(t===void 0&&(t=0),n===void 0&&(n=e?e.length:0),r===void 0&&(r=0),s===void 0&&(s=this.length),t<0||n>e.length||r<0||s>this.length)throw new RangeError("out of range index");if(r>=s&&t>=n)return 0;if(r>=s)return-1;if(t>=n)return 1;if(t>>>=0,n>>>=0,r>>>=0,s>>>=0,this===e)return 0;let o=s-r,l=n-t,a=Math.min(o,l),h=this.slice(r,s),c=e.slice(t,n);for(let f=0;f<a;++f)if(h[f]!==c[f]){o=h[f],l=c[f];break}return o<l?-1:l<o?1:0};function Xl(i,e,t,n,r){if(i.length===0)return-1;if(typeof t=="string"?(n=t,t=0):t>2147483647?t=2147483647:t<-2147483648&&(t=-2147483648),t=+t,$r(t)&&(t=r?0:i.length-1),t<0&&(t=i.length+t),t>=i.length){if(r)return-1;t=i.length-1}else if(t<0)if(r)t=0;else return-1;if(typeof e=="string"&&(e=b.from(e,n)),b.isBuffer(e))return e.length===0?-1:jl(i,e,t,n,r);if(typeof e=="number")return e=e&255,typeof Uint8Array.prototype.indexOf=="function"?r?Uint8Array.prototype.indexOf.call(i,e,t):Uint8Array.prototype.lastIndexOf.call(i,e,t):jl(i,[e],t,n,r);throw new TypeError("val must be string, number or Buffer")}function jl(i,e,t,n,r){let s=1,o=i.length,l=e.length;if(n!==void 0&&(n=String(n).toLowerCase(),n==="ucs2"||n==="ucs-2"||n==="utf16le"||n==="utf-16le")){if(i.length<2||e.length<2)return-1;s=2,o/=2,l/=2,t/=2}function a(c,f){return s===1?c[f]:c.readUInt16BE(f*s)}let h;if(r){let c=-1;for(h=t;h<o;h++)if(a(i,h)===a(e,c===-1?0:h-c)){if(c===-1&&(c=h),h-c+1===l)return c*s}else c!==-1&&(h-=h-c),c=-1}else for(t+l>o&&(t=o-l),h=t;h>=0;h--){let c=!0;for(let f=0;f<l;f++)if(a(i,h+f)!==a(e,f)){c=!1;break}if(c)return h}return-1}b.prototype.includes=function(e,t,n){return this.indexOf(e,t,n)!==-1};b.prototype.indexOf=function(e,t,n){return Xl(this,e,t,n,!0)};b.prototype.lastIndexOf=function(e,t,n){return Xl(this,e,t,n,!1)};function Eu(i,e,t,n){t=Number(t)||0;let r=i.length-t;n?(n=Number(n),n>r&&(n=r)):n=r;let s=e.length;n>s/2&&(n=s/2);let o;for(o=0;o<n;++o){let l=parseInt(e.substr(o*2,2),16);if($r(l))return o;i[t+o]=l}return o}function Tu(i,e,t,n){return xn(zr(e,i.length-t),i,t,n)}function Du(i,e,t,n){return xn(Uu(e),i,t,n)}function Ou(i,e,t,n){return xn(sa(e),i,t,n)}function Iu(i,e,t,n){return xn(zu(e,i.length-t),i,t,n)}b.prototype.write=function(e,t,n,r){if(t===void 0)r="utf8",n=this.length,t=0;else if(n===void 0&&typeof t=="string")r=t,n=this.length,t=0;else if(isFinite(t))t=t>>>0,isFinite(n)?(n=n>>>0,r===void 0&&(r="utf8")):(r=n,n=void 0);else throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");let s=this.length-t;if((n===void 0||n>s)&&(n=s),e.length>0&&(n<0||t<0)||t>this.length)throw new RangeError("Attempt to write outside buffer bounds");r||(r="utf8");let o=!1;for(;;)switch(r){case"hex":return Eu(this,e,t,n);case"utf8":case"utf-8":return Tu(this,e,t,n);case"ascii":case"latin1":case"binary":return Du(this,e,t,n);case"base64":return Ou(this,e,t,n);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return Iu(this,e,t,n);default:if(o)throw new TypeError("Unknown encoding: "+r);r=(""+r).toLowerCase(),o=!0}};b.prototype.toJSON=function(){return{type:"Buffer",data:Array.prototype.slice.call(this._arr||this,0)}};function Lu(i,e,t){return e===0&&t===i.length?Vr.fromByteArray(i):Vr.fromByteArray(i.slice(e,t))}function Ql(i,e,t){t=Math.min(i.length,t);let n=[],r=e;for(;r<t;){let s=i[r],o=null,l=s>239?4:s>223?3:s>191?2:1;if(r+l<=t){let a,h,c,f;switch(l){case 1:s<128&&(o=s);break;case 2:a=i[r+1],(a&192)===128&&(f=(s&31)<<6|a&63,f>127&&(o=f));break;case 3:a=i[r+1],h=i[r+2],(a&192)===128&&(h&192)===128&&(f=(s&15)<<12|(a&63)<<6|h&63,f>2047&&(f<55296||f>57343)&&(o=f));break;case 4:a=i[r+1],h=i[r+2],c=i[r+3],(a&192)===128&&(h&192)===128&&(c&192)===128&&(f=(s&15)<<18|(a&63)<<12|(h&63)<<6|c&63,f>65535&&f<1114112&&(o=f))}}o===null?(o=65533,l=1):o>65535&&(o-=65536,n.push(o>>>10&1023|55296),o=56320|o&1023),n.push(o),r+=l}return Ru(n)}var Kl=4096;function Ru(i){let e=i.length;if(e<=Kl)return String.fromCharCode.apply(String,i);let t="",n=0;for(;n<e;)t+=String.fromCharCode.apply(String,i.slice(n,n+=Kl));return t}function Pu(i,e,t){let n="";t=Math.min(i.length,t);for(let r=e;r<t;++r)n+=String.fromCharCode(i[r]&127);return n}function Fu(i,e,t){let n="";t=Math.min(i.length,t);for(let r=e;r<t;++r)n+=String.fromCharCode(i[r]);return n}function Nu(i,e,t){let n=i.length;(!e||e<0)&&(e=0),(!t||t<0||t>n)&&(t=n);let r="";for(let s=e;s<t;++s)r+=qu[i[s]];return r}function Hu(i,e,t){let n=i.slice(e,t),r="";for(let s=0;s<n.length-1;s+=2)r+=String.fromCharCode(n[s]+n[s+1]*256);return r}b.prototype.slice=function(e,t){let n=this.length;e=~~e,t=t===void 0?n:~~t,e<0?(e+=n,e<0&&(e=0)):e>n&&(e=n),t<0?(t+=n,t<0&&(t=0)):t>n&&(t=n),t<e&&(t=e);let r=this.subarray(e,t);return Object.setPrototypeOf(r,b.prototype),r};function Z(i,e,t){if(i%1!==0||i<0)throw new RangeError("offset is not uint");if(i+e>t)throw new RangeError("Trying to access beyond buffer length")}b.prototype.readUintLE=b.prototype.readUIntLE=function(e,t,n){e=e>>>0,t=t>>>0,n||Z(e,t,this.length);let r=this[e],s=1,o=0;for(;++o<t&&(s*=256);)r+=this[e+o]*s;return r};b.prototype.readUintBE=b.prototype.readUIntBE=function(e,t,n){e=e>>>0,t=t>>>0,n||Z(e,t,this.length);let r=this[e+--t],s=1;for(;t>0&&(s*=256);)r+=this[e+--t]*s;return r};b.prototype.readUint8=b.prototype.readUInt8=function(e,t){return e=e>>>0,t||Z(e,1,this.length),this[e]};b.prototype.readUint16LE=b.prototype.readUInt16LE=function(e,t){return e=e>>>0,t||Z(e,2,this.length),this[e]|this[e+1]<<8};b.prototype.readUint16BE=b.prototype.readUInt16BE=function(e,t){return e=e>>>0,t||Z(e,2,this.length),this[e]<<8|this[e+1]};b.prototype.readUint32LE=b.prototype.readUInt32LE=function(e,t){return e=e>>>0,t||Z(e,4,this.length),(this[e]|this[e+1]<<8|this[e+2]<<16)+this[e+3]*16777216};b.prototype.readUint32BE=b.prototype.readUInt32BE=function(e,t){return e=e>>>0,t||Z(e,4,this.length),this[e]*16777216+(this[e+1]<<16|this[e+2]<<8|this[e+3])};b.prototype.readBigUInt64LE=yt(function(e){e=e>>>0,ni(e,"offset");let t=this[e],n=this[e+7];(t===void 0||n===void 0)&&Ii(e,this.length-8);let r=t+this[++e]*2**8+this[++e]*2**16+this[++e]*2**24,s=this[++e]+this[++e]*2**8+this[++e]*2**16+n*2**24;return BigInt(r)+(BigInt(s)<<BigInt(32))});b.prototype.readBigUInt64BE=yt(function(e){e=e>>>0,ni(e,"offset");let t=this[e],n=this[e+7];(t===void 0||n===void 0)&&Ii(e,this.length-8);let r=t*2**24+this[++e]*2**16+this[++e]*2**8+this[++e],s=this[++e]*2**24+this[++e]*2**16+this[++e]*2**8+n;return(BigInt(r)<<BigInt(32))+BigInt(s)});b.prototype.readIntLE=function(e,t,n){e=e>>>0,t=t>>>0,n||Z(e,t,this.length);let r=this[e],s=1,o=0;for(;++o<t&&(s*=256);)r+=this[e+o]*s;return s*=128,r>=s&&(r-=Math.pow(2,8*t)),r};b.prototype.readIntBE=function(e,t,n){e=e>>>0,t=t>>>0,n||Z(e,t,this.length);let r=t,s=1,o=this[e+--r];for(;r>0&&(s*=256);)o+=this[e+--r]*s;return s*=128,o>=s&&(o-=Math.pow(2,8*t)),o};b.prototype.readInt8=function(e,t){return e=e>>>0,t||Z(e,1,this.length),this[e]&128?(255-this[e]+1)*-1:this[e]};b.prototype.readInt16LE=function(e,t){e=e>>>0,t||Z(e,2,this.length);let n=this[e]|this[e+1]<<8;return n&32768?n|4294901760:n};b.prototype.readInt16BE=function(e,t){e=e>>>0,t||Z(e,2,this.length);let n=this[e+1]|this[e]<<8;return n&32768?n|4294901760:n};b.prototype.readInt32LE=function(e,t){return e=e>>>0,t||Z(e,4,this.length),this[e]|this[e+1]<<8|this[e+2]<<16|this[e+3]<<24};b.prototype.readInt32BE=function(e,t){return e=e>>>0,t||Z(e,4,this.length),this[e]<<24|this[e+1]<<16|this[e+2]<<8|this[e+3]};b.prototype.readBigInt64LE=yt(function(e){e=e>>>0,ni(e,"offset");let t=this[e],n=this[e+7];(t===void 0||n===void 0)&&Ii(e,this.length-8);let r=this[e+4]+this[e+5]*2**8+this[e+6]*2**16+(n<<24);return(BigInt(r)<<BigInt(32))+BigInt(t+this[++e]*2**8+this[++e]*2**16+this[++e]*2**24)});b.prototype.readBigInt64BE=yt(function(e){e=e>>>0,ni(e,"offset");let t=this[e],n=this[e+7];(t===void 0||n===void 0)&&Ii(e,this.length-8);let r=(t<<24)+this[++e]*2**16+this[++e]*2**8+this[++e];return(BigInt(r)<<BigInt(32))+BigInt(this[++e]*2**24+this[++e]*2**16+this[++e]*2**8+n)});b.prototype.readFloatLE=function(e,t){return e=e>>>0,t||Z(e,4,this.length),ii.read(this,e,!0,23,4)};b.prototype.readFloatBE=function(e,t){return e=e>>>0,t||Z(e,4,this.length),ii.read(this,e,!1,23,4)};b.prototype.readDoubleLE=function(e,t){return e=e>>>0,t||Z(e,8,this.length),ii.read(this,e,!0,52,8)};b.prototype.readDoubleBE=function(e,t){return e=e>>>0,t||Z(e,8,this.length),ii.read(this,e,!1,52,8)};function ge(i,e,t,n,r,s){if(!b.isBuffer(i))throw new TypeError('"buffer" argument must be a Buffer instance');if(e>r||e<s)throw new RangeError('"value" argument is out of bounds');if(t+n>i.length)throw new RangeError("Index out of range")}b.prototype.writeUintLE=b.prototype.writeUIntLE=function(e,t,n,r){if(e=+e,t=t>>>0,n=n>>>0,!r){let l=Math.pow(2,8*n)-1;ge(this,e,t,n,l,0)}let s=1,o=0;for(this[t]=e&255;++o<n&&(s*=256);)this[t+o]=e/s&255;return t+n};b.prototype.writeUintBE=b.prototype.writeUIntBE=function(e,t,n,r){if(e=+e,t=t>>>0,n=n>>>0,!r){let l=Math.pow(2,8*n)-1;ge(this,e,t,n,l,0)}let s=n-1,o=1;for(this[t+s]=e&255;--s>=0&&(o*=256);)this[t+s]=e/o&255;return t+n};b.prototype.writeUint8=b.prototype.writeUInt8=function(e,t,n){return e=+e,t=t>>>0,n||ge(this,e,t,1,255,0),this[t]=e&255,t+1};b.prototype.writeUint16LE=b.prototype.writeUInt16LE=function(e,t,n){return e=+e,t=t>>>0,n||ge(this,e,t,2,65535,0),this[t]=e&255,this[t+1]=e>>>8,t+2};b.prototype.writeUint16BE=b.prototype.writeUInt16BE=function(e,t,n){return e=+e,t=t>>>0,n||ge(this,e,t,2,65535,0),this[t]=e>>>8,this[t+1]=e&255,t+2};b.prototype.writeUint32LE=b.prototype.writeUInt32LE=function(e,t,n){return e=+e,t=t>>>0,n||ge(this,e,t,4,4294967295,0),this[t+3]=e>>>24,this[t+2]=e>>>16,this[t+1]=e>>>8,this[t]=e&255,t+4};b.prototype.writeUint32BE=b.prototype.writeUInt32BE=function(e,t,n){return e=+e,t=t>>>0,n||ge(this,e,t,4,4294967295,0),this[t]=e>>>24,this[t+1]=e>>>16,this[t+2]=e>>>8,this[t+3]=e&255,t+4};function Zl(i,e,t,n,r){ra(e,n,r,i,t,7);let s=Number(e&BigInt(4294967295));i[t++]=s,s=s>>8,i[t++]=s,s=s>>8,i[t++]=s,s=s>>8,i[t++]=s;let o=Number(e>>BigInt(32)&BigInt(4294967295));return i[t++]=o,o=o>>8,i[t++]=o,o=o>>8,i[t++]=o,o=o>>8,i[t++]=o,t}function ea(i,e,t,n,r){ra(e,n,r,i,t,7);let s=Number(e&BigInt(4294967295));i[t+7]=s,s=s>>8,i[t+6]=s,s=s>>8,i[t+5]=s,s=s>>8,i[t+4]=s;let o=Number(e>>BigInt(32)&BigInt(4294967295));return i[t+3]=o,o=o>>8,i[t+2]=o,o=o>>8,i[t+1]=o,o=o>>8,i[t]=o,t+8}b.prototype.writeBigUInt64LE=yt(function(e,t=0){return Zl(this,e,t,BigInt(0),BigInt("0xffffffffffffffff"))});b.prototype.writeBigUInt64BE=yt(function(e,t=0){return ea(this,e,t,BigInt(0),BigInt("0xffffffffffffffff"))});b.prototype.writeIntLE=function(e,t,n,r){if(e=+e,t=t>>>0,!r){let a=Math.pow(2,8*n-1);ge(this,e,t,n,a-1,-a)}let s=0,o=1,l=0;for(this[t]=e&255;++s<n&&(o*=256);)e<0&&l===0&&this[t+s-1]!==0&&(l=1),this[t+s]=(e/o>>0)-l&255;return t+n};b.prototype.writeIntBE=function(e,t,n,r){if(e=+e,t=t>>>0,!r){let a=Math.pow(2,8*n-1);ge(this,e,t,n,a-1,-a)}let s=n-1,o=1,l=0;for(this[t+s]=e&255;--s>=0&&(o*=256);)e<0&&l===0&&this[t+s+1]!==0&&(l=1),this[t+s]=(e/o>>0)-l&255;return t+n};b.prototype.writeInt8=function(e,t,n){return e=+e,t=t>>>0,n||ge(this,e,t,1,127,-128),e<0&&(e=255+e+1),this[t]=e&255,t+1};b.prototype.writeInt16LE=function(e,t,n){return e=+e,t=t>>>0,n||ge(this,e,t,2,32767,-32768),this[t]=e&255,this[t+1]=e>>>8,t+2};b.prototype.writeInt16BE=function(e,t,n){return e=+e,t=t>>>0,n||ge(this,e,t,2,32767,-32768),this[t]=e>>>8,this[t+1]=e&255,t+2};b.prototype.writeInt32LE=function(e,t,n){return e=+e,t=t>>>0,n||ge(this,e,t,4,2147483647,-2147483648),this[t]=e&255,this[t+1]=e>>>8,this[t+2]=e>>>16,this[t+3]=e>>>24,t+4};b.prototype.writeInt32BE=function(e,t,n){return e=+e,t=t>>>0,n||ge(this,e,t,4,2147483647,-2147483648),e<0&&(e=4294967295+e+1),this[t]=e>>>24,this[t+1]=e>>>16,this[t+2]=e>>>8,this[t+3]=e&255,t+4};b.prototype.writeBigInt64LE=yt(function(e,t=0){return Zl(this,e,t,-BigInt("0x8000000000000000"),BigInt("0x7fffffffffffffff"))});b.prototype.writeBigInt64BE=yt(function(e,t=0){return ea(this,e,t,-BigInt("0x8000000000000000"),BigInt("0x7fffffffffffffff"))});function ta(i,e,t,n,r,s){if(t+n>i.length)throw new RangeError("Index out of range");if(t<0)throw new RangeError("Index out of range")}function ia(i,e,t,n,r){return e=+e,t=t>>>0,r||ta(i,e,t,4,34028234663852886e22,-34028234663852886e22),ii.write(i,e,t,n,23,4),t+4}b.prototype.writeFloatLE=function(e,t,n){return ia(this,e,t,!0,n)};b.prototype.writeFloatBE=function(e,t,n){return ia(this,e,t,!1,n)};function na(i,e,t,n,r){return e=+e,t=t>>>0,r||ta(i,e,t,8,17976931348623157e292,-17976931348623157e292),ii.write(i,e,t,n,52,8),t+8}b.prototype.writeDoubleLE=function(e,t,n){return na(this,e,t,!0,n)};b.prototype.writeDoubleBE=function(e,t,n){return na(this,e,t,!1,n)};b.prototype.copy=function(e,t,n,r){if(!b.isBuffer(e))throw new TypeError("argument should be a Buffer");if(n||(n=0),!r&&r!==0&&(r=this.length),t>=e.length&&(t=e.length),t||(t=0),r>0&&r<n&&(r=n),r===n||e.length===0||this.length===0)return 0;if(t<0)throw new RangeError("targetStart out of bounds");if(n<0||n>=this.length)throw new RangeError("Index out of range");if(r<0)throw new RangeError("sourceEnd out of bounds");r>this.length&&(r=this.length),e.length-t<r-n&&(r=e.length-t+n);let s=r-n;return this===e&&typeof Uint8Array.prototype.copyWithin=="function"?this.copyWithin(t,n,r):Uint8Array.prototype.set.call(e,this.subarray(n,r),t),s};b.prototype.fill=function(e,t,n,r){if(typeof e=="string"){if(typeof t=="string"?(r=t,t=0,n=this.length):typeof n=="string"&&(r=n,n=this.length),r!==void 0&&typeof r!="string")throw new TypeError("encoding must be a string");if(typeof r=="string"&&!b.isEncoding(r))throw new TypeError("Unknown encoding: "+r);if(e.length===1){let o=e.charCodeAt(0);(r==="utf8"&&o<128||r==="latin1")&&(e=o)}}else typeof e=="number"?e=e&255:typeof e=="boolean"&&(e=Number(e));if(t<0||this.length<t||this.length<n)throw new RangeError("Out of range index");if(n<=t)return this;t=t>>>0,n=n===void 0?this.length:n>>>0,e||(e=0);let s;if(typeof e=="number")for(s=t;s<n;++s)this[s]=e;else{let o=b.isBuffer(e)?e:b.from(e,r),l=o.length;if(l===0)throw new TypeError('The value "'+e+'" is invalid for argument "value"');for(s=0;s<n-t;++s)this[s+t]=o[s%l]}return this};var ti={};function Kr(i,e,t){ti[i]=class extends t{constructor(){super(),Object.defineProperty(this,"message",{value:e.apply(this,arguments),writable:!0,configurable:!0}),this.name=`${this.name} [${i}]`,this.stack,delete this.name}get code(){return i}set code(r){Object.defineProperty(this,"code",{configurable:!0,enumerable:!0,value:r,writable:!0})}toString(){return`${this.name} [${i}]: ${this.message}`}}}Kr("ERR_BUFFER_OUT_OF_BOUNDS",function(i){return i?`${i} is outside of buffer bounds`:"Attempt to access memory outside buffer bounds"},RangeError);Kr("ERR_INVALID_ARG_TYPE",function(i,e){return`The "${i}" argument must be of type number. Received type ${typeof e}`},TypeError);Kr("ERR_OUT_OF_RANGE",function(i,e,t){let n=`The value of "${i}" is out of range.`,r=t;return Number.isInteger(t)&&Math.abs(t)>2**32?r=$l(String(t)):typeof t=="bigint"&&(r=String(t),(t>BigInt(2)**BigInt(32)||t<-(BigInt(2)**BigInt(32)))&&(r=$l(r)),r+="n"),n+=` It must be ${e}. Received ${r}`,n},RangeError);function $l(i){let e="",t=i.length,n=i[0]==="-"?1:0;for(;t>=n+4;t-=3)e=`_${i.slice(t-3,t)}${e}`;return`${i.slice(0,t)}${e}`}function Wu(i,e,t){ni(e,"offset"),(i[e]===void 0||i[e+t]===void 0)&&Ii(e,i.length-(t+1))}function ra(i,e,t,n,r,s){if(i>t||i<e){let o=typeof e=="bigint"?"n":"",l;throw s>3?e===0||e===BigInt(0)?l=`>= 0${o} and < 2${o} ** ${(s+1)*8}${o}`:l=`>= -(2${o} ** ${(s+1)*8-1}${o}) and < 2 ** ${(s+1)*8-1}${o}`:l=`>= ${e}${o} and <= ${t}${o}`,new ti.ERR_OUT_OF_RANGE("value",l,i)}Wu(n,r,s)}function ni(i,e){if(typeof i!="number")throw new ti.ERR_INVALID_ARG_TYPE(e,"number",i)}function Ii(i,e,t){throw Math.floor(i)!==i?(ni(i,t),new ti.ERR_OUT_OF_RANGE(t||"offset","an integer",i)):e<0?new ti.ERR_BUFFER_OUT_OF_BOUNDS:new ti.ERR_OUT_OF_RANGE(t||"offset",`>= ${t?1:0} and <= ${e}`,i)}var Vu=/[^+/0-9A-Za-z-_]/g;function _u(i){if(i=i.split("=")[0],i=i.trim().replace(Vu,""),i.length<2)return"";for(;i.length%4!==0;)i=i+"=";return i}function zr(i,e){e=e||1/0;let t,n=i.length,r=null,s=[];for(let o=0;o<n;++o){if(t=i.charCodeAt(o),t>55295&&t<57344){if(!r){if(t>56319){(e-=3)>-1&&s.push(239,191,189);continue}else if(o+1===n){(e-=3)>-1&&s.push(239,191,189);continue}r=t;continue}if(t<56320){(e-=3)>-1&&s.push(239,191,189),r=t;continue}t=(r-55296<<10|t-56320)+65536}else r&&(e-=3)>-1&&s.push(239,191,189);if(r=null,t<128){if((e-=1)<0)break;s.push(t)}else if(t<2048){if((e-=2)<0)break;s.push(t>>6|192,t&63|128)}else if(t<65536){if((e-=3)<0)break;s.push(t>>12|224,t>>6&63|128,t&63|128)}else if(t<1114112){if((e-=4)<0)break;s.push(t>>18|240,t>>12&63|128,t>>6&63|128,t&63|128)}else throw new Error("Invalid code point")}return s}function Uu(i){let e=[];for(let t=0;t<i.length;++t)e.push(i.charCodeAt(t)&255);return e}function zu(i,e){let t,n,r,s=[];for(let o=0;o<i.length&&!((e-=2)<0);++o)t=i.charCodeAt(o),n=t>>8,r=t%256,s.push(r),s.push(n);return s}function sa(i){return Vr.toByteArray(_u(i))}function xn(i,e,t,n){let r;for(r=0;r<n&&!(r+t>=e.length||r>=i.length);++r)e[r+t]=i[r];return r}function Ye(i,e){return i instanceof e||i!=null&&i.constructor!=null&&i.constructor.name!=null&&i.constructor.name===e.name}function $r(i){return i!==i}var qu=(function(){let i="0123456789abcdef",e=new Array(256);for(let t=0;t<16;++t){let n=t*16;for(let r=0;r<16;++r)e[n+r]=i[t]+i[r]}return e})();function yt(i){return typeof BigInt>"u"?ju:i}function ju(){throw new Error("BigInt not supported")}});var ht=V((dm,oa)=>{"use strict";var kn=vn(),si=kn.Buffer,Ce={},Ae;for(Ae in kn)kn.hasOwnProperty(Ae)&&(Ae==="SlowBuffer"||Ae==="Buffer"||(Ce[Ae]=kn[Ae]));var oi=Ce.Buffer={};for(Ae in si)si.hasOwnProperty(Ae)&&(Ae==="allocUnsafe"||Ae==="allocUnsafeSlow"||(oi[Ae]=si[Ae]));Ce.Buffer.prototype=si.prototype;(!oi.from||oi.from===Uint8Array.from)&&(oi.from=function(i,e,t){if(typeof i=="number")throw new TypeError('The "value" argument must not be of type number. Received type '+typeof i);if(i&&typeof i.length>"u")throw new TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type "+typeof i);return si(i,e,t)});oi.alloc||(oi.alloc=function(i,e,t){if(typeof i!="number")throw new TypeError('The "size" argument must be of type number. Received type '+typeof i);if(i<0||i>=2*(1<<30))throw new RangeError('The value "'+i+'" is invalid for option "size"');var n=si(i);return!e||e.length===0?n.fill(0):typeof t=="string"?n.fill(e,t):n.fill(e),n});if(!Ce.kStringMaxLength)try{Ce.kStringMaxLength=process.binding("buffer").kStringMaxLength}catch{}Ce.constants||(Ce.constants={MAX_LENGTH:Ce.kMaxLength},Ce.kStringMaxLength&&(Ce.constants.MAX_STRING_LENGTH=Ce.kStringMaxLength));oa.exports=Ce});var aa=V(Jr=>{"use strict";var la="\uFEFF";Jr.PrependBOM=Gr;function Gr(i,e){this.encoder=i,this.addBOM=!0}Gr.prototype.write=function(i){return this.addBOM&&(i=la+i,this.addBOM=!1),this.encoder.write(i)};Gr.prototype.end=function(){return this.encoder.end()};Jr.StripBOM=Yr;function Yr(i,e){this.decoder=i,this.pass=!1,this.options=e||{}}Yr.prototype.write=function(i){var e=this.decoder.write(i);return this.pass||!e||(e[0]===la&&(e=e.slice(1),typeof this.options.stripBOM=="function"&&this.options.stripBOM()),this.pass=!0),e};Yr.prototype.end=function(){return this.decoder.end()}});var Xr=V((gm,ha)=>{"use strict";var Ku=typeof Object.hasOwn>"u"?Function.call.bind(Object.prototype.hasOwnProperty):Object.hasOwn;function $u(i,e){for(var t in e)Ku(e,t)&&(i[t]=e[t])}ha.exports=$u});var ua=V((Qr,fa)=>{var Sn=vn(),Je=Sn.Buffer;function ca(i,e){for(var t in i)e[t]=i[t]}Je.from&&Je.alloc&&Je.allocUnsafe&&Je.allocUnsafeSlow?fa.exports=Sn:(ca(Sn,Qr),Qr.Buffer=It);function It(i,e,t){return Je(i,e,t)}It.prototype=Object.create(Je.prototype);ca(Je,It);It.from=function(i,e,t){if(typeof i=="number")throw new TypeError("Argument must not be a number");return Je(i,e,t)};It.alloc=function(i,e,t){if(typeof i!="number")throw new TypeError("Argument must be a number");var n=Je(i);return e!==void 0?typeof t=="string"?n.fill(e,t):n.fill(e):n.fill(0),n};It.allocUnsafe=function(i){if(typeof i!="number")throw new TypeError("Argument must be a number");return Je(i)};It.allocUnsafeSlow=function(i){if(typeof i!="number")throw new TypeError("Argument must be a number");return Sn.SlowBuffer(i)}});var ga=V(pa=>{"use strict";var es=ua().Buffer,da=es.isEncoding||function(i){switch(i=""+i,i&&i.toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":case"raw":return!0;default:return!1}};function Gu(i){if(!i)return"utf8";for(var e;;)switch(i){case"utf8":case"utf-8":return"utf8";case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return"utf16le";case"latin1":case"binary":return"latin1";case"base64":case"ascii":case"hex":return i;default:if(e)return;i=(""+i).toLowerCase(),e=!0}}function Yu(i){var e=Gu(i);if(typeof e!="string"&&(es.isEncoding===da||!da(i)))throw new Error("Unknown encoding: "+i);return e||i}pa.StringDecoder=Li;function Li(i){this.encoding=Yu(i);var e;switch(this.encoding){case"utf16le":this.text=td,this.end=id,e=4;break;case"utf8":this.fillLast=Qu,e=4;break;case"base64":this.text=nd,this.end=rd,e=3;break;default:this.write=sd,this.end=od;return}this.lastNeed=0,this.lastTotal=0,this.lastChar=es.allocUnsafe(e)}Li.prototype.write=function(i){if(i.length===0)return"";var e,t;if(this.lastNeed){if(e=this.fillLast(i),e===void 0)return"";t=this.lastNeed,this.lastNeed=0}else t=0;return t<i.length?e?e+this.text(i,t):this.text(i,t):e||""};Li.prototype.end=ed;Li.prototype.text=Zu;Li.prototype.fillLast=function(i){if(this.lastNeed<=i.length)return i.copy(this.lastChar,this.lastTotal-this.lastNeed,0,this.lastNeed),this.lastChar.toString(this.encoding,0,this.lastTotal);i.copy(this.lastChar,this.lastTotal-this.lastNeed,0,i.length),this.lastNeed-=i.length};function Zr(i){return i<=127?0:i>>5===6?2:i>>4===14?3:i>>3===30?4:i>>6===2?-1:-2}function Ju(i,e,t){var n=e.length-1;if(n<t)return 0;var r=Zr(e[n]);return r>=0?(r>0&&(i.lastNeed=r-1),r):--n<t||r===-2?0:(r=Zr(e[n]),r>=0?(r>0&&(i.lastNeed=r-2),r):--n<t||r===-2?0:(r=Zr(e[n]),r>=0?(r>0&&(r===2?r=0:i.lastNeed=r-3),r):0))}function Xu(i,e,t){if((e[0]&192)!==128)return i.lastNeed=0,"\uFFFD";if(i.lastNeed>1&&e.length>1){if((e[1]&192)!==128)return i.lastNeed=1,"\uFFFD";if(i.lastNeed>2&&e.length>2&&(e[2]&192)!==128)return i.lastNeed=2,"\uFFFD"}}function Qu(i){var e=this.lastTotal-this.lastNeed,t=Xu(this,i,e);if(t!==void 0)return t;if(this.lastNeed<=i.length)return i.copy(this.lastChar,e,0,this.lastNeed),this.lastChar.toString(this.encoding,0,this.lastTotal);i.copy(this.lastChar,e,0,i.length),this.lastNeed-=i.length}function Zu(i,e){var t=Ju(this,i,e);if(!this.lastNeed)return i.toString("utf8",e);this.lastTotal=t;var n=i.length-(t-this.lastNeed);return i.copy(this.lastChar,0,n),i.toString("utf8",e,n)}function ed(i){var e=i&&i.length?this.write(i):"";return this.lastNeed?e+"\uFFFD":e}function td(i,e){if((i.length-e)%2===0){var t=i.toString("utf16le",e);if(t){var n=t.charCodeAt(t.length-1);if(n>=55296&&n<=56319)return this.lastNeed=2,this.lastTotal=4,this.lastChar[0]=i[i.length-2],this.lastChar[1]=i[i.length-1],t.slice(0,-1)}return t}return this.lastNeed=1,this.lastTotal=2,this.lastChar[0]=i[i.length-1],i.toString("utf16le",e,i.length-1)}function id(i){var e=i&&i.length?this.write(i):"";if(this.lastNeed){var t=this.lastTotal-this.lastNeed;return e+this.lastChar.toString("utf16le",0,t)}return e}function nd(i,e){var t=(i.length-e)%3;return t===0?i.toString("base64",e):(this.lastNeed=3-t,this.lastTotal=3,t===1?this.lastChar[0]=i[i.length-1]:(this.lastChar[0]=i[i.length-2],this.lastChar[1]=i[i.length-1]),i.toString("base64",e,i.length-t))}function rd(i){var e=i&&i.length?this.write(i):"";return this.lastNeed?e+this.lastChar.toString("base64",0,3-this.lastNeed):e}function sd(i){return i.toString(this.encoding)}function od(i){return i&&i.length?this.write(i):""}});var ba=V((bm,ma)=>{"use strict";var ct=ht().Buffer;ma.exports={utf8:{type:"_internal",bomAware:!0},cesu8:{type:"_internal",bomAware:!0},unicode11utf8:"utf8",ucs2:{type:"_internal",bomAware:!0},utf16le:"ucs2",binary:{type:"_internal"},base64:{type:"_internal"},hex:{type:"_internal"},_internal:ts};function ts(i,e){this.enc=i.encodingName,this.bomAware=i.bomAware,this.enc==="base64"?this.encoder=rs:this.enc==="utf8"?this.encoder=ls:this.enc==="cesu8"&&(this.enc="utf8",this.encoder=ss,ct.from("eda0bdedb2a9","hex").toString()!=="\u{1F4A9}"&&(this.decoder=os,this.defaultCharUnicode=e.defaultCharUnicode))}ts.prototype.encoder=ns;ts.prototype.decoder=is;var ld=ga().StringDecoder;function is(i,e){this.decoder=new ld(e.enc)}is.prototype.write=function(i){return ct.isBuffer(i)||(i=ct.from(i)),this.decoder.write(i)};is.prototype.end=function(){return this.decoder.end()};function ns(i,e){this.enc=e.enc}ns.prototype.write=function(i){return ct.from(i,this.enc)};ns.prototype.end=function(){};function rs(i,e){this.prevStr=""}rs.prototype.write=function(i){i=this.prevStr+i;var e=i.length-i.length%4;return this.prevStr=i.slice(e),i=i.slice(0,e),ct.from(i,"base64")};rs.prototype.end=function(){return ct.from(this.prevStr,"base64")};function ss(i,e){}ss.prototype.write=function(i){for(var e=ct.alloc(i.length*3),t=0,n=0;n<i.length;n++){var r=i.charCodeAt(n);r<128?e[t++]=r:r<2048?(e[t++]=192+(r>>>6),e[t++]=128+(r&63)):(e[t++]=224+(r>>>12),e[t++]=128+(r>>>6&63),e[t++]=128+(r&63))}return e.slice(0,t)};ss.prototype.end=function(){};function os(i,e){this.acc=0,this.contBytes=0,this.accBytes=0,this.defaultCharUnicode=e.defaultCharUnicode}os.prototype.write=function(i){for(var e=this.acc,t=this.contBytes,n=this.accBytes,r="",s=0;s<i.length;s++){var o=i[s];(o&192)!==128?(t>0&&(r+=this.defaultCharUnicode,t=0),o<128?r+=String.fromCharCode(o):o<224?(e=o&31,t=1,n=1):o<240?(e=o&15,t=2,n=1):r+=this.defaultCharUnicode):t>0?(e=e<<6|o&63,t--,n++,t===0&&(n===2&&e<128&&e>0?r+=this.defaultCharUnicode:n===3&&e<2048?r+=this.defaultCharUnicode:r+=String.fromCharCode(e))):r+=this.defaultCharUnicode}return this.acc=e,this.contBytes=t,this.accBytes=n,r};os.prototype.end=function(){var i=0;return this.contBytes>0&&(i+=this.defaultCharUnicode),i};function ls(i,e){this.highSurrogate=""}ls.prototype.write=function(i){if(this.highSurrogate&&(i=this.highSurrogate+i,this.highSurrogate=""),i.length>0){var e=i.charCodeAt(i.length-1);e>=55296&&e<56320&&(this.highSurrogate=i[i.length-1],i=i.slice(0,i.length-1))}return ct.from(i,this.enc)};ls.prototype.end=function(){if(this.highSurrogate){var i=this.highSurrogate;return this.highSurrogate="",ct.from(i,this.enc)}}});var xa=V(wt=>{"use strict";var Cn=ht().Buffer;wt._utf32=as;function as(i,e){this.iconv=e,this.bomAware=!0,this.isLE=i.isLE}wt.utf32le={type:"_utf32",isLE:!0};wt.utf32be={type:"_utf32",isLE:!1};wt.ucs4le="utf32le";wt.ucs4be="utf32be";as.prototype.encoder=hs;as.prototype.decoder=cs;function hs(i,e){this.isLE=e.isLE,this.highSurrogate=0}hs.prototype.write=function(i){for(var e=Cn.from(i,"ucs2"),t=Cn.alloc(e.length*2+4),n=this.isLE?t.writeUInt32LE:t.writeUInt32BE,r=0,s=0;s<e.length;s+=2){var o=e.readUInt16LE(s),l=o>=55296&&o<56320,a=o>=56320&&o<57344;if(this.highSurrogate)if(l||!a)n.call(t,this.highSurrogate,r),r+=4;else{var h=(this.highSurrogate-55296<<10|o-56320)+65536;n.call(t,h,r),r+=4,this.highSurrogate=0;continue}l?this.highSurrogate=o:(n.call(t,o,r),r+=4,this.highSurrogate=0)}return r<t.length&&(t=t.slice(0,r)),t};hs.prototype.end=function(){if(this.highSurrogate){var i=Cn.alloc(4);return this.isLE?i.writeUInt32LE(this.highSurrogate,0):i.writeUInt32BE(this.highSurrogate,0),this.highSurrogate=0,i}};function cs(i,e){this.isLE=e.isLE,this.badChar=e.iconv.defaultCharUnicode.charCodeAt(0),this.overflow=[]}cs.prototype.write=function(i){if(i.length===0)return"";var e=0,t=0,n=Cn.alloc(i.length+4),r=0,s=this.isLE,o=this.overflow,l=this.badChar;if(o.length>0){for(;e<i.length&&o.length<4;e++)o.push(i[e]);o.length===4&&(s?t=o[0]|o[1]<<8|o[2]<<16|o[3]<<24:t=o[3]|o[2]<<8|o[1]<<16|o[0]<<24,o.length=0,r=ya(n,r,t,l))}for(;e<i.length-3;e+=4)s?t=i[e]|i[e+1]<<8|i[e+2]<<16|i[e+3]<<24:t=i[e+3]|i[e+2]<<8|i[e+1]<<16|i[e]<<24,r=ya(n,r,t,l);for(;e<i.length;e++)o.push(i[e]);return n.slice(0,r).toString("ucs2")};function ya(i,e,t,n){if((t<0||t>1114111)&&(t=n),t>=65536){t-=65536;var r=55296|t>>10;i[e++]=r&255,i[e++]=r>>8;var t=56320|t&1023}return i[e++]=t&255,i[e++]=t>>8,e}cs.prototype.end=function(){if(this.overflow.length!==0)return this.overflow.length=0,String.fromCharCode(this.badChar)};wt.utf32=fs;wt.ucs4="utf32";function fs(i,e){this.iconv=e}fs.prototype.encoder=us;fs.prototype.decoder=ds;function us(i,e){i=i||{},i.addBOM===void 0&&(i.addBOM=!0),this.encoder=e.iconv.getEncoder(i.defaultEncoding||"utf-32le",i)}us.prototype.write=function(i){return this.encoder.write(i)};us.prototype.end=function(){return this.encoder.end()};function ds(i,e){this.decoder=null,this.initialBufs=[],this.initialBufsLen=0,this.options=i||{},this.iconv=e.iconv}ds.prototype.write=function(i){if(!this.decoder){if(this.initialBufs.push(i),this.initialBufsLen+=i.length,this.initialBufsLen<32)return"";var e=wa(this.initialBufs,this.options.defaultEncoding);this.decoder=this.iconv.getDecoder(e,this.options);for(var t="",n=0;n<this.initialBufs.length;n++)t+=this.decoder.write(this.initialBufs[n]);return this.initialBufs.length=this.initialBufsLen=0,t}return this.decoder.write(i)};ds.prototype.end=function(){if(!this.decoder){var i=wa(this.initialBufs,this.options.defaultEncoding);this.decoder=this.iconv.getDecoder(i,this.options);for(var e="",t=0;t<this.initialBufs.length;t++)e+=this.decoder.write(this.initialBufs[t]);var n=this.decoder.end();return n&&(e+=n),this.initialBufs.length=this.initialBufsLen=0,e}return this.decoder.end()};function wa(i,e){var t=[],n=0,r=0,s=0,o=0,l=0;e:for(var a=0;a<i.length;a++)for(var h=i[a],c=0;c<h.length;c++)if(t.push(h[c]),t.length===4){if(n===0){if(t[0]===255&&t[1]===254&&t[2]===0&&t[3]===0)return"utf-32le";if(t[0]===0&&t[1]===0&&t[2]===254&&t[3]===255)return"utf-32be"}if((t[0]!==0||t[1]>16)&&s++,(t[3]!==0||t[2]>16)&&r++,t[0]===0&&t[1]===0&&(t[2]!==0||t[3]!==0)&&l++,(t[0]!==0||t[1]!==0)&&t[2]===0&&t[3]===0&&o++,t.length=0,n++,n>=100)break e}return l-s>o-r?"utf-32be":l-s<o-r?"utf-32le":e||"utf-32le"}});var Sa=V(ws=>{"use strict";var va=ht().Buffer;ws.utf16be=An;function An(){}An.prototype.encoder=ps;An.prototype.decoder=gs;An.prototype.bomAware=!0;function ps(){}ps.prototype.write=function(i){for(var e=va.from(i,"ucs2"),t=0;t<e.length;t+=2){var n=e[t];e[t]=e[t+1],e[t+1]=n}return e};ps.prototype.end=function(){};function gs(){this.overflowByte=-1}gs.prototype.write=function(i){if(i.length==0)return"";var e=va.alloc(i.length+1),t=0,n=0;for(this.overflowByte!==-1&&(e[0]=i[0],e[1]=this.overflowByte,t=1,n=2);t<i.length-1;t+=2,n+=2)e[n]=i[t+1],e[n+1]=i[t];return this.overflowByte=t==i.length-1?i[i.length-1]:-1,e.slice(0,n).toString("ucs2")};gs.prototype.end=function(){this.overflowByte=-1};ws.utf16=ms;function ms(i,e){this.iconv=e}ms.prototype.encoder=bs;ms.prototype.decoder=ys;function bs(i,e){i=i||{},i.addBOM===void 0&&(i.addBOM=!0),this.encoder=e.iconv.getEncoder("utf-16le",i)}bs.prototype.write=function(i){return this.encoder.write(i)};bs.prototype.end=function(){return this.encoder.end()};function ys(i,e){this.decoder=null,this.initialBufs=[],this.initialBufsLen=0,this.options=i||{},this.iconv=e.iconv}ys.prototype.write=function(i){if(!this.decoder){if(this.initialBufs.push(i),this.initialBufsLen+=i.length,this.initialBufsLen<16)return"";var e=ka(this.initialBufs,this.options.defaultEncoding);this.decoder=this.iconv.getDecoder(e,this.options);for(var t="",n=0;n<this.initialBufs.length;n++)t+=this.decoder.write(this.initialBufs[n]);return this.initialBufs.length=this.initialBufsLen=0,t}return this.decoder.write(i)};ys.prototype.end=function(){if(!this.decoder){var i=ka(this.initialBufs,this.options.defaultEncoding);this.decoder=this.iconv.getDecoder(i,this.options);for(var e="",t=0;t<this.initialBufs.length;t++)e+=this.decoder.write(this.initialBufs[t]);var n=this.decoder.end();return n&&(e+=n),this.initialBufs.length=this.initialBufsLen=0,e}return this.decoder.end()};function ka(i,e){var t=[],n=0,r=0,s=0;e:for(var o=0;o<i.length;o++)for(var l=i[o],a=0;a<l.length;a++)if(t.push(l[a]),t.length===2){if(n===0){if(t[0]===255&&t[1]===254)return"utf-16le";if(t[0]===254&&t[1]===255)return"utf-16be"}if(t[0]===0&&t[1]!==0&&s++,t[0]!==0&&t[1]===0&&r++,t.length=0,n++,n>=100)break e}return s>r?"utf-16be":s<r?"utf-16le":e||"utf-16le"}});var Aa=V(En=>{"use strict";var Xe=ht().Buffer;En.utf7=Bn;En.unicode11utf7="utf7";function Bn(i,e){this.iconv=e}Bn.prototype.encoder=vs;Bn.prototype.decoder=ks;Bn.prototype.bomAware=!0;var ad=/[^A-Za-z0-9'\(\),-\.\/:\? \n\r\t]+/g;function vs(i,e){this.iconv=e.iconv}vs.prototype.write=function(i){return Xe.from(i.replace(ad,function(e){return"+"+(e==="+"?"":this.iconv.encode(e,"utf16-be").toString("base64").replace(/=+$/,""))+"-"}.bind(this)))};vs.prototype.end=function(){};function ks(i,e){this.iconv=e.iconv,this.inBase64=!1,this.base64Accum=""}var hd=/[A-Za-z0-9\/+]/,Ss=[];for(Ri=0;Ri<256;Ri++)Ss[Ri]=hd.test(String.fromCharCode(Ri));var Ri,cd=43,Lt=45,xs=38;ks.prototype.write=function(i){for(var e="",t=0,n=this.inBase64,r=this.base64Accum,s=0;s<i.length;s++)if(!n)i[s]==cd&&(e+=this.iconv.decode(i.slice(t,s),"ascii"),t=s+1,n=!0);else if(!Ss[i[s]]){if(s==t&&i[s]==Lt)e+="+";else{var o=r+this.iconv.decode(i.slice(t,s),"ascii");e+=this.iconv.decode(Xe.from(o,"base64"),"utf16-be")}i[s]!=Lt&&s--,t=s+1,n=!1,r=""}if(!n)e+=this.iconv.decode(i.slice(t),"ascii");else{var o=r+this.iconv.decode(i.slice(t),"ascii"),l=o.length-o.length%8;r=o.slice(l),o=o.slice(0,l),e+=this.iconv.decode(Xe.from(o,"base64"),"utf16-be")}return this.inBase64=n,this.base64Accum=r,e};ks.prototype.end=function(){var i="";return this.inBase64&&this.base64Accum.length>0&&(i=this.iconv.decode(Xe.from(this.base64Accum,"base64"),"utf16-be")),this.inBase64=!1,this.base64Accum="",i};En.utf7imap=Mn;function Mn(i,e){this.iconv=e}Mn.prototype.encoder=Cs;Mn.prototype.decoder=As;Mn.prototype.bomAware=!0;function Cs(i,e){this.iconv=e.iconv,this.inBase64=!1,this.base64Accum=Xe.alloc(6),this.base64AccumIdx=0}Cs.prototype.write=function(i){for(var e=this.inBase64,t=this.base64Accum,n=this.base64AccumIdx,r=Xe.alloc(i.length*5+10),s=0,o=0;o<i.length;o++){var l=i.charCodeAt(o);l>=32&&l<=126?(e&&(n>0&&(s+=r.write(t.slice(0,n).toString("base64").replace(/\//g,",").replace(/=+$/,""),s),n=0),r[s++]=Lt,e=!1),e||(r[s++]=l,l===xs&&(r[s++]=Lt))):(e||(r[s++]=xs,e=!0),e&&(t[n++]=l>>8,t[n++]=l&255,n==t.length&&(s+=r.write(t.toString("base64").replace(/\//g,","),s),n=0)))}return this.inBase64=e,this.base64AccumIdx=n,r.slice(0,s)};Cs.prototype.end=function(){var i=Xe.alloc(10),e=0;return this.inBase64&&(this.base64AccumIdx>0&&(e+=i.write(this.base64Accum.slice(0,this.base64AccumIdx).toString("base64").replace(/\//g,",").replace(/=+$/,""),e),this.base64AccumIdx=0),i[e++]=Lt,this.inBase64=!1),i.slice(0,e)};function As(i,e){this.iconv=e.iconv,this.inBase64=!1,this.base64Accum=""}var Ca=Ss.slice();Ca[44]=!0;As.prototype.write=function(i){for(var e="",t=0,n=this.inBase64,r=this.base64Accum,s=0;s<i.length;s++)if(!n)i[s]==xs&&(e+=this.iconv.decode(i.slice(t,s),"ascii"),t=s+1,n=!0);else if(!Ca[i[s]]){if(s==t&&i[s]==Lt)e+="&";else{var o=r+this.iconv.decode(i.slice(t,s),"ascii").replace(/,/g,"/");e+=this.iconv.decode(Xe.from(o,"base64"),"utf16-be")}i[s]!=Lt&&s--,t=s+1,n=!1,r=""}if(!n)e+=this.iconv.decode(i.slice(t),"ascii");else{var o=r+this.iconv.decode(i.slice(t),"ascii").replace(/,/g,"/"),l=o.length-o.length%8;r=o.slice(l),o=o.slice(0,l),e+=this.iconv.decode(Xe.from(o,"base64"),"utf16-be")}return this.inBase64=n,this.base64Accum=r,e};As.prototype.end=function(){var i="";return this.inBase64&&this.base64Accum.length>0&&(i=this.iconv.decode(Xe.from(this.base64Accum,"base64"),"utf16-be")),this.inBase64=!1,this.base64Accum="",i}});var Ma=V(Ba=>{"use strict";var Tn=ht().Buffer;Ba._sbcs=Bs;function Bs(i,e){if(!i)throw new Error("SBCS codec is called without the data.");if(!i.chars||i.chars.length!==128&&i.chars.length!==256)throw new Error("Encoding '"+i.type+"' has incorrect 'chars' (must be of len 128 or 256)");if(i.chars.length===128){for(var t="",n=0;n<128;n++)t+=String.fromCharCode(n);i.chars=t+i.chars}this.decodeBuf=Tn.from(i.chars,"ucs2");for(var r=Tn.alloc(65536,e.defaultCharSingleByte.charCodeAt(0)),n=0;n<i.chars.length;n++)r[i.chars.charCodeAt(n)]=n;this.encodeBuf=r}Bs.prototype.encoder=Ms;Bs.prototype.decoder=Es;function Ms(i,e){this.encodeBuf=e.encodeBuf}Ms.prototype.write=function(i){for(var e=Tn.alloc(i.length),t=0;t<i.length;t++)e[t]=this.encodeBuf[i.charCodeAt(t)];return e};Ms.prototype.end=function(){};function Es(i,e){this.decodeBuf=e.decodeBuf}Es.prototype.write=function(i){for(var e=this.decodeBuf,t=Tn.alloc(i.length*2),n=0,r=0,s=0;s<i.length;s++)n=i[s]*2,r=s*2,t[r]=e[n],t[r+1]=e[n+1];return t.toString("ucs2")};Es.prototype.end=function(){}});var Ta=V((km,Ea)=>{"use strict";Ea.exports={10029:"maccenteuro",maccenteuro:{type:"_sbcs",chars:"\xC4\u0100\u0101\xC9\u0104\xD6\xDC\xE1\u0105\u010C\xE4\u010D\u0106\u0107\xE9\u0179\u017A\u010E\xED\u010F\u0112\u0113\u0116\xF3\u0117\xF4\xF6\xF5\xFA\u011A\u011B\xFC\u2020\xB0\u0118\xA3\xA7\u2022\xB6\xDF\xAE\xA9\u2122\u0119\xA8\u2260\u0123\u012E\u012F\u012A\u2264\u2265\u012B\u0136\u2202\u2211\u0142\u013B\u013C\u013D\u013E\u0139\u013A\u0145\u0146\u0143\xAC\u221A\u0144\u0147\u2206\xAB\xBB\u2026\xA0\u0148\u0150\xD5\u0151\u014C\u2013\u2014\u201C\u201D\u2018\u2019\xF7\u25CA\u014D\u0154\u0155\u0158\u2039\u203A\u0159\u0156\u0157\u0160\u201A\u201E\u0161\u015A\u015B\xC1\u0164\u0165\xCD\u017D\u017E\u016A\xD3\xD4\u016B\u016E\xDA\u016F\u0170\u0171\u0172\u0173\xDD\xFD\u0137\u017B\u0141\u017C\u0122\u02C7"},808:"cp808",ibm808:"cp808",cp808:{type:"_sbcs",chars:"\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042A\u042B\u042C\u042D\u042E\u042F\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044A\u044B\u044C\u044D\u044E\u044F\u0401\u0451\u0404\u0454\u0407\u0457\u040E\u045E\xB0\u2219\xB7\u221A\u2116\u20AC\u25A0\xA0"},mik:{type:"_sbcs",chars:"\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042A\u042B\u042C\u042D\u042E\u042F\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044A\u044B\u044C\u044D\u044E\u044F\u2514\u2534\u252C\u251C\u2500\u253C\u2563\u2551\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2510\u2591\u2592\u2593\u2502\u2524\u2116\xA7\u2557\u255D\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u03B1\xDF\u0393\u03C0\u03A3\u03C3\xB5\u03C4\u03A6\u0398\u03A9\u03B4\u221E\u03C6\u03B5\u2229\u2261\xB1\u2265\u2264\u2320\u2321\xF7\u2248\xB0\u2219\xB7\u221A\u207F\xB2\u25A0\xA0"},cp720:{type:"_sbcs",chars:"\x80\x81\xE9\xE2\x84\xE0\x86\xE7\xEA\xEB\xE8\xEF\xEE\x8D\x8E\x8F\x90\u0651\u0652\xF4\xA4\u0640\xFB\xF9\u0621\u0622\u0623\u0624\xA3\u0625\u0626\u0627\u0628\u0629\u062A\u062B\u062C\u062D\u062E\u062F\u0630\u0631\u0632\u0633\u0634\u0635\xAB\xBB\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u0636\u0637\u0638\u0639\u063A\u0641\xB5\u0642\u0643\u0644\u0645\u0646\u0647\u0648\u0649\u064A\u2261\u064B\u064C\u064D\u064E\u064F\u0650\u2248\xB0\u2219\xB7\u221A\u207F\xB2\u25A0\xA0"},ascii8bit:"ascii",usascii:"ascii",ansix34:"ascii",ansix341968:"ascii",ansix341986:"ascii",csascii:"ascii",cp367:"ascii",ibm367:"ascii",isoir6:"ascii",iso646us:"ascii",iso646irv:"ascii",us:"ascii",latin1:"iso88591",latin2:"iso88592",latin3:"iso88593",latin4:"iso88594",latin5:"iso88599",latin6:"iso885910",latin7:"iso885913",latin8:"iso885914",latin9:"iso885915",latin10:"iso885916",csisolatin1:"iso88591",csisolatin2:"iso88592",csisolatin3:"iso88593",csisolatin4:"iso88594",csisolatincyrillic:"iso88595",csisolatinarabic:"iso88596",csisolatingreek:"iso88597",csisolatinhebrew:"iso88598",csisolatin5:"iso88599",csisolatin6:"iso885910",l1:"iso88591",l2:"iso88592",l3:"iso88593",l4:"iso88594",l5:"iso88599",l6:"iso885910",l7:"iso885913",l8:"iso885914",l9:"iso885915",l10:"iso885916",isoir14:"iso646jp",isoir57:"iso646cn",isoir100:"iso88591",isoir101:"iso88592",isoir109:"iso88593",isoir110:"iso88594",isoir144:"iso88595",isoir127:"iso88596",isoir126:"iso88597",isoir138:"iso88598",isoir148:"iso88599",isoir157:"iso885910",isoir166:"tis620",isoir179:"iso885913",isoir199:"iso885914",isoir203:"iso885915",isoir226:"iso885916",cp819:"iso88591",ibm819:"iso88591",cyrillic:"iso88595",arabic:"iso88596",arabic8:"iso88596",ecma114:"iso88596",asmo708:"iso88596",greek:"iso88597",greek8:"iso88597",ecma118:"iso88597",elot928:"iso88597",hebrew:"iso88598",hebrew8:"iso88598",iso88598i:"iso88598",iso88598e:"iso88598",turkish:"iso88599",turkish8:"iso88599",thai:"iso885911",thai8:"iso885911",celtic:"iso885914",celtic8:"iso885914",isoceltic:"iso885914",tis6200:"tis620",tis62025291:"tis620",tis62025330:"tis620",1e4:"macroman",10006:"macgreek",10007:"maccyrillic",10079:"maciceland",10081:"macturkish",cspc8codepage437:"cp437",cspc775baltic:"cp775",cspc850multilingual:"cp850",cspcp852:"cp852",cspc862latinhebrew:"cp862",cpgr:"cp869",msee:"cp1250",mscyrl:"cp1251",msansi:"cp1252",msgreek:"cp1253",msturk:"cp1254",mshebr:"cp1255",msarab:"cp1256",winbaltrim:"cp1257",cp20866:"koi8r",20866:"koi8r",ibm878:"koi8r",cskoi8r:"koi8r",cp21866:"koi8u",21866:"koi8u",ibm1168:"koi8u",strk10482002:"rk1048",tcvn5712:"tcvn",tcvn57121:"tcvn",gb198880:"iso646cn",cn:"iso646cn",csiso14jisc6220ro:"iso646jp",jisc62201969ro:"iso646jp",jp:"iso646jp",cshproman8:"hproman8",r8:"hproman8",roman8:"hproman8",xroman8:"hproman8",ibm1051:"hproman8",mac:"macintosh",csmacintosh:"macintosh"}});var Oa=V((Sm,Da)=>{"use strict";Da.exports={437:"cp437",737:"cp737",775:"cp775",850:"cp850",852:"cp852",855:"cp855",856:"cp856",857:"cp857",858:"cp858",860:"cp860",861:"cp861",862:"cp862",863:"cp863",864:"cp864",865:"cp865",866:"cp866",869:"cp869",874:"windows874",922:"cp922",1046:"cp1046",1124:"cp1124",1125:"cp1125",1129:"cp1129",1133:"cp1133",1161:"cp1161",1162:"cp1162",1163:"cp1163",1250:"windows1250",1251:"windows1251",1252:"windows1252",1253:"windows1253",1254:"windows1254",1255:"windows1255",1256:"windows1256",1257:"windows1257",1258:"windows1258",28591:"iso88591",28592:"iso88592",28593:"iso88593",28594:"iso88594",28595:"iso88595",28596:"iso88596",28597:"iso88597",28598:"iso88598",28599:"iso88599",28600:"iso885910",28601:"iso885911",28603:"iso885913",28604:"iso885914",28605:"iso885915",28606:"iso885916",windows874:{type:"_sbcs",chars:"\u20AC\uFFFD\uFFFD\uFFFD\uFFFD\u2026\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u2018\u2019\u201C\u201D\u2022\u2013\u2014\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\xA0\u0E01\u0E02\u0E03\u0E04\u0E05\u0E06\u0E07\u0E08\u0E09\u0E0A\u0E0B\u0E0C\u0E0D\u0E0E\u0E0F\u0E10\u0E11\u0E12\u0E13\u0E14\u0E15\u0E16\u0E17\u0E18\u0E19\u0E1A\u0E1B\u0E1C\u0E1D\u0E1E\u0E1F\u0E20\u0E21\u0E22\u0E23\u0E24\u0E25\u0E26\u0E27\u0E28\u0E29\u0E2A\u0E2B\u0E2C\u0E2D\u0E2E\u0E2F\u0E30\u0E31\u0E32\u0E33\u0E34\u0E35\u0E36\u0E37\u0E38\u0E39\u0E3A\uFFFD\uFFFD\uFFFD\uFFFD\u0E3F\u0E40\u0E41\u0E42\u0E43\u0E44\u0E45\u0E46\u0E47\u0E48\u0E49\u0E4A\u0E4B\u0E4C\u0E4D\u0E4E\u0E4F\u0E50\u0E51\u0E52\u0E53\u0E54\u0E55\u0E56\u0E57\u0E58\u0E59\u0E5A\u0E5B\uFFFD\uFFFD\uFFFD\uFFFD"},win874:"windows874",cp874:"windows874",windows1250:{type:"_sbcs",chars:"\u20AC\uFFFD\u201A\uFFFD\u201E\u2026\u2020\u2021\uFFFD\u2030\u0160\u2039\u015A\u0164\u017D\u0179\uFFFD\u2018\u2019\u201C\u201D\u2022\u2013\u2014\uFFFD\u2122\u0161\u203A\u015B\u0165\u017E\u017A\xA0\u02C7\u02D8\u0141\xA4\u0104\xA6\xA7\xA8\xA9\u015E\xAB\xAC\xAD\xAE\u017B\xB0\xB1\u02DB\u0142\xB4\xB5\xB6\xB7\xB8\u0105\u015F\xBB\u013D\u02DD\u013E\u017C\u0154\xC1\xC2\u0102\xC4\u0139\u0106\xC7\u010C\xC9\u0118\xCB\u011A\xCD\xCE\u010E\u0110\u0143\u0147\xD3\xD4\u0150\xD6\xD7\u0158\u016E\xDA\u0170\xDC\xDD\u0162\xDF\u0155\xE1\xE2\u0103\xE4\u013A\u0107\xE7\u010D\xE9\u0119\xEB\u011B\xED\xEE\u010F\u0111\u0144\u0148\xF3\xF4\u0151\xF6\xF7\u0159\u016F\xFA\u0171\xFC\xFD\u0163\u02D9"},win1250:"windows1250",cp1250:"windows1250",windows1251:{type:"_sbcs",chars:"\u0402\u0403\u201A\u0453\u201E\u2026\u2020\u2021\u20AC\u2030\u0409\u2039\u040A\u040C\u040B\u040F\u0452\u2018\u2019\u201C\u201D\u2022\u2013\u2014\uFFFD\u2122\u0459\u203A\u045A\u045C\u045B\u045F\xA0\u040E\u045E\u0408\xA4\u0490\xA6\xA7\u0401\xA9\u0404\xAB\xAC\xAD\xAE\u0407\xB0\xB1\u0406\u0456\u0491\xB5\xB6\xB7\u0451\u2116\u0454\xBB\u0458\u0405\u0455\u0457\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042A\u042B\u042C\u042D\u042E\u042F\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044A\u044B\u044C\u044D\u044E\u044F"},win1251:"windows1251",cp1251:"windows1251",windows1252:{type:"_sbcs",chars:"\u20AC\uFFFD\u201A\u0192\u201E\u2026\u2020\u2021\u02C6\u2030\u0160\u2039\u0152\uFFFD\u017D\uFFFD\uFFFD\u2018\u2019\u201C\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\uFFFD\u017E\u0178\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF"},win1252:"windows1252",cp1252:"windows1252",windows1253:{type:"_sbcs",chars:"\u20AC\uFFFD\u201A\u0192\u201E\u2026\u2020\u2021\uFFFD\u2030\uFFFD\u2039\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u2018\u2019\u201C\u201D\u2022\u2013\u2014\uFFFD\u2122\uFFFD\u203A\uFFFD\uFFFD\uFFFD\uFFFD\xA0\u0385\u0386\xA3\xA4\xA5\xA6\xA7\xA8\xA9\uFFFD\xAB\xAC\xAD\xAE\u2015\xB0\xB1\xB2\xB3\u0384\xB5\xB6\xB7\u0388\u0389\u038A\xBB\u038C\xBD\u038E\u038F\u0390\u0391\u0392\u0393\u0394\u0395\u0396\u0397\u0398\u0399\u039A\u039B\u039C\u039D\u039E\u039F\u03A0\u03A1\uFFFD\u03A3\u03A4\u03A5\u03A6\u03A7\u03A8\u03A9\u03AA\u03AB\u03AC\u03AD\u03AE\u03AF\u03B0\u03B1\u03B2\u03B3\u03B4\u03B5\u03B6\u03B7\u03B8\u03B9\u03BA\u03BB\u03BC\u03BD\u03BE\u03BF\u03C0\u03C1\u03C2\u03C3\u03C4\u03C5\u03C6\u03C7\u03C8\u03C9\u03CA\u03CB\u03CC\u03CD\u03CE\uFFFD"},win1253:"windows1253",cp1253:"windows1253",windows1254:{type:"_sbcs",chars:"\u20AC\uFFFD\u201A\u0192\u201E\u2026\u2020\u2021\u02C6\u2030\u0160\u2039\u0152\uFFFD\uFFFD\uFFFD\uFFFD\u2018\u2019\u201C\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\uFFFD\uFFFD\u0178\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\u011E\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\u0130\u015E\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\u011F\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\u0131\u015F\xFF"},win1254:"windows1254",cp1254:"windows1254",windows1255:{type:"_sbcs",chars:"\u20AC\uFFFD\u201A\u0192\u201E\u2026\u2020\u2021\u02C6\u2030\uFFFD\u2039\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u2018\u2019\u201C\u201D\u2022\u2013\u2014\u02DC\u2122\uFFFD\u203A\uFFFD\uFFFD\uFFFD\uFFFD\xA0\xA1\xA2\xA3\u20AA\xA5\xA6\xA7\xA8\xA9\xD7\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xF7\xBB\xBC\xBD\xBE\xBF\u05B0\u05B1\u05B2\u05B3\u05B4\u05B5\u05B6\u05B7\u05B8\u05B9\u05BA\u05BB\u05BC\u05BD\u05BE\u05BF\u05C0\u05C1\u05C2\u05C3\u05F0\u05F1\u05F2\u05F3\u05F4\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u05D0\u05D1\u05D2\u05D3\u05D4\u05D5\u05D6\u05D7\u05D8\u05D9\u05DA\u05DB\u05DC\u05DD\u05DE\u05DF\u05E0\u05E1\u05E2\u05E3\u05E4\u05E5\u05E6\u05E7\u05E8\u05E9\u05EA\uFFFD\uFFFD\u200E\u200F\uFFFD"},win1255:"windows1255",cp1255:"windows1255",windows1256:{type:"_sbcs",chars:"\u20AC\u067E\u201A\u0192\u201E\u2026\u2020\u2021\u02C6\u2030\u0679\u2039\u0152\u0686\u0698\u0688\u06AF\u2018\u2019\u201C\u201D\u2022\u2013\u2014\u06A9\u2122\u0691\u203A\u0153\u200C\u200D\u06BA\xA0\u060C\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\u06BE\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\u061B\xBB\xBC\xBD\xBE\u061F\u06C1\u0621\u0622\u0623\u0624\u0625\u0626\u0627\u0628\u0629\u062A\u062B\u062C\u062D\u062E\u062F\u0630\u0631\u0632\u0633\u0634\u0635\u0636\xD7\u0637\u0638\u0639\u063A\u0640\u0641\u0642\u0643\xE0\u0644\xE2\u0645\u0646\u0647\u0648\xE7\xE8\xE9\xEA\xEB\u0649\u064A\xEE\xEF\u064B\u064C\u064D\u064E\xF4\u064F\u0650\xF7\u0651\xF9\u0652\xFB\xFC\u200E\u200F\u06D2"},win1256:"windows1256",cp1256:"windows1256",windows1257:{type:"_sbcs",chars:"\u20AC\uFFFD\u201A\uFFFD\u201E\u2026\u2020\u2021\uFFFD\u2030\uFFFD\u2039\uFFFD\xA8\u02C7\xB8\uFFFD\u2018\u2019\u201C\u201D\u2022\u2013\u2014\uFFFD\u2122\uFFFD\u203A\uFFFD\xAF\u02DB\uFFFD\xA0\uFFFD\xA2\xA3\xA4\uFFFD\xA6\xA7\xD8\xA9\u0156\xAB\xAC\xAD\xAE\xC6\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xF8\xB9\u0157\xBB\xBC\xBD\xBE\xE6\u0104\u012E\u0100\u0106\xC4\xC5\u0118\u0112\u010C\xC9\u0179\u0116\u0122\u0136\u012A\u013B\u0160\u0143\u0145\xD3\u014C\xD5\xD6\xD7\u0172\u0141\u015A\u016A\xDC\u017B\u017D\xDF\u0105\u012F\u0101\u0107\xE4\xE5\u0119\u0113\u010D\xE9\u017A\u0117\u0123\u0137\u012B\u013C\u0161\u0144\u0146\xF3\u014D\xF5\xF6\xF7\u0173\u0142\u015B\u016B\xFC\u017C\u017E\u02D9"},win1257:"windows1257",cp1257:"windows1257",windows1258:{type:"_sbcs",chars:"\u20AC\uFFFD\u201A\u0192\u201E\u2026\u2020\u2021\u02C6\u2030\uFFFD\u2039\u0152\uFFFD\uFFFD\uFFFD\uFFFD\u2018\u2019\u201C\u201D\u2022\u2013\u2014\u02DC\u2122\uFFFD\u203A\u0153\uFFFD\uFFFD\u0178\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\u0102\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\u0300\xCD\xCE\xCF\u0110\xD1\u0309\xD3\xD4\u01A0\xD6\xD7\xD8\xD9\xDA\xDB\xDC\u01AF\u0303\xDF\xE0\xE1\xE2\u0103\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\u0301\xED\xEE\xEF\u0111\xF1\u0323\xF3\xF4\u01A1\xF6\xF7\xF8\xF9\xFA\xFB\xFC\u01B0\u20AB\xFF"},win1258:"windows1258",cp1258:"windows1258",iso88591:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF"},cp28591:"iso88591",iso88592:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u0104\u02D8\u0141\xA4\u013D\u015A\xA7\xA8\u0160\u015E\u0164\u0179\xAD\u017D\u017B\xB0\u0105\u02DB\u0142\xB4\u013E\u015B\u02C7\xB8\u0161\u015F\u0165\u017A\u02DD\u017E\u017C\u0154\xC1\xC2\u0102\xC4\u0139\u0106\xC7\u010C\xC9\u0118\xCB\u011A\xCD\xCE\u010E\u0110\u0143\u0147\xD3\xD4\u0150\xD6\xD7\u0158\u016E\xDA\u0170\xDC\xDD\u0162\xDF\u0155\xE1\xE2\u0103\xE4\u013A\u0107\xE7\u010D\xE9\u0119\xEB\u011B\xED\xEE\u010F\u0111\u0144\u0148\xF3\xF4\u0151\xF6\xF7\u0159\u016F\xFA\u0171\xFC\xFD\u0163\u02D9"},cp28592:"iso88592",iso88593:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u0126\u02D8\xA3\xA4\uFFFD\u0124\xA7\xA8\u0130\u015E\u011E\u0134\xAD\uFFFD\u017B\xB0\u0127\xB2\xB3\xB4\xB5\u0125\xB7\xB8\u0131\u015F\u011F\u0135\xBD\uFFFD\u017C\xC0\xC1\xC2\uFFFD\xC4\u010A\u0108\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\uFFFD\xD1\xD2\xD3\xD4\u0120\xD6\xD7\u011C\xD9\xDA\xDB\xDC\u016C\u015C\xDF\xE0\xE1\xE2\uFFFD\xE4\u010B\u0109\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\uFFFD\xF1\xF2\xF3\xF4\u0121\xF6\xF7\u011D\xF9\xFA\xFB\xFC\u016D\u015D\u02D9"},cp28593:"iso88593",iso88594:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u0104\u0138\u0156\xA4\u0128\u013B\xA7\xA8\u0160\u0112\u0122\u0166\xAD\u017D\xAF\xB0\u0105\u02DB\u0157\xB4\u0129\u013C\u02C7\xB8\u0161\u0113\u0123\u0167\u014A\u017E\u014B\u0100\xC1\xC2\xC3\xC4\xC5\xC6\u012E\u010C\xC9\u0118\xCB\u0116\xCD\xCE\u012A\u0110\u0145\u014C\u0136\xD4\xD5\xD6\xD7\xD8\u0172\xDA\xDB\xDC\u0168\u016A\xDF\u0101\xE1\xE2\xE3\xE4\xE5\xE6\u012F\u010D\xE9\u0119\xEB\u0117\xED\xEE\u012B\u0111\u0146\u014D\u0137\xF4\xF5\xF6\xF7\xF8\u0173\xFA\xFB\xFC\u0169\u016B\u02D9"},cp28594:"iso88594",iso88595:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u0401\u0402\u0403\u0404\u0405\u0406\u0407\u0408\u0409\u040A\u040B\u040C\xAD\u040E\u040F\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042A\u042B\u042C\u042D\u042E\u042F\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044A\u044B\u044C\u044D\u044E\u044F\u2116\u0451\u0452\u0453\u0454\u0455\u0456\u0457\u0458\u0459\u045A\u045B\u045C\xA7\u045E\u045F"},cp28595:"iso88595",iso88596:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\uFFFD\uFFFD\uFFFD\xA4\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u060C\xAD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u061B\uFFFD\uFFFD\uFFFD\u061F\uFFFD\u0621\u0622\u0623\u0624\u0625\u0626\u0627\u0628\u0629\u062A\u062B\u062C\u062D\u062E\u062F\u0630\u0631\u0632\u0633\u0634\u0635\u0636\u0637\u0638\u0639\u063A\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u0640\u0641\u0642\u0643\u0644\u0645\u0646\u0647\u0648\u0649\u064A\u064B\u064C\u064D\u064E\u064F\u0650\u0651\u0652\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD"},cp28596:"iso88596",iso88597:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u2018\u2019\xA3\u20AC\u20AF\xA6\xA7\xA8\xA9\u037A\xAB\xAC\xAD\uFFFD\u2015\xB0\xB1\xB2\xB3\u0384\u0385\u0386\xB7\u0388\u0389\u038A\xBB\u038C\xBD\u038E\u038F\u0390\u0391\u0392\u0393\u0394\u0395\u0396\u0397\u0398\u0399\u039A\u039B\u039C\u039D\u039E\u039F\u03A0\u03A1\uFFFD\u03A3\u03A4\u03A5\u03A6\u03A7\u03A8\u03A9\u03AA\u03AB\u03AC\u03AD\u03AE\u03AF\u03B0\u03B1\u03B2\u03B3\u03B4\u03B5\u03B6\u03B7\u03B8\u03B9\u03BA\u03BB\u03BC\u03BD\u03BE\u03BF\u03C0\u03C1\u03C2\u03C3\u03C4\u03C5\u03C6\u03C7\u03C8\u03C9\u03CA\u03CB\u03CC\u03CD\u03CE\uFFFD"},cp28597:"iso88597",iso88598:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\uFFFD\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xD7\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xF7\xBB\xBC\xBD\xBE\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u2017\u05D0\u05D1\u05D2\u05D3\u05D4\u05D5\u05D6\u05D7\u05D8\u05D9\u05DA\u05DB\u05DC\u05DD\u05DE\u05DF\u05E0\u05E1\u05E2\u05E3\u05E4\u05E5\u05E6\u05E7\u05E8\u05E9\u05EA\uFFFD\uFFFD\u200E\u200F\uFFFD"},cp28598:"iso88598",iso88599:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\u011E\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\u0130\u015E\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\u011F\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\u0131\u015F\xFF"},cp28599:"iso88599",iso885910:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u0104\u0112\u0122\u012A\u0128\u0136\xA7\u013B\u0110\u0160\u0166\u017D\xAD\u016A\u014A\xB0\u0105\u0113\u0123\u012B\u0129\u0137\xB7\u013C\u0111\u0161\u0167\u017E\u2015\u016B\u014B\u0100\xC1\xC2\xC3\xC4\xC5\xC6\u012E\u010C\xC9\u0118\xCB\u0116\xCD\xCE\xCF\xD0\u0145\u014C\xD3\xD4\xD5\xD6\u0168\xD8\u0172\xDA\xDB\xDC\xDD\xDE\xDF\u0101\xE1\xE2\xE3\xE4\xE5\xE6\u012F\u010D\xE9\u0119\xEB\u0117\xED\xEE\xEF\xF0\u0146\u014D\xF3\xF4\xF5\xF6\u0169\xF8\u0173\xFA\xFB\xFC\xFD\xFE\u0138"},cp28600:"iso885910",iso885911:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u0E01\u0E02\u0E03\u0E04\u0E05\u0E06\u0E07\u0E08\u0E09\u0E0A\u0E0B\u0E0C\u0E0D\u0E0E\u0E0F\u0E10\u0E11\u0E12\u0E13\u0E14\u0E15\u0E16\u0E17\u0E18\u0E19\u0E1A\u0E1B\u0E1C\u0E1D\u0E1E\u0E1F\u0E20\u0E21\u0E22\u0E23\u0E24\u0E25\u0E26\u0E27\u0E28\u0E29\u0E2A\u0E2B\u0E2C\u0E2D\u0E2E\u0E2F\u0E30\u0E31\u0E32\u0E33\u0E34\u0E35\u0E36\u0E37\u0E38\u0E39\u0E3A\uFFFD\uFFFD\uFFFD\uFFFD\u0E3F\u0E40\u0E41\u0E42\u0E43\u0E44\u0E45\u0E46\u0E47\u0E48\u0E49\u0E4A\u0E4B\u0E4C\u0E4D\u0E4E\u0E4F\u0E50\u0E51\u0E52\u0E53\u0E54\u0E55\u0E56\u0E57\u0E58\u0E59\u0E5A\u0E5B\uFFFD\uFFFD\uFFFD\uFFFD"},cp28601:"iso885911",iso885913:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u201D\xA2\xA3\xA4\u201E\xA6\xA7\xD8\xA9\u0156\xAB\xAC\xAD\xAE\xC6\xB0\xB1\xB2\xB3\u201C\xB5\xB6\xB7\xF8\xB9\u0157\xBB\xBC\xBD\xBE\xE6\u0104\u012E\u0100\u0106\xC4\xC5\u0118\u0112\u010C\xC9\u0179\u0116\u0122\u0136\u012A\u013B\u0160\u0143\u0145\xD3\u014C\xD5\xD6\xD7\u0172\u0141\u015A\u016A\xDC\u017B\u017D\xDF\u0105\u012F\u0101\u0107\xE4\xE5\u0119\u0113\u010D\xE9\u017A\u0117\u0123\u0137\u012B\u013C\u0161\u0144\u0146\xF3\u014D\xF5\xF6\xF7\u0173\u0142\u015B\u016B\xFC\u017C\u017E\u2019"},cp28603:"iso885913",iso885914:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u1E02\u1E03\xA3\u010A\u010B\u1E0A\xA7\u1E80\xA9\u1E82\u1E0B\u1EF2\xAD\xAE\u0178\u1E1E\u1E1F\u0120\u0121\u1E40\u1E41\xB6\u1E56\u1E81\u1E57\u1E83\u1E60\u1EF3\u1E84\u1E85\u1E61\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\u0174\xD1\xD2\xD3\xD4\xD5\xD6\u1E6A\xD8\xD9\xDA\xDB\xDC\xDD\u0176\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\u0175\xF1\xF2\xF3\xF4\xF5\xF6\u1E6B\xF8\xF9\xFA\xFB\xFC\xFD\u0177\xFF"},cp28604:"iso885914",iso885915:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\u20AC\xA5\u0160\xA7\u0161\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\u017D\xB5\xB6\xB7\u017E\xB9\xBA\xBB\u0152\u0153\u0178\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF"},cp28605:"iso885915",iso885916:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u0104\u0105\u0141\u20AC\u201E\u0160\xA7\u0161\xA9\u0218\xAB\u0179\xAD\u017A\u017B\xB0\xB1\u010C\u0142\u017D\u201D\xB6\xB7\u017E\u010D\u0219\xBB\u0152\u0153\u0178\u017C\xC0\xC1\xC2\u0102\xC4\u0106\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\u0110\u0143\xD2\xD3\xD4\u0150\xD6\u015A\u0170\xD9\xDA\xDB\xDC\u0118\u021A\xDF\xE0\xE1\xE2\u0103\xE4\u0107\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\u0111\u0144\xF2\xF3\xF4\u0151\xF6\u015B\u0171\xF9\xFA\xFB\xFC\u0119\u021B\xFF"},cp28606:"iso885916",cp437:{type:"_sbcs",chars:"\xC7\xFC\xE9\xE2\xE4\xE0\xE5\xE7\xEA\xEB\xE8\xEF\xEE\xEC\xC4\xC5\xC9\xE6\xC6\xF4\xF6\xF2\xFB\xF9\xFF\xD6\xDC\xA2\xA3\xA5\u20A7\u0192\xE1\xED\xF3\xFA\xF1\xD1\xAA\xBA\xBF\u2310\xAC\xBD\xBC\xA1\xAB\xBB\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u03B1\xDF\u0393\u03C0\u03A3\u03C3\xB5\u03C4\u03A6\u0398\u03A9\u03B4\u221E\u03C6\u03B5\u2229\u2261\xB1\u2265\u2264\u2320\u2321\xF7\u2248\xB0\u2219\xB7\u221A\u207F\xB2\u25A0\xA0"},ibm437:"cp437",csibm437:"cp437",cp737:{type:"_sbcs",chars:"\u0391\u0392\u0393\u0394\u0395\u0396\u0397\u0398\u0399\u039A\u039B\u039C\u039D\u039E\u039F\u03A0\u03A1\u03A3\u03A4\u03A5\u03A6\u03A7\u03A8\u03A9\u03B1\u03B2\u03B3\u03B4\u03B5\u03B6\u03B7\u03B8\u03B9\u03BA\u03BB\u03BC\u03BD\u03BE\u03BF\u03C0\u03C1\u03C3\u03C2\u03C4\u03C5\u03C6\u03C7\u03C8\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u03C9\u03AC\u03AD\u03AE\u03CA\u03AF\u03CC\u03CD\u03CB\u03CE\u0386\u0388\u0389\u038A\u038C\u038E\u038F\xB1\u2265\u2264\u03AA\u03AB\xF7\u2248\xB0\u2219\xB7\u221A\u207F\xB2\u25A0\xA0"},ibm737:"cp737",csibm737:"cp737",cp775:{type:"_sbcs",chars:"\u0106\xFC\xE9\u0101\xE4\u0123\xE5\u0107\u0142\u0113\u0156\u0157\u012B\u0179\xC4\xC5\xC9\xE6\xC6\u014D\xF6\u0122\xA2\u015A\u015B\xD6\xDC\xF8\xA3\xD8\xD7\xA4\u0100\u012A\xF3\u017B\u017C\u017A\u201D\xA6\xA9\xAE\xAC\xBD\xBC\u0141\xAB\xBB\u2591\u2592\u2593\u2502\u2524\u0104\u010C\u0118\u0116\u2563\u2551\u2557\u255D\u012E\u0160\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u0172\u016A\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u017D\u0105\u010D\u0119\u0117\u012F\u0161\u0173\u016B\u017E\u2518\u250C\u2588\u2584\u258C\u2590\u2580\xD3\xDF\u014C\u0143\xF5\xD5\xB5\u0144\u0136\u0137\u013B\u013C\u0146\u0112\u0145\u2019\xAD\xB1\u201C\xBE\xB6\xA7\xF7\u201E\xB0\u2219\xB7\xB9\xB3\xB2\u25A0\xA0"},ibm775:"cp775",csibm775:"cp775",cp850:{type:"_sbcs",chars:"\xC7\xFC\xE9\xE2\xE4\xE0\xE5\xE7\xEA\xEB\xE8\xEF\xEE\xEC\xC4\xC5\xC9\xE6\xC6\xF4\xF6\xF2\xFB\xF9\xFF\xD6\xDC\xF8\xA3\xD8\xD7\u0192\xE1\xED\xF3\xFA\xF1\xD1\xAA\xBA\xBF\xAE\xAC\xBD\xBC\xA1\xAB\xBB\u2591\u2592\u2593\u2502\u2524\xC1\xC2\xC0\xA9\u2563\u2551\u2557\u255D\xA2\xA5\u2510\u2514\u2534\u252C\u251C\u2500\u253C\xE3\xC3\u255A\u2554\u2569\u2566\u2560\u2550\u256C\xA4\xF0\xD0\xCA\xCB\xC8\u0131\xCD\xCE\xCF\u2518\u250C\u2588\u2584\xA6\xCC\u2580\xD3\xDF\xD4\xD2\xF5\xD5\xB5\xFE\xDE\xDA\xDB\xD9\xFD\xDD\xAF\xB4\xAD\xB1\u2017\xBE\xB6\xA7\xF7\xB8\xB0\xA8\xB7\xB9\xB3\xB2\u25A0\xA0"},ibm850:"cp850",csibm850:"cp850",cp852:{type:"_sbcs",chars:"\xC7\xFC\xE9\xE2\xE4\u016F\u0107\xE7\u0142\xEB\u0150\u0151\xEE\u0179\xC4\u0106\xC9\u0139\u013A\xF4\xF6\u013D\u013E\u015A\u015B\xD6\xDC\u0164\u0165\u0141\xD7\u010D\xE1\xED\xF3\xFA\u0104\u0105\u017D\u017E\u0118\u0119\xAC\u017A\u010C\u015F\xAB\xBB\u2591\u2592\u2593\u2502\u2524\xC1\xC2\u011A\u015E\u2563\u2551\u2557\u255D\u017B\u017C\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u0102\u0103\u255A\u2554\u2569\u2566\u2560\u2550\u256C\xA4\u0111\u0110\u010E\xCB\u010F\u0147\xCD\xCE\u011B\u2518\u250C\u2588\u2584\u0162\u016E\u2580\xD3\xDF\xD4\u0143\u0144\u0148\u0160\u0161\u0154\xDA\u0155\u0170\xFD\xDD\u0163\xB4\xAD\u02DD\u02DB\u02C7\u02D8\xA7\xF7\xB8\xB0\xA8\u02D9\u0171\u0158\u0159\u25A0\xA0"},ibm852:"cp852",csibm852:"cp852",cp855:{type:"_sbcs",chars:"\u0452\u0402\u0453\u0403\u0451\u0401\u0454\u0404\u0455\u0405\u0456\u0406\u0457\u0407\u0458\u0408\u0459\u0409\u045A\u040A\u045B\u040B\u045C\u040C\u045E\u040E\u045F\u040F\u044E\u042E\u044A\u042A\u0430\u0410\u0431\u0411\u0446\u0426\u0434\u0414\u0435\u0415\u0444\u0424\u0433\u0413\xAB\xBB\u2591\u2592\u2593\u2502\u2524\u0445\u0425\u0438\u0418\u2563\u2551\u2557\u255D\u0439\u0419\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u043A\u041A\u255A\u2554\u2569\u2566\u2560\u2550\u256C\xA4\u043B\u041B\u043C\u041C\u043D\u041D\u043E\u041E\u043F\u2518\u250C\u2588\u2584\u041F\u044F\u2580\u042F\u0440\u0420\u0441\u0421\u0442\u0422\u0443\u0423\u0436\u0416\u0432\u0412\u044C\u042C\u2116\xAD\u044B\u042B\u0437\u0417\u0448\u0428\u044D\u042D\u0449\u0429\u0447\u0427\xA7\u25A0\xA0"},ibm855:"cp855",csibm855:"cp855",cp856:{type:"_sbcs",chars:"\u05D0\u05D1\u05D2\u05D3\u05D4\u05D5\u05D6\u05D7\u05D8\u05D9\u05DA\u05DB\u05DC\u05DD\u05DE\u05DF\u05E0\u05E1\u05E2\u05E3\u05E4\u05E5\u05E6\u05E7\u05E8\u05E9\u05EA\uFFFD\xA3\uFFFD\xD7\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\xAE\xAC\xBD\xBC\uFFFD\xAB\xBB\u2591\u2592\u2593\u2502\u2524\uFFFD\uFFFD\uFFFD\xA9\u2563\u2551\u2557\u255D\xA2\xA5\u2510\u2514\u2534\u252C\u251C\u2500\u253C\uFFFD\uFFFD\u255A\u2554\u2569\u2566\u2560\u2550\u256C\xA4\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u2518\u250C\u2588\u2584\xA6\uFFFD\u2580\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\xB5\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\xAF\xB4\xAD\xB1\u2017\xBE\xB6\xA7\xF7\xB8\xB0\xA8\xB7\xB9\xB3\xB2\u25A0\xA0"},ibm856:"cp856",csibm856:"cp856",cp857:{type:"_sbcs",chars:"\xC7\xFC\xE9\xE2\xE4\xE0\xE5\xE7\xEA\xEB\xE8\xEF\xEE\u0131\xC4\xC5\xC9\xE6\xC6\xF4\xF6\xF2\xFB\xF9\u0130\xD6\xDC\xF8\xA3\xD8\u015E\u015F\xE1\xED\xF3\xFA\xF1\xD1\u011E\u011F\xBF\xAE\xAC\xBD\xBC\xA1\xAB\xBB\u2591\u2592\u2593\u2502\u2524\xC1\xC2\xC0\xA9\u2563\u2551\u2557\u255D\xA2\xA5\u2510\u2514\u2534\u252C\u251C\u2500\u253C\xE3\xC3\u255A\u2554\u2569\u2566\u2560\u2550\u256C\xA4\xBA\xAA\xCA\xCB\xC8\uFFFD\xCD\xCE\xCF\u2518\u250C\u2588\u2584\xA6\xCC\u2580\xD3\xDF\xD4\xD2\xF5\xD5\xB5\uFFFD\xD7\xDA\xDB\xD9\xEC\xFF\xAF\xB4\xAD\xB1\uFFFD\xBE\xB6\xA7\xF7\xB8\xB0\xA8\xB7\xB9\xB3\xB2\u25A0\xA0"},ibm857:"cp857",csibm857:"cp857",cp858:{type:"_sbcs",chars:"\xC7\xFC\xE9\xE2\xE4\xE0\xE5\xE7\xEA\xEB\xE8\xEF\xEE\xEC\xC4\xC5\xC9\xE6\xC6\xF4\xF6\xF2\xFB\xF9\xFF\xD6\xDC\xF8\xA3\xD8\xD7\u0192\xE1\xED\xF3\xFA\xF1\xD1\xAA\xBA\xBF\xAE\xAC\xBD\xBC\xA1\xAB\xBB\u2591\u2592\u2593\u2502\u2524\xC1\xC2\xC0\xA9\u2563\u2551\u2557\u255D\xA2\xA5\u2510\u2514\u2534\u252C\u251C\u2500\u253C\xE3\xC3\u255A\u2554\u2569\u2566\u2560\u2550\u256C\xA4\xF0\xD0\xCA\xCB\xC8\u20AC\xCD\xCE\xCF\u2518\u250C\u2588\u2584\xA6\xCC\u2580\xD3\xDF\xD4\xD2\xF5\xD5\xB5\xFE\xDE\xDA\xDB\xD9\xFD\xDD\xAF\xB4\xAD\xB1\u2017\xBE\xB6\xA7\xF7\xB8\xB0\xA8\xB7\xB9\xB3\xB2\u25A0\xA0"},ibm858:"cp858",csibm858:"cp858",cp860:{type:"_sbcs",chars:"\xC7\xFC\xE9\xE2\xE3\xE0\xC1\xE7\xEA\xCA\xE8\xCD\xD4\xEC\xC3\xC2\xC9\xC0\xC8\xF4\xF5\xF2\xDA\xF9\xCC\xD5\xDC\xA2\xA3\xD9\u20A7\xD3\xE1\xED\xF3\xFA\xF1\xD1\xAA\xBA\xBF\xD2\xAC\xBD\xBC\xA1\xAB\xBB\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u03B1\xDF\u0393\u03C0\u03A3\u03C3\xB5\u03C4\u03A6\u0398\u03A9\u03B4\u221E\u03C6\u03B5\u2229\u2261\xB1\u2265\u2264\u2320\u2321\xF7\u2248\xB0\u2219\xB7\u221A\u207F\xB2\u25A0\xA0"},ibm860:"cp860",csibm860:"cp860",cp861:{type:"_sbcs",chars:"\xC7\xFC\xE9\xE2\xE4\xE0\xE5\xE7\xEA\xEB\xE8\xD0\xF0\xDE\xC4\xC5\xC9\xE6\xC6\xF4\xF6\xFE\xFB\xDD\xFD\xD6\xDC\xF8\xA3\xD8\u20A7\u0192\xE1\xED\xF3\xFA\xC1\xCD\xD3\xDA\xBF\u2310\xAC\xBD\xBC\xA1\xAB\xBB\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u03B1\xDF\u0393\u03C0\u03A3\u03C3\xB5\u03C4\u03A6\u0398\u03A9\u03B4\u221E\u03C6\u03B5\u2229\u2261\xB1\u2265\u2264\u2320\u2321\xF7\u2248\xB0\u2219\xB7\u221A\u207F\xB2\u25A0\xA0"},ibm861:"cp861",csibm861:"cp861",cp862:{type:"_sbcs",chars:"\u05D0\u05D1\u05D2\u05D3\u05D4\u05D5\u05D6\u05D7\u05D8\u05D9\u05DA\u05DB\u05DC\u05DD\u05DE\u05DF\u05E0\u05E1\u05E2\u05E3\u05E4\u05E5\u05E6\u05E7\u05E8\u05E9\u05EA\xA2\xA3\xA5\u20A7\u0192\xE1\xED\xF3\xFA\xF1\xD1\xAA\xBA\xBF\u2310\xAC\xBD\xBC\xA1\xAB\xBB\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u03B1\xDF\u0393\u03C0\u03A3\u03C3\xB5\u03C4\u03A6\u0398\u03A9\u03B4\u221E\u03C6\u03B5\u2229\u2261\xB1\u2265\u2264\u2320\u2321\xF7\u2248\xB0\u2219\xB7\u221A\u207F\xB2\u25A0\xA0"},ibm862:"cp862",csibm862:"cp862",cp863:{type:"_sbcs",chars:"\xC7\xFC\xE9\xE2\xC2\xE0\xB6\xE7\xEA\xEB\xE8\xEF\xEE\u2017\xC0\xA7\xC9\xC8\xCA\xF4\xCB\xCF\xFB\xF9\xA4\xD4\xDC\xA2\xA3\xD9\xDB\u0192\xA6\xB4\xF3\xFA\xA8\xB8\xB3\xAF\xCE\u2310\xAC\xBD\xBC\xBE\xAB\xBB\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u03B1\xDF\u0393\u03C0\u03A3\u03C3\xB5\u03C4\u03A6\u0398\u03A9\u03B4\u221E\u03C6\u03B5\u2229\u2261\xB1\u2265\u2264\u2320\u2321\xF7\u2248\xB0\u2219\xB7\u221A\u207F\xB2\u25A0\xA0"},ibm863:"cp863",csibm863:"cp863",cp864:{type:"_sbcs",chars:`\0\x07\b	
 \v\f\r\x1B !"#$\u066A&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\`abcdefghijklmnopqrstuvwxyz{|}~\x7F\xB0\xB7\u2219\u221A\u2592\u2500\u2502\u253C\u2524\u252C\u251C\u2534\u2510\u250C\u2514\u2518\u03B2\u221E\u03C6\xB1\xBD\xBC\u2248\xAB\xBB\uFEF7\uFEF8\uFFFD\uFFFD\uFEFB\uFEFC\uFFFD\xA0\xAD\uFE82\xA3\xA4\uFE84\uFFFD\uFFFD\uFE8E\uFE8F\uFE95\uFE99\u060C\uFE9D\uFEA1\uFEA5\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669\uFED1\u061B\uFEB1\uFEB5\uFEB9\u061F\xA2\uFE80\uFE81\uFE83\uFE85\uFECA\uFE8B\uFE8D\uFE91\uFE93\uFE97\uFE9B\uFE9F\uFEA3\uFEA7\uFEA9\uFEAB\uFEAD\uFEAF\uFEB3\uFEB7\uFEBB\uFEBF\uFEC1\uFEC5\uFECB\uFECF\xA6\xAC\xF7\xD7\uFEC9\u0640\uFED3\uFED7\uFEDB\uFEDF\uFEE3\uFEE7\uFEEB\uFEED\uFEEF\uFEF3\uFEBD\uFECC\uFECE\uFECD\uFEE1\uFE7D\u0651\uFEE5\uFEE9\uFEEC\uFEF0\uFEF2\uFED0\uFED5\uFEF5\uFEF6\uFEDD\uFED9\uFEF1\u25A0\uFFFD`},ibm864:"cp864",csibm864:"cp864",cp865:{type:"_sbcs",chars:"\xC7\xFC\xE9\xE2\xE4\xE0\xE5\xE7\xEA\xEB\xE8\xEF\xEE\xEC\xC4\xC5\xC9\xE6\xC6\xF4\xF6\xF2\xFB\xF9\xFF\xD6\xDC\xF8\xA3\xD8\u20A7\u0192\xE1\xED\xF3\xFA\xF1\xD1\xAA\xBA\xBF\u2310\xAC\xBD\xBC\xA1\xAB\xA4\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u03B1\xDF\u0393\u03C0\u03A3\u03C3\xB5\u03C4\u03A6\u0398\u03A9\u03B4\u221E\u03C6\u03B5\u2229\u2261\xB1\u2265\u2264\u2320\u2321\xF7\u2248\xB0\u2219\xB7\u221A\u207F\xB2\u25A0\xA0"},ibm865:"cp865",csibm865:"cp865",cp866:{type:"_sbcs",chars:"\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042A\u042B\u042C\u042D\u042E\u042F\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044A\u044B\u044C\u044D\u044E\u044F\u0401\u0451\u0404\u0454\u0407\u0457\u040E\u045E\xB0\u2219\xB7\u221A\u2116\xA4\u25A0\xA0"},ibm866:"cp866",csibm866:"cp866",cp869:{type:"_sbcs",chars:"\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u0386\uFFFD\xB7\xAC\xA6\u2018\u2019\u0388\u2015\u0389\u038A\u03AA\u038C\uFFFD\uFFFD\u038E\u03AB\xA9\u038F\xB2\xB3\u03AC\xA3\u03AD\u03AE\u03AF\u03CA\u0390\u03CC\u03CD\u0391\u0392\u0393\u0394\u0395\u0396\u0397\xBD\u0398\u0399\xAB\xBB\u2591\u2592\u2593\u2502\u2524\u039A\u039B\u039C\u039D\u2563\u2551\u2557\u255D\u039E\u039F\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u03A0\u03A1\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u03A3\u03A4\u03A5\u03A6\u03A7\u03A8\u03A9\u03B1\u03B2\u03B3\u2518\u250C\u2588\u2584\u03B4\u03B5\u2580\u03B6\u03B7\u03B8\u03B9\u03BA\u03BB\u03BC\u03BD\u03BE\u03BF\u03C0\u03C1\u03C3\u03C2\u03C4\u0384\xAD\xB1\u03C5\u03C6\u03C7\xA7\u03C8\u0385\xB0\xA8\u03C9\u03CB\u03B0\u03CE\u25A0\xA0"},ibm869:"cp869",csibm869:"cp869",cp922:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\u203E\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\u0160\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\u017D\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\u0161\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\u017E\xFF"},ibm922:"cp922",csibm922:"cp922",cp1046:{type:"_sbcs",chars:"\uFE88\xD7\xF7\uF8F6\uF8F5\uF8F4\uF8F7\uFE71\x88\u25A0\u2502\u2500\u2510\u250C\u2514\u2518\uFE79\uFE7B\uFE7D\uFE7F\uFE77\uFE8A\uFEF0\uFEF3\uFEF2\uFECE\uFECF\uFED0\uFEF6\uFEF8\uFEFA\uFEFC\xA0\uF8FA\uF8F9\uF8F8\xA4\uF8FB\uFE8B\uFE91\uFE97\uFE9B\uFE9F\uFEA3\u060C\xAD\uFEA7\uFEB3\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669\uFEB7\u061B\uFEBB\uFEBF\uFECA\u061F\uFECB\u0621\u0622\u0623\u0624\u0625\u0626\u0627\u0628\u0629\u062A\u062B\u062C\u062D\u062E\u062F\u0630\u0631\u0632\u0633\u0634\u0635\u0636\u0637\uFEC7\u0639\u063A\uFECC\uFE82\uFE84\uFE8E\uFED3\u0640\u0641\u0642\u0643\u0644\u0645\u0646\u0647\u0648\u0649\u064A\u064B\u064C\u064D\u064E\u064F\u0650\u0651\u0652\uFED7\uFEDB\uFEDF\uF8FC\uFEF5\uFEF7\uFEF9\uFEFB\uFEE3\uFEE7\uFEEC\uFEE9\uFFFD"},ibm1046:"cp1046",csibm1046:"cp1046",cp1124:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u0401\u0402\u0490\u0404\u0405\u0406\u0407\u0408\u0409\u040A\u040B\u040C\xAD\u040E\u040F\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042A\u042B\u042C\u042D\u042E\u042F\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044A\u044B\u044C\u044D\u044E\u044F\u2116\u0451\u0452\u0491\u0454\u0455\u0456\u0457\u0458\u0459\u045A\u045B\u045C\xA7\u045E\u045F"},ibm1124:"cp1124",csibm1124:"cp1124",cp1125:{type:"_sbcs",chars:"\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042A\u042B\u042C\u042D\u042E\u042F\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044A\u044B\u044C\u044D\u044E\u044F\u0401\u0451\u0490\u0491\u0404\u0454\u0406\u0456\u0407\u0457\xB7\u221A\u2116\xA4\u25A0\xA0"},ibm1125:"cp1125",csibm1125:"cp1125",cp1129:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\u0153\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\u0178\xB5\xB6\xB7\u0152\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\u0102\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\u0300\xCD\xCE\xCF\u0110\xD1\u0309\xD3\xD4\u01A0\xD6\xD7\xD8\xD9\xDA\xDB\xDC\u01AF\u0303\xDF\xE0\xE1\xE2\u0103\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\u0301\xED\xEE\xEF\u0111\xF1\u0323\xF3\xF4\u01A1\xF6\xF7\xF8\xF9\xFA\xFB\xFC\u01B0\u20AB\xFF"},ibm1129:"cp1129",csibm1129:"cp1129",cp1133:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u0E81\u0E82\u0E84\u0E87\u0E88\u0EAA\u0E8A\u0E8D\u0E94\u0E95\u0E96\u0E97\u0E99\u0E9A\u0E9B\u0E9C\u0E9D\u0E9E\u0E9F\u0EA1\u0EA2\u0EA3\u0EA5\u0EA7\u0EAB\u0EAD\u0EAE\uFFFD\uFFFD\uFFFD\u0EAF\u0EB0\u0EB2\u0EB3\u0EB4\u0EB5\u0EB6\u0EB7\u0EB8\u0EB9\u0EBC\u0EB1\u0EBB\u0EBD\uFFFD\uFFFD\uFFFD\u0EC0\u0EC1\u0EC2\u0EC3\u0EC4\u0EC8\u0EC9\u0ECA\u0ECB\u0ECC\u0ECD\u0EC6\uFFFD\u0EDC\u0EDD\u20AD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u0ED0\u0ED1\u0ED2\u0ED3\u0ED4\u0ED5\u0ED6\u0ED7\u0ED8\u0ED9\uFFFD\uFFFD\xA2\xAC\xA6\uFFFD"},ibm1133:"cp1133",csibm1133:"cp1133",cp1161:{type:"_sbcs",chars:"\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u0E48\u0E01\u0E02\u0E03\u0E04\u0E05\u0E06\u0E07\u0E08\u0E09\u0E0A\u0E0B\u0E0C\u0E0D\u0E0E\u0E0F\u0E10\u0E11\u0E12\u0E13\u0E14\u0E15\u0E16\u0E17\u0E18\u0E19\u0E1A\u0E1B\u0E1C\u0E1D\u0E1E\u0E1F\u0E20\u0E21\u0E22\u0E23\u0E24\u0E25\u0E26\u0E27\u0E28\u0E29\u0E2A\u0E2B\u0E2C\u0E2D\u0E2E\u0E2F\u0E30\u0E31\u0E32\u0E33\u0E34\u0E35\u0E36\u0E37\u0E38\u0E39\u0E3A\u0E49\u0E4A\u0E4B\u20AC\u0E3F\u0E40\u0E41\u0E42\u0E43\u0E44\u0E45\u0E46\u0E47\u0E48\u0E49\u0E4A\u0E4B\u0E4C\u0E4D\u0E4E\u0E4F\u0E50\u0E51\u0E52\u0E53\u0E54\u0E55\u0E56\u0E57\u0E58\u0E59\u0E5A\u0E5B\xA2\xAC\xA6\xA0"},ibm1161:"cp1161",csibm1161:"cp1161",cp1162:{type:"_sbcs",chars:"\u20AC\x81\x82\x83\x84\u2026\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\u2018\u2019\u201C\u201D\u2022\u2013\u2014\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\u0E01\u0E02\u0E03\u0E04\u0E05\u0E06\u0E07\u0E08\u0E09\u0E0A\u0E0B\u0E0C\u0E0D\u0E0E\u0E0F\u0E10\u0E11\u0E12\u0E13\u0E14\u0E15\u0E16\u0E17\u0E18\u0E19\u0E1A\u0E1B\u0E1C\u0E1D\u0E1E\u0E1F\u0E20\u0E21\u0E22\u0E23\u0E24\u0E25\u0E26\u0E27\u0E28\u0E29\u0E2A\u0E2B\u0E2C\u0E2D\u0E2E\u0E2F\u0E30\u0E31\u0E32\u0E33\u0E34\u0E35\u0E36\u0E37\u0E38\u0E39\u0E3A\uFFFD\uFFFD\uFFFD\uFFFD\u0E3F\u0E40\u0E41\u0E42\u0E43\u0E44\u0E45\u0E46\u0E47\u0E48\u0E49\u0E4A\u0E4B\u0E4C\u0E4D\u0E4E\u0E4F\u0E50\u0E51\u0E52\u0E53\u0E54\u0E55\u0E56\u0E57\u0E58\u0E59\u0E5A\u0E5B\uFFFD\uFFFD\uFFFD\uFFFD"},ibm1162:"cp1162",csibm1162:"cp1162",cp1163:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\u20AC\xA5\xA6\xA7\u0153\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\u0178\xB5\xB6\xB7\u0152\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\u0102\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\u0300\xCD\xCE\xCF\u0110\xD1\u0309\xD3\xD4\u01A0\xD6\xD7\xD8\xD9\xDA\xDB\xDC\u01AF\u0303\xDF\xE0\xE1\xE2\u0103\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\u0301\xED\xEE\xEF\u0111\xF1\u0323\xF3\xF4\u01A1\xF6\xF7\xF8\xF9\xFA\xFB\xFC\u01B0\u20AB\xFF"},ibm1163:"cp1163",csibm1163:"cp1163",maccroatian:{type:"_sbcs",chars:"\xC4\xC5\xC7\xC9\xD1\xD6\xDC\xE1\xE0\xE2\xE4\xE3\xE5\xE7\xE9\xE8\xEA\xEB\xED\xEC\xEE\xEF\xF1\xF3\xF2\xF4\xF6\xF5\xFA\xF9\xFB\xFC\u2020\xB0\xA2\xA3\xA7\u2022\xB6\xDF\xAE\u0160\u2122\xB4\xA8\u2260\u017D\xD8\u221E\xB1\u2264\u2265\u2206\xB5\u2202\u2211\u220F\u0161\u222B\xAA\xBA\u2126\u017E\xF8\xBF\xA1\xAC\u221A\u0192\u2248\u0106\xAB\u010C\u2026\xA0\xC0\xC3\xD5\u0152\u0153\u0110\u2014\u201C\u201D\u2018\u2019\xF7\u25CA\uFFFD\xA9\u2044\xA4\u2039\u203A\xC6\xBB\u2013\xB7\u201A\u201E\u2030\xC2\u0107\xC1\u010D\xC8\xCD\xCE\xCF\xCC\xD3\xD4\u0111\xD2\xDA\xDB\xD9\u0131\u02C6\u02DC\xAF\u03C0\xCB\u02DA\xB8\xCA\xE6\u02C7"},maccyrillic:{type:"_sbcs",chars:"\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042A\u042B\u042C\u042D\u042E\u042F\u2020\xB0\xA2\xA3\xA7\u2022\xB6\u0406\xAE\xA9\u2122\u0402\u0452\u2260\u0403\u0453\u221E\xB1\u2264\u2265\u0456\xB5\u2202\u0408\u0404\u0454\u0407\u0457\u0409\u0459\u040A\u045A\u0458\u0405\xAC\u221A\u0192\u2248\u2206\xAB\xBB\u2026\xA0\u040B\u045B\u040C\u045C\u0455\u2013\u2014\u201C\u201D\u2018\u2019\xF7\u201E\u040E\u045E\u040F\u045F\u2116\u0401\u0451\u044F\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044A\u044B\u044C\u044D\u044E\xA4"},macgreek:{type:"_sbcs",chars:"\xC4\xB9\xB2\xC9\xB3\xD6\xDC\u0385\xE0\xE2\xE4\u0384\xA8\xE7\xE9\xE8\xEA\xEB\xA3\u2122\xEE\xEF\u2022\xBD\u2030\xF4\xF6\xA6\xAD\xF9\xFB\xFC\u2020\u0393\u0394\u0398\u039B\u039E\u03A0\xDF\xAE\xA9\u03A3\u03AA\xA7\u2260\xB0\u0387\u0391\xB1\u2264\u2265\xA5\u0392\u0395\u0396\u0397\u0399\u039A\u039C\u03A6\u03AB\u03A8\u03A9\u03AC\u039D\xAC\u039F\u03A1\u2248\u03A4\xAB\xBB\u2026\xA0\u03A5\u03A7\u0386\u0388\u0153\u2013\u2015\u201C\u201D\u2018\u2019\xF7\u0389\u038A\u038C\u038E\u03AD\u03AE\u03AF\u03CC\u038F\u03CD\u03B1\u03B2\u03C8\u03B4\u03B5\u03C6\u03B3\u03B7\u03B9\u03BE\u03BA\u03BB\u03BC\u03BD\u03BF\u03C0\u03CE\u03C1\u03C3\u03C4\u03B8\u03C9\u03C2\u03C7\u03C5\u03B6\u03CA\u03CB\u0390\u03B0\uFFFD"},maciceland:{type:"_sbcs",chars:"\xC4\xC5\xC7\xC9\xD1\xD6\xDC\xE1\xE0\xE2\xE4\xE3\xE5\xE7\xE9\xE8\xEA\xEB\xED\xEC\xEE\xEF\xF1\xF3\xF2\xF4\xF6\xF5\xFA\xF9\xFB\xFC\xDD\xB0\xA2\xA3\xA7\u2022\xB6\xDF\xAE\xA9\u2122\xB4\xA8\u2260\xC6\xD8\u221E\xB1\u2264\u2265\xA5\xB5\u2202\u2211\u220F\u03C0\u222B\xAA\xBA\u2126\xE6\xF8\xBF\xA1\xAC\u221A\u0192\u2248\u2206\xAB\xBB\u2026\xA0\xC0\xC3\xD5\u0152\u0153\u2013\u2014\u201C\u201D\u2018\u2019\xF7\u25CA\xFF\u0178\u2044\xA4\xD0\xF0\xDE\xFE\xFD\xB7\u201A\u201E\u2030\xC2\xCA\xC1\xCB\xC8\xCD\xCE\xCF\xCC\xD3\xD4\uFFFD\xD2\xDA\xDB\xD9\u0131\u02C6\u02DC\xAF\u02D8\u02D9\u02DA\xB8\u02DD\u02DB\u02C7"},macroman:{type:"_sbcs",chars:"\xC4\xC5\xC7\xC9\xD1\xD6\xDC\xE1\xE0\xE2\xE4\xE3\xE5\xE7\xE9\xE8\xEA\xEB\xED\xEC\xEE\xEF\xF1\xF3\xF2\xF4\xF6\xF5\xFA\xF9\xFB\xFC\u2020\xB0\xA2\xA3\xA7\u2022\xB6\xDF\xAE\xA9\u2122\xB4\xA8\u2260\xC6\xD8\u221E\xB1\u2264\u2265\xA5\xB5\u2202\u2211\u220F\u03C0\u222B\xAA\xBA\u2126\xE6\xF8\xBF\xA1\xAC\u221A\u0192\u2248\u2206\xAB\xBB\u2026\xA0\xC0\xC3\xD5\u0152\u0153\u2013\u2014\u201C\u201D\u2018\u2019\xF7\u25CA\xFF\u0178\u2044\xA4\u2039\u203A\uFB01\uFB02\u2021\xB7\u201A\u201E\u2030\xC2\xCA\xC1\xCB\xC8\xCD\xCE\xCF\xCC\xD3\xD4\uFFFD\xD2\xDA\xDB\xD9\u0131\u02C6\u02DC\xAF\u02D8\u02D9\u02DA\xB8\u02DD\u02DB\u02C7"},macromania:{type:"_sbcs",chars:"\xC4\xC5\xC7\xC9\xD1\xD6\xDC\xE1\xE0\xE2\xE4\xE3\xE5\xE7\xE9\xE8\xEA\xEB\xED\xEC\xEE\xEF\xF1\xF3\xF2\xF4\xF6\xF5\xFA\xF9\xFB\xFC\u2020\xB0\xA2\xA3\xA7\u2022\xB6\xDF\xAE\xA9\u2122\xB4\xA8\u2260\u0102\u015E\u221E\xB1\u2264\u2265\xA5\xB5\u2202\u2211\u220F\u03C0\u222B\xAA\xBA\u2126\u0103\u015F\xBF\xA1\xAC\u221A\u0192\u2248\u2206\xAB\xBB\u2026\xA0\xC0\xC3\xD5\u0152\u0153\u2013\u2014\u201C\u201D\u2018\u2019\xF7\u25CA\xFF\u0178\u2044\xA4\u2039\u203A\u0162\u0163\u2021\xB7\u201A\u201E\u2030\xC2\xCA\xC1\xCB\xC8\xCD\xCE\xCF\xCC\xD3\xD4\uFFFD\xD2\xDA\xDB\xD9\u0131\u02C6\u02DC\xAF\u02D8\u02D9\u02DA\xB8\u02DD\u02DB\u02C7"},macthai:{type:"_sbcs",chars:"\xAB\xBB\u2026\uF88C\uF88F\uF892\uF895\uF898\uF88B\uF88E\uF891\uF894\uF897\u201C\u201D\uF899\uFFFD\u2022\uF884\uF889\uF885\uF886\uF887\uF888\uF88A\uF88D\uF890\uF893\uF896\u2018\u2019\uFFFD\xA0\u0E01\u0E02\u0E03\u0E04\u0E05\u0E06\u0E07\u0E08\u0E09\u0E0A\u0E0B\u0E0C\u0E0D\u0E0E\u0E0F\u0E10\u0E11\u0E12\u0E13\u0E14\u0E15\u0E16\u0E17\u0E18\u0E19\u0E1A\u0E1B\u0E1C\u0E1D\u0E1E\u0E1F\u0E20\u0E21\u0E22\u0E23\u0E24\u0E25\u0E26\u0E27\u0E28\u0E29\u0E2A\u0E2B\u0E2C\u0E2D\u0E2E\u0E2F\u0E30\u0E31\u0E32\u0E33\u0E34\u0E35\u0E36\u0E37\u0E38\u0E39\u0E3A\uFEFF\u200B\u2013\u2014\u0E3F\u0E40\u0E41\u0E42\u0E43\u0E44\u0E45\u0E46\u0E47\u0E48\u0E49\u0E4A\u0E4B\u0E4C\u0E4D\u2122\u0E4F\u0E50\u0E51\u0E52\u0E53\u0E54\u0E55\u0E56\u0E57\u0E58\u0E59\xAE\xA9\uFFFD\uFFFD\uFFFD\uFFFD"},macturkish:{type:"_sbcs",chars:"\xC4\xC5\xC7\xC9\xD1\xD6\xDC\xE1\xE0\xE2\xE4\xE3\xE5\xE7\xE9\xE8\xEA\xEB\xED\xEC\xEE\xEF\xF1\xF3\xF2\xF4\xF6\xF5\xFA\xF9\xFB\xFC\u2020\xB0\xA2\xA3\xA7\u2022\xB6\xDF\xAE\xA9\u2122\xB4\xA8\u2260\xC6\xD8\u221E\xB1\u2264\u2265\xA5\xB5\u2202\u2211\u220F\u03C0\u222B\xAA\xBA\u2126\xE6\xF8\xBF\xA1\xAC\u221A\u0192\u2248\u2206\xAB\xBB\u2026\xA0\xC0\xC3\xD5\u0152\u0153\u2013\u2014\u201C\u201D\u2018\u2019\xF7\u25CA\xFF\u0178\u011E\u011F\u0130\u0131\u015E\u015F\u2021\xB7\u201A\u201E\u2030\xC2\xCA\xC1\xCB\xC8\xCD\xCE\xCF\xCC\xD3\xD4\uFFFD\xD2\xDA\xDB\xD9\uFFFD\u02C6\u02DC\xAF\u02D8\u02D9\u02DA\xB8\u02DD\u02DB\u02C7"},macukraine:{type:"_sbcs",chars:"\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042A\u042B\u042C\u042D\u042E\u042F\u2020\xB0\u0490\xA3\xA7\u2022\xB6\u0406\xAE\xA9\u2122\u0402\u0452\u2260\u0403\u0453\u221E\xB1\u2264\u2265\u0456\xB5\u0491\u0408\u0404\u0454\u0407\u0457\u0409\u0459\u040A\u045A\u0458\u0405\xAC\u221A\u0192\u2248\u2206\xAB\xBB\u2026\xA0\u040B\u045B\u040C\u045C\u0455\u2013\u2014\u201C\u201D\u2018\u2019\xF7\u201E\u040E\u045E\u040F\u045F\u2116\u0401\u0451\u044F\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044A\u044B\u044C\u044D\u044E\xA4"},koi8r:{type:"_sbcs",chars:"\u2500\u2502\u250C\u2510\u2514\u2518\u251C\u2524\u252C\u2534\u253C\u2580\u2584\u2588\u258C\u2590\u2591\u2592\u2593\u2320\u25A0\u2219\u221A\u2248\u2264\u2265\xA0\u2321\xB0\xB2\xB7\xF7\u2550\u2551\u2552\u0451\u2553\u2554\u2555\u2556\u2557\u2558\u2559\u255A\u255B\u255C\u255D\u255E\u255F\u2560\u2561\u0401\u2562\u2563\u2564\u2565\u2566\u2567\u2568\u2569\u256A\u256B\u256C\xA9\u044E\u0430\u0431\u0446\u0434\u0435\u0444\u0433\u0445\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u044F\u0440\u0441\u0442\u0443\u0436\u0432\u044C\u044B\u0437\u0448\u044D\u0449\u0447\u044A\u042E\u0410\u0411\u0426\u0414\u0415\u0424\u0413\u0425\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u042F\u0420\u0421\u0422\u0423\u0416\u0412\u042C\u042B\u0417\u0428\u042D\u0429\u0427\u042A"},koi8u:{type:"_sbcs",chars:"\u2500\u2502\u250C\u2510\u2514\u2518\u251C\u2524\u252C\u2534\u253C\u2580\u2584\u2588\u258C\u2590\u2591\u2592\u2593\u2320\u25A0\u2219\u221A\u2248\u2264\u2265\xA0\u2321\xB0\xB2\xB7\xF7\u2550\u2551\u2552\u0451\u0454\u2554\u0456\u0457\u2557\u2558\u2559\u255A\u255B\u0491\u255D\u255E\u255F\u2560\u2561\u0401\u0404\u2563\u0406\u0407\u2566\u2567\u2568\u2569\u256A\u0490\u256C\xA9\u044E\u0430\u0431\u0446\u0434\u0435\u0444\u0433\u0445\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u044F\u0440\u0441\u0442\u0443\u0436\u0432\u044C\u044B\u0437\u0448\u044D\u0449\u0447\u044A\u042E\u0410\u0411\u0426\u0414\u0415\u0424\u0413\u0425\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u042F\u0420\u0421\u0422\u0423\u0416\u0412\u042C\u042B\u0417\u0428\u042D\u0429\u0427\u042A"},koi8ru:{type:"_sbcs",chars:"\u2500\u2502\u250C\u2510\u2514\u2518\u251C\u2524\u252C\u2534\u253C\u2580\u2584\u2588\u258C\u2590\u2591\u2592\u2593\u2320\u25A0\u2219\u221A\u2248\u2264\u2265\xA0\u2321\xB0\xB2\xB7\xF7\u2550\u2551\u2552\u0451\u0454\u2554\u0456\u0457\u2557\u2558\u2559\u255A\u255B\u0491\u045E\u255E\u255F\u2560\u2561\u0401\u0404\u2563\u0406\u0407\u2566\u2567\u2568\u2569\u256A\u0490\u040E\xA9\u044E\u0430\u0431\u0446\u0434\u0435\u0444\u0433\u0445\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u044F\u0440\u0441\u0442\u0443\u0436\u0432\u044C\u044B\u0437\u0448\u044D\u0449\u0447\u044A\u042E\u0410\u0411\u0426\u0414\u0415\u0424\u0413\u0425\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u042F\u0420\u0421\u0422\u0423\u0416\u0412\u042C\u042B\u0417\u0428\u042D\u0429\u0427\u042A"},koi8t:{type:"_sbcs",chars:"\u049B\u0493\u201A\u0492\u201E\u2026\u2020\u2021\uFFFD\u2030\u04B3\u2039\u04B2\u04B7\u04B6\uFFFD\u049A\u2018\u2019\u201C\u201D\u2022\u2013\u2014\uFFFD\u2122\uFFFD\u203A\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\u04EF\u04EE\u0451\xA4\u04E3\xA6\xA7\uFFFD\uFFFD\uFFFD\xAB\xAC\xAD\xAE\uFFFD\xB0\xB1\xB2\u0401\uFFFD\u04E2\xB6\xB7\uFFFD\u2116\uFFFD\xBB\uFFFD\uFFFD\uFFFD\xA9\u044E\u0430\u0431\u0446\u0434\u0435\u0444\u0433\u0445\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u044F\u0440\u0441\u0442\u0443\u0436\u0432\u044C\u044B\u0437\u0448\u044D\u0449\u0447\u044A\u042E\u0410\u0411\u0426\u0414\u0415\u0424\u0413\u0425\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u042F\u0420\u0421\u0422\u0423\u0416\u0412\u042C\u042B\u0417\u0428\u042D\u0429\u0427\u042A"},armscii8:{type:"_sbcs",chars:"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\uFFFD\u0587\u0589)(\xBB\xAB\u2014.\u055D,-\u058A\u2026\u055C\u055B\u055E\u0531\u0561\u0532\u0562\u0533\u0563\u0534\u0564\u0535\u0565\u0536\u0566\u0537\u0567\u0538\u0568\u0539\u0569\u053A\u056A\u053B\u056B\u053C\u056C\u053D\u056D\u053E\u056E\u053F\u056F\u0540\u0570\u0541\u0571\u0542\u0572\u0543\u0573\u0544\u0574\u0545\u0575\u0546\u0576\u0547\u0577\u0548\u0578\u0549\u0579\u054A\u057A\u054B\u057B\u054C\u057C\u054D\u057D\u054E\u057E\u054F\u057F\u0550\u0580\u0551\u0581\u0552\u0582\u0553\u0583\u0554\u0584\u0555\u0585\u0556\u0586\u055A\uFFFD"},rk1048:{type:"_sbcs",chars:"\u0402\u0403\u201A\u0453\u201E\u2026\u2020\u2021\u20AC\u2030\u0409\u2039\u040A\u049A\u04BA\u040F\u0452\u2018\u2019\u201C\u201D\u2022\u2013\u2014\uFFFD\u2122\u0459\u203A\u045A\u049B\u04BB\u045F\xA0\u04B0\u04B1\u04D8\xA4\u04E8\xA6\xA7\u0401\xA9\u0492\xAB\xAC\xAD\xAE\u04AE\xB0\xB1\u0406\u0456\u04E9\xB5\xB6\xB7\u0451\u2116\u0493\xBB\u04D9\u04A2\u04A3\u04AF\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042A\u042B\u042C\u042D\u042E\u042F\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044A\u044B\u044C\u044D\u044E\u044F"},tcvn:{type:"_sbcs",chars:`\0\xDA\u1EE4\u1EEA\u1EEC\u1EEE\x07\b	
 \v\f\r\u1EE8\u1EF0\u1EF2\u1EF6\u1EF8\xDD\u1EF4\x1B !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\`abcdefghijklmnopqrstuvwxyz{|}~\x7F\xC0\u1EA2\xC3\xC1\u1EA0\u1EB6\u1EAC\xC8\u1EBA\u1EBC\xC9\u1EB8\u1EC6\xCC\u1EC8\u0128\xCD\u1ECA\xD2\u1ECE\xD5\xD3\u1ECC\u1ED8\u1EDC\u1EDE\u1EE0\u1EDA\u1EE2\xD9\u1EE6\u0168\xA0\u0102\xC2\xCA\xD4\u01A0\u01AF\u0110\u0103\xE2\xEA\xF4\u01A1\u01B0\u0111\u1EB0\u0300\u0309\u0303\u0301\u0323\xE0\u1EA3\xE3\xE1\u1EA1\u1EB2\u1EB1\u1EB3\u1EB5\u1EAF\u1EB4\u1EAE\u1EA6\u1EA8\u1EAA\u1EA4\u1EC0\u1EB7\u1EA7\u1EA9\u1EAB\u1EA5\u1EAD\xE8\u1EC2\u1EBB\u1EBD\xE9\u1EB9\u1EC1\u1EC3\u1EC5\u1EBF\u1EC7\xEC\u1EC9\u1EC4\u1EBE\u1ED2\u0129\xED\u1ECB\xF2\u1ED4\u1ECF\xF5\xF3\u1ECD\u1ED3\u1ED5\u1ED7\u1ED1\u1ED9\u1EDD\u1EDF\u1EE1\u1EDB\u1EE3\xF9\u1ED6\u1EE7\u0169\xFA\u1EE5\u1EEB\u1EED\u1EEF\u1EE9\u1EF1\u1EF3\u1EF7\u1EF9\xFD\u1EF5\u1ED0`},georgianacademy:{type:"_sbcs",chars:"\x80\x81\u201A\u0192\u201E\u2026\u2020\u2021\u02C6\u2030\u0160\u2039\u0152\x8D\x8E\x8F\x90\u2018\u2019\u201C\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\x9D\x9E\u0178\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\u10D0\u10D1\u10D2\u10D3\u10D4\u10D5\u10D6\u10D7\u10D8\u10D9\u10DA\u10DB\u10DC\u10DD\u10DE\u10DF\u10E0\u10E1\u10E2\u10E3\u10E4\u10E5\u10E6\u10E7\u10E8\u10E9\u10EA\u10EB\u10EC\u10ED\u10EE\u10EF\u10F0\u10F1\u10F2\u10F3\u10F4\u10F5\u10F6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF"},georgianps:{type:"_sbcs",chars:"\x80\x81\u201A\u0192\u201E\u2026\u2020\u2021\u02C6\u2030\u0160\u2039\u0152\x8D\x8E\x8F\x90\u2018\u2019\u201C\u201D\u2022\u2013\u2014\u02DC\u2122\u0161\u203A\u0153\x9D\x9E\u0178\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\u10D0\u10D1\u10D2\u10D3\u10D4\u10D5\u10D6\u10F1\u10D7\u10D8\u10D9\u10DA\u10DB\u10DC\u10F2\u10DD\u10DE\u10DF\u10E0\u10E1\u10E2\u10F3\u10E3\u10E4\u10E5\u10E6\u10E7\u10E8\u10E9\u10EA\u10EB\u10EC\u10ED\u10EE\u10F4\u10EF\u10F0\u10F5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF"},pt154:{type:"_sbcs",chars:"\u0496\u0492\u04EE\u0493\u201E\u2026\u04B6\u04AE\u04B2\u04AF\u04A0\u04E2\u04A2\u049A\u04BA\u04B8\u0497\u2018\u2019\u201C\u201D\u2022\u2013\u2014\u04B3\u04B7\u04A1\u04E3\u04A3\u049B\u04BB\u04B9\xA0\u040E\u045E\u0408\u04E8\u0498\u04B0\xA7\u0401\xA9\u04D8\xAB\xAC\u04EF\xAE\u049C\xB0\u04B1\u0406\u0456\u0499\u04E9\xB6\xB7\u0451\u2116\u04D9\xBB\u0458\u04AA\u04AB\u049D\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042A\u042B\u042C\u042D\u042E\u042F\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044A\u044B\u044C\u044D\u044E\u044F"},viscii:{type:"_sbcs",chars:`\0\u1EB2\u1EB4\u1EAA\x07\b	
@@ -1429,7 +2116,90 @@ safe-buffer/index.js:
       },
     };
   }
-  global.ExplorerEditAssist = { pattern, patternKind, infer, makeRule, apply, create, MAX_SAMPLE };
+  const MASKS = [
+    {
+      id: 'mask-email',
+      zh: '脱敏邮箱地址（z***@example.com）',
+      en: 'Mask email addresses (z***@example.com)',
+    },
+    {
+      id: 'mask-ipv4',
+      zh: '脱敏 IPv4 地址（192.168.*.*）',
+      en: 'Mask IPv4 addresses (192.168.*.*)',
+    },
+    {
+      id: 'mask-phone',
+      zh: '脱敏手机号 / 证件长数字（138****5678）',
+      en: 'Mask phone numbers & long numeric IDs (138****5678)',
+    },
+    {
+      id: 'mask-secret',
+      zh: '脱敏 Token / Bearer / 密钥参数（token=***）',
+      en: 'Mask Bearer tokens, API keys & passwords (token=***)',
+    },
+    {
+      id: 'mask-url-query',
+      zh: '脱敏 URL 查询参数值（?user=***&code=***）',
+      en: 'Mask URL query parameter values (?user=***&code=***)',
+    },
+    {
+      id: 'clean-log-prefix',
+      zh: '剥离行首日志时间戳与级别前缀',
+      en: 'Strip leading log timestamp & level prefix',
+    },
+  ];
+  function applyMask(value, maskId) {
+    if (typeof value !== 'string' || !value) return null;
+    let out = value;
+    if (maskId === 'mask-email') {
+      out = value.replace(
+        /([A-Za-z0-9._%+-])([A-Za-z0-9._%+-]*)(@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/g,
+        (_, first, _rest, domain) => first + '***' + domain,
+      );
+    } else if (maskId === 'mask-ipv4') {
+      out = value.replace(
+        /\b((?:25[0-5]|2[0-4]\d|1?\d?\d)\.(?:25[0-5]|2[0-4]\d|1?\d?\d))\.(?:25[0-5]|2[0-4]\d|1?\d?\d)\.(?:25[0-5]|2[0-4]\d|1?\d?\d)\b/g,
+        '$1.*.*',
+      );
+    } else if (maskId === 'mask-phone') {
+      out = value.replace(
+        /\b(\+?\d{2,3}[-\s]?)?(\d{3})\d{4,11}(\d{4})\b/g,
+        (_, pre, head, tail) => (pre || '') + head + '****' + tail,
+      );
+    } else if (maskId === 'mask-secret') {
+      out = value
+        .replace(/\b(Bearer\s+)[A-Za-z0-9._~+/=-]{4,}/gi, '$1***')
+        .replace(
+          /\b((?:access_)?token|api[_-]?key|secret|password|passwd|pwd|session(?:_id)?)(\s*[:=]\s*["']?)([^"'\s,&;]+)(["']?)/gi,
+          '$1$2***$4',
+        );
+    } else if (maskId === 'mask-url-query') {
+      out = value.replace(
+        /(\?[A-Za-z0-9_.-]+=)([^&#\s]+)((?:&[A-Za-z0-9_.-]+=[^&#\s]+)*)/g,
+        (_, firstKey, _firstVal, rest) =>
+          firstKey + '***' + rest.replace(/(&[A-Za-z0-9_.-]+=)([^&#\s]+)/g, '$1***'),
+      );
+    } else if (maskId === 'clean-log-prefix') {
+      out = value.replace(
+        /^\s*(?:\[\s*\d{4}[-/]\d{2}[-/]\d{2}[T\s]\d{2}:\d{2}:\d{2}(?:[.,]\d+)?(?:Z|[+-]\d{2}:?\d{2})?\s*\]|\d{4}[-/]\d{2}[-/]\d{2}[T\s]\d{2}:\d{2}:\d{2}(?:[.,]\d+)?(?:Z|[+-]\d{2}:?\d{2})?)\s*(?:[-|]?\s*(?:\[\s*(?:INFO|WARN|WARNING|ERROR|DEBUG|TRACE|FATAL)\s*\]|\b(?:INFO|WARN|WARNING|ERROR|DEBUG|TRACE|FATAL)\b)\s*[:|-]?\s*)?/i,
+        '',
+      );
+    } else {
+      return null;
+    }
+    return out === value ? null : out;
+  }
+  global.ExplorerEditAssist = {
+    pattern,
+    patternKind,
+    infer,
+    makeRule,
+    apply,
+    MASKS,
+    applyMask,
+    create,
+    MAX_SAMPLE,
+  };
 })(globalThis);
 </script>
     <script>(function (global) {
@@ -1889,7 +2659,31 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
       warnings.add('XML 按 @属性、#text、同名元素数组映射；空元素为 null，单个元素不表示数组');
       return object([[doc.documentElement.nodeName, element(doc.documentElement)]]);
     }
-    if (format === 'json') JSON.parse(text); // Syntax only; never use rounded values.
+    if (format === 'json') {
+      try {
+        JSON.parse(text); // Syntax only; never use rounded values.
+      } catch (e) {
+        const lines = text
+          .split(/\r\n|\r|\n/)
+          .map((l) => l.trim())
+          .filter(Boolean);
+        if (
+          lines.length >= 2 &&
+          lines.every((l) => {
+            try {
+              JSON.parse(l);
+              return true;
+            } catch {
+              return false;
+            }
+          })
+        ) {
+          text = '[\n' + lines.join(',\n') + '\n]';
+        } else {
+          throw e;
+        }
+      }
+    }
     const docs = g.YAML.parseAllDocuments(text, {
       intAsBigInt: true,
       keepSourceTokens: true,
@@ -2331,6 +3125,532 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
   g.ExplorerConvertUI = { attach };
 })(globalThis);
 </script>
+    <script>/* FindChanged v1 transport. Content is sent only to the explicitly selected origin/window. */
+(function (global) {
+  'use strict';
+  const MAX_BYTES = 5 * 1024 * 1024,
+    MAX_LINES = 100000;
+  const statuses = new Set(['ok', 'stale', 'notFound', 'busy']);
+  function originOf(address) {
+    const url = new URL(address);
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password)
+      throw Error('address');
+    return url.origin;
+  }
+  function tooLarge(text) {
+    if (text.length > MAX_BYTES || new TextEncoder().encode(text).length > MAX_BYTES) return true;
+    let lines = 1;
+    for (let i = 0; i < text.length; i++) if (text[i] === '\n' && ++lines > MAX_LINES) return true;
+    return false;
+  }
+  function offsetOf(text, pos) {
+    if (
+      !pos ||
+      !Number.isSafeInteger(pos.line) ||
+      !Number.isSafeInteger(pos.column) ||
+      pos.line < 1 ||
+      pos.column < 1
+    )
+      return -1;
+    let start = 0;
+    for (let line = 1; line < pos.line; line++) {
+      const end = text.indexOf('\n', start);
+      if (end < 0) return -1;
+      start = end + 1;
+    }
+    let end = text.indexOf('\n', start);
+    if (end < 0) end = text.length;
+    if (end > start && text[end - 1] === '\r') end--;
+    const offset = start + pos.column - 1;
+    return offset <= end ? offset : -1;
+  }
+  function rangeOffset(text, range) {
+    if (!range || typeof range !== 'object') return -1;
+    const from = offsetOf(text, range.from),
+      to = offsetOf(text, range.to);
+    return from >= 0 && to >= from ? from : -1;
+  }
+  function fileName(name, fallback) {
+    return (
+      String(name || fallback)
+        .split(/[\\/]/)
+        .pop()
+        .replace(/[\u0000-\u001f]/g, '')
+        .trim()
+        .slice(0, 255) || fallback
+    );
+  }
+  function side(c) {
+    return {
+      name: fileName(c.filename, 'document.' + c.format),
+      label: c.label.slice(0, 200),
+      format: c.format,
+      text: c.text,
+    };
+  }
+  function downloadNames(left, right) {
+    const suffix = (name, which) => {
+      const dot = name.lastIndexOf('.');
+      return dot > 0 ? name.slice(0, dot) + '-' + which + name.slice(dot) : name + '-' + which;
+    };
+    return left.name === right.name
+      ? [suffix(left.name, 'left'), suffix(right.name, 'right')]
+      : [left.name, right.name];
+  }
+  function manifest(h) {
+    const info = (s) => ({ name: s.name, label: s.label, format: s.format });
+    const nodeInfo = (s) => ({
+      session: s.session,
+      revision: s.revision,
+      node: s.node,
+      path: s.path,
+    });
+    return {
+      version: 1,
+      id: h.id,
+      session: h.session,
+      revision: h.revision,
+      node: h.node,
+      folder: h.folder,
+      origin: h.origin,
+      target: h.target,
+      choices: h.choices,
+      left: info(h.left),
+      right: info(h.right),
+      ...(h.mode === 'nodes'
+        ? {
+            mode: 'nodes',
+            nodeSources: {
+              left: nodeInfo(h.nodeSources.left),
+              right: nodeInfo(h.nodeSources.right),
+            },
+          }
+        : {}),
+    };
+  }
+  function create(api) {
+    const win = api.window;
+    let handoff = null,
+      peer = null,
+      timer = null,
+      status = 'prepared',
+      reason = '';
+    function change(next, why = '') {
+      status = next;
+      reason = why;
+      api.onStatus?.(status, reason);
+    }
+    function stopTimer() {
+      if (timer !== null) win.clearTimeout(timer);
+      timer = null;
+    }
+    function post(message) {
+      if (!peer || peer.closed) return false;
+      try {
+        peer.postMessage(message, handoff.origin);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+    function set(next) {
+      stopTimer();
+      peer = null;
+      handoff = next;
+      change(tooLarge(next.left.text) || tooLarge(next.right.text) ? 'tooLarge' : 'prepared');
+    }
+    function open() {
+      if (!handoff) return false;
+      stopTimer();
+      peer = null;
+      if (tooLarge(handoff.left.text) || tooLarge(handoff.right.text)) {
+        change('tooLarge');
+        return false;
+      }
+      try {
+        peer = win.open(handoff.target, '_blank');
+      } catch {
+        peer = null;
+      }
+      if (!peer) {
+        change('blocked');
+        return false;
+      }
+      change('waiting');
+      timer = win.setTimeout(() => {
+        timer = null;
+        change('timeout');
+      }, 15000);
+      return true;
+    }
+    function receive(ev) {
+      if (!handoff || !peer || peer.closed || ev.source !== peer || ev.origin !== handoff.origin)
+        return;
+      const m = ev.data;
+      if (!m || typeof m !== 'object' || Array.isArray(m)) return;
+      if (m.type === 'fc-xjy-ready') {
+        if (m.version !== 1) {
+          stopTimer();
+          change('rejected', 'version');
+          return;
+        }
+        stopTimer();
+        change('waiting');
+        timer = win.setTimeout(() => {
+          timer = null;
+          change('timeout');
+        }, 15000);
+        if (
+          !post({
+            type: 'xjy-compare',
+            version: 1,
+            id: handoff.id,
+            left: handoff.left,
+            right: handoff.right,
+          })
+        )
+          change('unavailable');
+        return;
+      }
+      if (m.version !== 1) return;
+      if (m.type === 'fc-xjy-rejected') {
+        if (m.id !== undefined && m.id !== handoff.id) return;
+        if (!['version', 'invalid', 'tooLarge'].includes(m.reason)) return;
+        stopTimer();
+        change('rejected', m.reason);
+      } else if (m.id === handoff.id && m.type === 'fc-xjy-accepted') {
+        stopTimer();
+        change('accepted');
+      } else if (
+        m.id === handoff.id &&
+        m.type === 'fc-xjy-locate' &&
+        Number.isSafeInteger(m.request) &&
+        m.request >= 0
+      ) {
+        let result;
+        try {
+          result = m.left || m.right ? api.locate(handoff, m) : 'notFound';
+        } catch {
+          result = 'notFound';
+        }
+        post({
+          type: 'xjy-locate-result',
+          version: 1,
+          id: handoff.id,
+          request: m.request,
+          status: statuses.has(result) ? result : 'notFound',
+        });
+      }
+    }
+    win.addEventListener('message', receive);
+    return {
+      set,
+      open,
+      state: () => ({ status, reason }),
+      dispose() {
+        stopTimer();
+        peer = null;
+        handoff = null;
+        win.removeEventListener('message', receive);
+      },
+    };
+  }
+  function inferFormat(name, explicit) {
+    const f = String(explicit || '')
+      .toLowerCase()
+      .trim();
+    if (
+      [
+        'xml',
+        'kml',
+        'json',
+        'jsonl',
+        'ndjson',
+        'yaml',
+        'yml',
+        'csv',
+        'tsv',
+        'xlsx',
+        'xls',
+        'sqlite',
+        'db',
+      ].includes(f)
+    ) {
+      if (f === 'kml') return 'xml';
+      if (f === 'ndjson') return 'jsonl';
+      if (f === 'yml') return 'yaml';
+      if (f === 'db') return 'sqlite';
+      return f;
+    }
+    const lower = String(name || '').toLowerCase();
+    if (/\.(?:xml|kml|mfcribbon-ms|ribbon-ms)$/.test(lower)) return 'xml';
+    if (/\.(?:jsonl|ndjson)$/.test(lower)) return 'jsonl';
+    if (/\.json$/.test(lower)) return 'json';
+    if (/\.ya?ml$/.test(lower)) return 'yaml';
+    if (/\.tsv$/.test(lower)) return 'tsv';
+    if (/\.csv$/.test(lower)) return 'csv';
+    if (/\.xlsx$/.test(lower)) return 'xlsx';
+    if (/\.xls$/.test(lower)) return 'xls';
+    if (/\.(?:sqlite|sqlite3|db|db3)$/.test(lower)) return 'sqlite';
+    return '';
+  }
+  function toBytes(raw) {
+    if (!raw) return null;
+    if (raw instanceof Uint8Array) return raw;
+    if (raw instanceof ArrayBuffer) return new Uint8Array(raw);
+    if (ArrayBuffer.isView(raw)) return new Uint8Array(raw.buffer, raw.byteOffset, raw.byteLength);
+    if (Array.isArray(raw)) return new Uint8Array(raw);
+    if (typeof raw === 'string') {
+      try {
+        const bin = atob(raw);
+        const out = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+        return out;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+  /**
+   * Inbound handoff receiver: FindChanged.com -> XJY Editor (v1).
+   * When opened by FindChanged via window.open, announces 'xjy-fc-ready', accepts 'fc-xjy-open',
+   * loads the file into the editor, supports 'fc-xjy-locate', and provides sendBack() ('xjy-fc-apply').
+   */
+  function createInbound(api) {
+    const win = api.window || global;
+    const editor = api.editor || 'xjy';
+    const acceptedFormats = new Set(api.formats || ['xml', 'json', 'jsonl', 'yaml']);
+    let current = null;
+    let applyBtn = null;
+
+    const isEn = () =>
+      (global.XJYI18n?.locale || win.document?.documentElement?.lang || '')
+        .toLowerCase()
+        .startsWith('en');
+    const labelText = () => (isEn() ? 'Apply to FindChanged ↗' : '回传到 FindChanged ↗');
+
+    function ensureButton() {
+      if (applyBtn || !api.mountAfter || !win.document) return;
+      applyBtn = win.document.createElement('button');
+      applyBtn.id = 'fcapplyback';
+      applyBtn.type = 'button';
+      applyBtn.className = 'primary';
+      applyBtn.hidden = true;
+      applyBtn.textContent = labelText();
+      applyBtn.onclick = () => sendBack();
+      api.mountAfter.after(applyBtn);
+      win.document.addEventListener('xjy-language-change', () => {
+        if (applyBtn) applyBtn.textContent = labelText();
+      });
+    }
+    ensureButton();
+
+    function reply(targetWin, origin, msg) {
+      if (!targetWin || targetWin.closed) return false;
+      const targetOrigin = origin && origin !== 'null' ? origin : '*';
+      try {
+        targetWin.postMessage(msg, targetOrigin);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    async function handleOpen(ev, m) {
+      const id = typeof m.id === 'string' && m.id.length >= 1 && m.id.length <= 100 ? m.id : '';
+      if (m.version !== 1) {
+        reply(ev.source, ev.origin, {
+          type: 'xjy-fc-rejected',
+          version: 1,
+          id: id || undefined,
+          reason: 'version',
+        });
+        return;
+      }
+      const f = m.file;
+      if (!id || !f || typeof f !== 'object') {
+        reply(ev.source, ev.origin, {
+          type: 'xjy-fc-rejected',
+          version: 1,
+          id: id || undefined,
+          reason: 'invalid',
+        });
+        return;
+      }
+      const fmt = inferFormat(f.name, f.format);
+      if (!fmt || !acceptedFormats.has(fmt)) {
+        reply(ev.source, ev.origin, {
+          type: 'xjy-fc-rejected',
+          version: 1,
+          id,
+          reason: 'unsupportedFormat',
+        });
+        return;
+      }
+      const text = typeof f.text === 'string' ? f.text : null;
+      const bytes = toBytes(f.bytes) || (text !== null ? new TextEncoder().encode(text) : null);
+      if (text === null && !bytes) {
+        reply(ev.source, ev.origin, { type: 'xjy-fc-rejected', version: 1, id, reason: 'invalid' });
+        return;
+      }
+      if ((text !== null && tooLarge(text)) || (bytes && bytes.byteLength > MAX_BYTES * 2)) {
+        reply(ev.source, ev.origin, {
+          type: 'xjy-fc-rejected',
+          version: 1,
+          id,
+          reason: 'tooLarge',
+        });
+        return;
+      }
+      const decodedText = text !== null ? text : new TextDecoder('utf-8').decode(bytes);
+      const payload = {
+        id,
+        origin: ev.origin,
+        source: ev.source,
+        side: f.side === 'left' || f.side === 'right' ? f.side : null,
+        name: fileName(f.name, 'document.' + fmt),
+        label: typeof f.label === 'string' ? f.label.slice(0, 200) : '',
+        format: fmt,
+        text: decodedText,
+        bytes,
+        locate: f.locate || m.locate || null,
+        recipe: m.recipe || null,
+      };
+      try {
+        await api.onOpen(payload);
+      } catch {
+        reply(ev.source, ev.origin, { type: 'xjy-fc-rejected', version: 1, id, reason: 'invalid' });
+        return;
+      }
+      current = payload;
+      ensureButton();
+      if (applyBtn) {
+        applyBtn.hidden = false;
+        applyBtn.textContent = labelText();
+      }
+      reply(ev.source, ev.origin, { type: 'xjy-fc-accepted', version: 1, id });
+    }
+
+    function receive(ev) {
+      if (!ev.source || (win.opener && ev.source !== win.opener && ev.source !== current?.source))
+        return;
+      const m = ev.data;
+      if (!m || typeof m !== 'object' || Array.isArray(m)) return;
+      if (m.type === 'fc-xjy-open') {
+        handleOpen(ev, m);
+      } else if (m.type === 'fc-xjy-ping') {
+        reply(ev.source, ev.origin, { type: 'xjy-fc-ready', version: 1, editor });
+      } else if (
+        current &&
+        m.version === 1 &&
+        m.id === current.id &&
+        m.type === 'fc-xjy-locate' &&
+        Number.isSafeInteger(m.request) &&
+        m.request >= 0
+      ) {
+        let status = 'notFound';
+        try {
+          status = api.onLocate ? api.onLocate(current, m) : 'notFound';
+        } catch {
+          status = 'notFound';
+        }
+        reply(ev.source, ev.origin, {
+          type: 'xjy-locate-result',
+          version: 1,
+          id: current.id,
+          request: m.request,
+          status: statuses.has(status) ? status : 'notFound',
+        });
+      } else if (current && m.version === 1 && m.id === current.id && m.type === 'fc-xjy-applied') {
+        api.onApplied?.(current);
+      }
+    }
+
+    function sendBack() {
+      if (!current || !current.source || current.source.closed) {
+        api.onNotify?.(
+          isEn()
+            ? 'The original FindChanged tab is no longer open.'
+            : '原 FindChanged 标签页已关闭，无法直接回传。',
+        );
+        return false;
+      }
+      let snap;
+      try {
+        snap = api.getCurrent?.();
+      } catch (e) {
+        api.onNotify?.(e.message);
+        return false;
+      }
+      if (!snap) return false;
+      const ok = reply(current.source, current.origin, {
+        type: 'xjy-fc-apply',
+        version: 1,
+        id: current.id,
+        side: current.side || 'right',
+        file: {
+          name: fileName(snap.name || current.name, current.name),
+          format: snap.format || current.format,
+          ...(typeof snap.text === 'string' ? { text: snap.text } : {}),
+          ...(snap.bytes ? { bytes: snap.bytes } : {}),
+        },
+      });
+      if (ok) {
+        api.onNotify?.(
+          isEn()
+            ? 'Sent updated content back to FindChanged.'
+            : '已将修改后的内容回传到 FindChanged。',
+        );
+        try {
+          current.source.focus();
+        } catch {}
+      }
+      return ok;
+    }
+
+    win.addEventListener('message', receive);
+    if (win.opener && !win.opener.closed) {
+      try {
+        win.opener.postMessage({ type: 'xjy-fc-ready', version: 1, editor }, '*');
+      } catch {}
+    }
+
+    return {
+      session: () => current,
+      sendBack,
+      announce() {
+        if (win.opener && !win.opener.closed) {
+          try {
+            win.opener.postMessage({ type: 'xjy-fc-ready', version: 1, editor }, '*');
+            return true;
+          } catch {}
+        }
+        return false;
+      },
+      dispose() {
+        win.removeEventListener('message', receive);
+        current = null;
+      },
+    };
+  }
+  global.ExplorerFindChanged = {
+    create,
+    createInbound,
+    inferFormat,
+    toBytes,
+    originOf,
+    tooLarge,
+    offsetOf,
+    rangeOffset,
+    side,
+    downloadNames,
+    manifest,
+    MAX_BYTES,
+    MAX_LINES,
+  };
+})(globalThis);
+</script>
     <script>/* Session-local file records and saving, matching FindChanged's file save:
  * write back to the opened file when a handle is available, otherwise download with the
  * same name; keep the original encoding, BOM and line endings; ask before overwriting a
@@ -2642,6 +3962,271 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
     document.addEventListener('DOMContentLoaded', () => wire());
   else wire();
   window.XJYHelp = { url, wire };
+})();
+</script>
+    <script>/* XJY Editor — Shared BugTS Feedback Modal (compatible with feedback.findchanged.com/api/v1/feedback) */
+(function () {
+  'use strict';
+
+  const FEEDBACK_URL = 'https://feedback.findchanged.com/api/v1/feedback';
+  const APP_VERSION = 'xjy-0.12.0';
+  const MAX_DESCRIPTION = 10000;
+  const MAX_ATTACHMENTS = 3;
+  const MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024;
+  const ALLOWED_EXTS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.csv', '.txt', '.xlsx', '.xls'];
+  const TIMEOUT_MS = 30000;
+
+  const isEn = () => (document.documentElement.lang || '').toLowerCase().startsWith('en');
+
+  const T = {
+    zh: {
+      title: '意见反馈',
+      note: '仅发送你填写的描述和主动添加的附件，不会上传你在编辑器中打开的任何文件。',
+      offlineNote:
+        '当前为离线本地文件（file://），无法直接提交在线反馈。请发送邮件至 contact@xjyeditor.com，或在 https://xjyeditor.com 上提交。',
+      descLabel: '问题描述或功能建议',
+      descPlaceholder: '请描述你遇到的问题、期望的功能，或对数据清洗规则的建议…',
+      attachLabel: '附件（可选，最多 3 个，每个 ≤ 5MB，支持图片/CSV/Excel/TXT）',
+      cancel: '取消',
+      submit: '提交反馈',
+      submitting: '正在提交…',
+      done: '已收到反馈，编号：',
+      errEmpty: '请先填写反馈内容。',
+      errTooLong: '反馈内容超过 10,000 字上限。',
+      errTooMany: '最多只能添加 3 个附件。',
+      errType: '不支持的附件格式（仅支持 png/jpg/gif/webp/csv/txt/xlsx/xls）。',
+      errSize: '单个附件不能超过 5 MB。',
+      errRate: '提交过于频繁，请稍后再试。',
+      errTimeout: '提交超时，请重试（重复提交会自动去重）。',
+      errNetwork: '网络请求失败，请检查网络连接或发送邮件至 contact@xjyeditor.com。',
+      errGeneric: '提交失败：',
+    },
+    en: {
+      title: 'Send Feedback',
+      note: 'Only your description and files you explicitly attach are sent. Files you open in the editor are never uploaded.',
+      offlineNote:
+        'You are viewing an offline local file (file://). Please email contact@xjyeditor.com or submit feedback on https://xjyeditor.com.',
+      descLabel: 'Issue or suggestion',
+      descPlaceholder:
+        'Describe a bug, feature request, or data cleaning rule you would like to see…',
+      attachLabel: 'Attachments (optional, up to 3 files, ≤ 5 MB each: images, CSV, Excel, TXT)',
+      cancel: 'Cancel',
+      submit: 'Submit Feedback',
+      submitting: 'Submitting…',
+      done: 'Feedback received! Ticket ID: ',
+      errEmpty: 'Please enter your feedback first.',
+      errTooLong: 'Description exceeds 10,000 characters.',
+      errTooMany: 'You can attach at most 3 files.',
+      errType: 'Unsupported attachment type (allowed: png, jpg, gif, webp, csv, txt, xlsx, xls).',
+      errSize: 'Each attachment must be 5 MB or smaller.',
+      errRate: 'Too many submissions. Please try again later.',
+      errTimeout: 'Request timed out. You can retry safely (duplicates are prevented).',
+      errNetwork: 'Network error. Please check your connection or email contact@xjyeditor.com.',
+      errGeneric: 'Submission failed: ',
+    },
+  };
+
+  function msg() {
+    return isEn() ? T.en : T.zh;
+  }
+
+  function newUuid() {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    return 'xjy-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+  }
+
+  function getVisitorId() {
+    const key = 'xjyeditor.visitor';
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved && /^[A-Za-z0-9_-]{8,64}$/.test(saved)) return saved;
+      const id = newUuid();
+      localStorage.setItem(key, id);
+      return id;
+    } catch (_) {
+      return newUuid();
+    }
+  }
+
+  let dialogEl = null;
+  let requestId = newUuid();
+
+  function ensureDialog() {
+    if (dialogEl) return dialogEl;
+    const t = msg();
+    const dlg = document.createElement('dialog');
+    dlg.id = 'xjy-feedback-dialog';
+    dlg.className = 'xjy-fb-dialog';
+    dlg.setAttribute('aria-labelledby', 'xjy-fb-title');
+
+    const head = document.createElement('div');
+    head.className = 'xjy-fb-head';
+    const h3 = document.createElement('h3');
+    h3.id = 'xjy-fb-title';
+    h3.textContent = t.title;
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'xjy-fb-close';
+    closeBtn.setAttribute('aria-label', t.cancel);
+    closeBtn.textContent = '×';
+    head.append(h3, closeBtn);
+
+    const body = document.createElement('div');
+    body.className = 'xjy-fb-body';
+
+    const note = document.createElement('p');
+    note.className = 'xjy-fb-note';
+    const isOffline = location.protocol === 'file:';
+    note.textContent = isOffline ? t.offlineNote : t.note;
+
+    const descLabel = document.createElement('label');
+    descLabel.className = 'xjy-fb-label';
+    descLabel.textContent = t.descLabel;
+    const textarea = document.createElement('textarea');
+    textarea.id = 'xjy-fb-desc';
+    textarea.className = 'xjy-fb-textarea';
+    textarea.placeholder = t.descPlaceholder;
+    textarea.maxLength = MAX_DESCRIPTION;
+    descLabel.appendChild(textarea);
+
+    const attachLabel = document.createElement('label');
+    attachLabel.className = 'xjy-fb-label';
+    attachLabel.textContent = t.attachLabel;
+    const fileInput = document.createElement('input');
+    fileInput.id = 'xjy-fb-files';
+    fileInput.className = 'xjy-fb-file';
+    fileInput.type = 'file';
+    fileInput.multiple = true;
+    fileInput.accept = ALLOWED_EXTS.join(',');
+    attachLabel.appendChild(fileInput);
+
+    const status = document.createElement('p');
+    status.id = 'xjy-fb-status';
+    status.className = 'xjy-fb-status';
+    status.hidden = true;
+    status.setAttribute('role', 'status');
+
+    body.append(note, descLabel, attachLabel, status);
+
+    const foot = document.createElement('div');
+    foot.className = 'xjy-fb-foot';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'xjy-fb-btn';
+    cancelBtn.textContent = t.cancel;
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'button';
+    submitBtn.id = 'xjy-fb-submit';
+    submitBtn.className = 'xjy-fb-btn primary';
+    submitBtn.textContent = t.submit;
+    if (isOffline) submitBtn.disabled = true;
+    foot.append(cancelBtn, submitBtn);
+
+    dlg.append(head, body, foot);
+    document.body.appendChild(dlg);
+
+    function setStatus(text, kind) {
+      if (!text) {
+        status.hidden = true;
+        status.textContent = '';
+        return;
+      }
+      status.hidden = false;
+      status.className = 'xjy-fb-status ' + kind;
+      status.textContent = text;
+    }
+
+    const close = () => dlg.close();
+    closeBtn.addEventListener('click', close);
+    cancelBtn.addEventListener('click', close);
+    dlg.addEventListener('click', (e) => {
+      if (e.target === dlg) close();
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const m = msg();
+      const desc = textarea.value.trim();
+      const files = Array.from(fileInput.files || []);
+      if (!desc) return setStatus(m.errEmpty, 'err');
+      if (Array.from(desc).length > MAX_DESCRIPTION) return setStatus(m.errTooLong, 'err');
+      if (files.length > MAX_ATTACHMENTS) return setStatus(m.errTooMany, 'err');
+      for (const f of files) {
+        const dot = f.name.lastIndexOf('.');
+        if (dot < 0 || !ALLOWED_EXTS.includes(f.name.slice(dot).toLowerCase())) {
+          return setStatus(m.errType, 'err');
+        }
+        if (f.size > MAX_ATTACHMENT_SIZE) return setStatus(m.errSize, 'err');
+      }
+
+      const form = new FormData();
+      form.set('request_id', requestId);
+      form.set('visitor_id', getVisitorId());
+      form.set('description', desc);
+      form.set('app_version', APP_VERSION);
+      form.set('locale', document.documentElement.lang || (isEn() ? 'en' : 'zh-CN'));
+      form.set('page', ('xjyeditor.com' + (location.pathname || '/')).slice(0, 200));
+      form.set('context', JSON.stringify({ product: 'xjyeditor' }));
+      for (const f of files) form.append('attachments', f, f.name);
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = m.submitting;
+      setStatus('', '');
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+      try {
+        const res = await fetch(FEEDBACK_URL, {
+          method: 'POST',
+          body: form,
+          credentials: 'omit',
+          signal: controller.signal,
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.number) {
+          setStatus(m.done + data.number, 'ok');
+          textarea.value = '';
+          fileInput.value = '';
+          requestId = newUuid();
+        } else if (data.error === 'rate_limited' || res.status === 429) {
+          setStatus(m.errRate, 'err');
+        } else {
+          setStatus(m.errGeneric + (data.error || res.status), 'err');
+        }
+      } catch (_) {
+        setStatus(controller.signal.aborted ? m.errTimeout : m.errNetwork, 'err');
+      } finally {
+        clearTimeout(timer);
+        submitBtn.disabled = false;
+        submitBtn.textContent = m.submit;
+      }
+    });
+
+    dialogEl = dlg;
+    return dlg;
+  }
+
+  function openFeedback() {
+    const dlg = ensureDialog();
+    const status = dlg.querySelector('#xjy-fb-status');
+    if (status && status.classList.contains('ok')) {
+      status.hidden = true;
+    }
+    if (typeof dlg.showModal === 'function') dlg.showModal();
+    else dlg.setAttribute('open', '');
+    const ta = dlg.querySelector('#xjy-fb-desc');
+    if (ta) ta.focus();
+  }
+
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest?.('[data-open-feedback]');
+    if (!trigger) return;
+    e.preventDefault();
+    openFeedback();
+  });
+
+  window.XJYFeedback = { open: openFeedback, url: FEEDBACK_URL };
 })();
 </script>
     <script>(function () {
@@ -3687,24 +5272,37 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
         (mode === 'table'
           ? `<label>目标列<select id="assistcolumn">${columns.map((c) => `<option value="${c}">${esc(name(doc.state.columns.indexOf(c)))}</option>`).join('')}</select></label>`
           : '<p>只处理当前选中的源码文本片段。</p>') +
+        (suggestion
+          ? ''
+          : `<label>🛡️ 日志与数据脱敏 / 清洗预设（可选）<select id="assistmask"><option value="">（不使用预设 · 按下方 36 条位置与模式规则编辑）</option>${(ExplorerEditAssist.MASKS || []).map((m) => `<option value="${esc(m.id)}">${esc(m.zh)}</option>`).join('')}</select></label>`) +
         `<label>规则<select id="assistrule">${Array.from({ length: 36 }, (_, i) => `<option value="${i}"${candidates && !candidates.some((c) => c.id === i) ? ' disabled' : ''}>${i} · ${tiers[Math.floor(i / 9)]} · ${ops[i % 9]}</option>`).join('')}</select></label><label>删除内容 / 插入文本<input id="assistcontent" value="${esc(suggestion?.content || '')}"></label><label>左侧保留字符数<input id="assistleft" type="number" min="1" value="${suggestion?.left || 1}"></label><label>右侧保留字符数<input id="assistright" type="number" min="1" value="${suggestion?.right || 1}"></label><label>仅等长删除的字符数（留空取内容长度）<input id="assistlength" type="number" min="1"></label>`,
       () => {
+        const maskId = !suggestion && $('assistmask') ? $('assistmask').value : '';
         const id = Number($('assistrule').value),
           content = $('assistcontent').value;
-        if (candidates && !candidates.some((c) => c.id === id))
-          throw Error('规则不在原始兼容候选中');
-        const candidate = candidates?.find((c) => c.id === id);
-        const rule = candidate
-          ? { ...candidate }
-          : ExplorerEditAssist.makeRule(
-              id,
-              content,
-              Number($('assistleft').value),
-              Number($('assistright').value),
-              $('assistlength').value ? Number($('assistlength').value) : undefined,
-            );
-        if (!rule) throw Error('请检查内容、位置与字符数');
+        let rule = null;
+        if (!maskId) {
+          if (candidates && !candidates.some((c) => c.id === id))
+            throw Error('规则不在原始兼容候选中');
+          const candidate = candidates?.find((c) => c.id === id);
+          rule = candidate
+            ? { ...candidate }
+            : ExplorerEditAssist.makeRule(
+                id,
+                content,
+                Number($('assistleft').value),
+                Number($('assistright').value),
+                $('assistlength').value ? Number($('assistlength').value) : undefined,
+              );
+          if (!rule) throw Error('请检查内容、位置与字符数');
+        }
         const token = snapshotToken();
+        const maskMeta = maskId && (ExplorerEditAssist.MASKS || []).find((m) => m.id === maskId);
+        const titleLabel = maskMeta ? maskMeta.zh : '规则 ' + id;
+        const transform = (val) =>
+          maskId
+            ? ExplorerEditAssist.applyMask(val, maskId)
+            : ExplorerEditAssist.apply(val, rule, content);
         let changes;
         if (mode === 'table') {
           changes = (suggestion ? automaticTargets(suggestion) : targets())
@@ -3712,7 +5310,7 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
             .map((t) => ({
               ...t,
               before: t.value,
-              after: ExplorerEditAssist.apply(t.value, rule, content),
+              after: transform(t.value),
               label: '记录 ' + (doc.rows.indexOf(t.r) + 1),
             }))
             .filter((c) => c.after !== null && c.before !== c.after);
@@ -3722,7 +5320,7 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
                 ? '当前筛选结果中没有其他符合规则的记录'
                 : '所选范围内没有命中；请检查规则和选区',
             );
-          previewChanges('辅助编辑预览 · 规则 ' + id, changes, token, () =>
+          previewChanges('辅助编辑预览 · ' + titleLabel, changes, token, () =>
             doc.transaction(() => changes.forEach((c) => doc.setCell(c.r.id, c.cid, c.after))),
           );
         } else {
@@ -3733,11 +5331,11 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
             .map((r) => ({
               ...r,
               before: text.slice(r.from, r.to),
-              after: ExplorerEditAssist.apply(text.slice(r.from, r.to), rule, content),
+              after: transform(text.slice(r.from, r.to)),
             }))
             .filter((c) => c.after !== null && c.after !== c.before);
           if (!changes.length) throw Error('选中的源码文本没有命中');
-          previewChanges('源码辅助编辑预览 · 规则 ' + id, changes, token, () =>
+          previewChanges('源码辅助编辑预览 · ' + titleLabel, changes, token, () =>
             sourceEditor.applyRanges(
               changes.map((c) => ({ from: c.from, to: c.to, insert: c.after })),
             ),
@@ -3797,6 +5395,29 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
       };
     },
   });
+  const inboundFC =
+    globalThis.ExplorerFindChanged?.createInbound?.({
+      window,
+      editor: 'csv',
+      formats: ['csv', 'tsv'],
+      mountAfter: $('download'),
+      onNotify: report,
+      onOpen(p) {
+        const delimiter = p.format === 'tsv' ? '\t' : C.detectDelimiter(p.text);
+        install(p.bytes, p.name, { encoding: 'utf-8', delimiter, header: true });
+      },
+      getCurrent() {
+        requireDoc();
+        if (!cellEditor.finish()) throw Error('请先完成当前单元格编辑');
+        const text = mode === 'source' ? sourceEditor.text() : doc.source();
+        return {
+          name: doc.name,
+          format: doc.state.delimiter === '\t' ? 'tsv' : 'csv',
+          text,
+          bytes: doc.bytes(),
+        };
+      },
+    }) || null;
   // Browser tests use the same operations as the UI; this surface does not bypass transactions.
   globalThis.CsvEditor = {
     get document() {
@@ -3809,6 +5430,7 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
     switchMode,
     install,
     saver,
+    inboundFC,
     get selection() {
       return [...chosen];
     },
