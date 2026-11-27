@@ -9,6 +9,7 @@
     <a href="https://xjyeditor.com/app/">🚀 Launch Web App (在线使用)</a> ·
     <a href="https://xjyeditor.com/app/cleaner">✦ Data Cleaner (数据清洗)</a> ·
     <a href="https://xjyeditor.com/en/pricing/">⚡ Pro &amp; REST API</a> ·
+    <a href="https://www.youtube.com/watch?v=7H1ex_RlGgA">▶ 60s Demo Video</a> ·
     <a href="https://xjyeditor.com/zh/windows/">🪟 Windows Right-Click Helper (右键助手)</a> ·
     <a href="https://findchanged.com">🔍 FindChanged Diff</a>
   </p>
@@ -17,6 +18,14 @@
 <p align="center">
   <img src="./og-card.png" width="860" alt="XJY Editor Preview" />
 </p>
+
+<div align="center">
+  <h3>▶ 60-Second Video Demo: Visual Data Cleaner &amp; Pro REST API</h3>
+  <a href="https://www.youtube.com/watch?v=7H1ex_RlGgA">
+    <img src="https://img.youtube.com/vi/7H1ex_RlGgA/hqdefault.jpg" width="600" alt="Watch XJY Editor Data Cleaner 60s Demo on YouTube" />
+  </a>
+  <p><em>Click to watch on YouTube: clean messy CSV/Excel/JSON locally, compare diffs in FindChanged.com, detect statistical outliers (Z-score/IQR/MAD) &amp; export cURL API calls.</em></p>
+</div>
 
 ---
 
@@ -53,7 +62,7 @@
 
 - **下载页面**：[https://xjyeditor.com/zh/windows/](https://xjyeditor.com/zh/windows/)（或直接下载本仓库中的 [`XJYEditorHelper.exe`](./XJYEditorHelper.exe)）
 - **当前版本**：`0.4.1`（大小：`6.7 MB`）
-- **SHA-256**：`ab1ab61ff562d4306d451077d566a13fa911a5a3084d46fa0538175d3ab2d50d`
+- **SHA-256**：`5acb4b6277d58de4b89ebb1eecb61864c83830260b69bc474b77046e32f455ed`
 
 ---
 

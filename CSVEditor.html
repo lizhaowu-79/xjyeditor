@@ -299,15 +299,13 @@ table {
   border-spacing: 0;
   table-layout: fixed;
   width: max-content;
-  min-width: 100%;
 }
 th,
 td {
   padding: 9px 12px;
   border-right: 1px solid #e5ebe7;
   border-bottom: 1px solid #e5ebe7;
-  min-width: 150px;
-  max-width: 300px;
+  min-width: 48px;
   width: 180px;
   height: 36px;
   white-space: pre;
@@ -323,8 +321,7 @@ th {
   z-index: 2;
   color: #5c7165;
   font-weight: 500;
-  resize: horizontal;
-  overflow: auto;
+  overflow: hidden;
   text-align: left;
 }
 th:first-child {
@@ -338,12 +335,14 @@ th:first-child,
 td:first-child {
   position: sticky;
   left: 0;
-  min-width: 52px;
-  width: 52px;
-  max-width: 52px;
+  min-width: 38px;
+  width: 38px;
+  max-width: 44px;
+  padding: 6px 4px;
   text-align: center;
   font-size: 11px;
   z-index: 1;
+  cursor: pointer;
 }
 td:first-child {
   background: #e5f2eb;
@@ -732,9 +731,23 @@ footer .type-legend [data-swatch] {
   font-size: 10px;
   line-height: 1.3;
 }
+header .local {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+  font-size: 12px;
+  color: #5c7a68;
+}
+header .local a {
+  margin-left: 0;
+  white-space: nowrap;
+}
 header .language-picker {
   height: 26px;
   padding: 2px 6px;
+  margin-left: 4px;
+  flex-shrink: 0;
   font-size: 12px;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -905,8 +918,10 @@ header .language-picker {
         <span class="mark">▦</span><strong>CSV 编辑器</strong>
       </div>
       <span class="local"
-        >● 文件只在本机处理 <a id="cleanerlink" href="cleaner.html">数据清洗 ↗</a
-        ><a id="sqlitelink" href="sqlite.html">SQLite 编辑器 ↗</a
+        ><span>● 文件只在本机处理</span><a id="xjylink" href="index.html" data-offline-href="XJYEditor.html">XJY 编辑器 ↗</a
+        ><a id="sqlitelink" href="sqlite.html" data-offline-href="SQLiteEditor.html">SQLite 编辑器 ↗</a
+        ><a id="excellink" href="excel.html" data-offline-href="ExcelEditor.html">Excel 编辑器 ↗</a
+        ><a id="cleanerlink" href="cleaner.html" data-offline-href="DataCleaner.html">数据清洗 ↗</a
         ><a id="feedbacklink" href="#feedback" data-open-feedback>反馈</a
         ><a id="helplink" data-help="csv" href="help.html#csv" target="_blank" rel="noopener">帮助</a></span
       >
@@ -990,367 +1005,1610 @@ header .language-picker {
         </div>
       </form>
     </dialog>
-    <script>/* Bilingual UI (zh-CN / en) for companion editors: CSV, SQLite, Excel, and Data Cleaner.
+    <script>/* Multilingual UI (zh-CN / zh-TW / ja / en) for companion editors: CSV, SQLite, Excel, and Data Cleaner.
  * Never translates user data cells inside #grid table, #tableContainer table, #sourceeditor, #schema, or #sqlresult. */
 (function (global) {
   'use strict';
   const STORAGE_KEY = 'xjy-language-v1';
+  const SUPPORTED_LOCALES = ['zh-CN', 'zh-TW', 'ja', 'en'];
 
-  const EXACT = {
-    // Shared header & footer
-    'CSV 编辑器': 'CSV Editor',
-    'SQLite 编辑器': 'SQLite Editor',
-    'Excel 编辑器': 'Excel Editor',
-    数据清洗工作台: 'Data Cleaner Workbench',
-    'CSV 编辑器 · XJY Editor': 'CSV Editor · XJY Editor',
-    'SQLite 编辑器 · XJY Editor': 'SQLite Editor · XJY Editor',
-    'Excel 编辑器 · XJY Editor': 'Excel Editor · XJY Editor',
-    '数据清洗工作台 · XJY Editor': 'Data Cleaner Workbench · XJY Editor',
-    '● 文件只在本机处理': '● Files stay on your device',
-    '● 数据库只在本机处理': '● Databases stay on your device',
-    '● 工作簿只在本机处理': '● Workbooks stay on your device',
-    '● 免费基础规则在本地处理': '● Free rules run locally in browser',
-    '数据清洗 ↗': 'Data Cleaner ↗',
-    'SQLite 编辑器 ↗': 'SQLite Editor ↗',
-    'CSV 编辑器 ↗': 'CSV Editor ↗',
-    'Excel 编辑器 ↗': 'Excel Editor ↗',
-    'CSV ↗': 'CSV ↗',
-    'SQLite ↗': 'SQLite ↗',
-    'XJY 编辑器': 'XJY Editor',
-    反馈: 'Feedback',
-    帮助: 'Help',
-    撤销: 'Undo',
-    重做: 'Redo',
-    保存: 'Save',
-    取消: 'Cancel',
-    确定: 'OK',
-    关闭: 'Close',
-    就绪: 'Ready',
-    '转换并导出…': 'Convert and export…',
-    '辅助编辑…': 'Assisted editing…',
-    '# 索引': '# Index',
-    文本: 'Text',
-    数值: 'Number',
-    布尔: 'Boolean',
-    日期: 'Date',
-    空值: 'Empty',
-    空白: 'Blank',
-    二进制: 'BLOB',
-    公式: 'Formula',
-    数据类型底色图例: 'Data type color legend',
-    表格: 'Table',
-    源码: 'Source',
-    筛选: 'Filter',
-    清除: 'Clear',
-    清除筛选: 'Clear filter',
-    上一页: 'Previous',
-    下一页: 'Next',
+  const EXACT_BY_LOCALE = {
+    en: {
+      // Shared header & footer
+      'CSV 编辑器': 'CSV Editor',
+      'SQLite 编辑器': 'SQLite Editor',
+      'Excel 编辑器': 'Excel Editor',
+      数据清洗工作台: 'Data Cleaner Workbench',
+      'CSV 编辑器 · XJY Editor': 'CSV Editor · XJY Editor',
+      'SQLite 编辑器 · XJY Editor': 'SQLite Editor · XJY Editor',
+      'Excel 编辑器 · XJY Editor': 'Excel Editor · XJY Editor',
+      '数据清洗工作台 · XJY Editor': 'Data Cleaner Workbench · XJY Editor',
+      '● 文件只在本机处理': '● Files stay on your device',
+      '● 数据库只在本机处理': '● Databases stay on your device',
+      '● 工作簿只在本机处理': '● Workbooks stay on your device',
+      '● 免费基础规则在本地处理': '● Free rules run locally in browser',
+      '数据清洗 ↗': 'Data Cleaner ↗',
+      'SQLite 编辑器 ↗': 'SQLite Editor ↗',
+      'CSV 编辑器 ↗': 'CSV Editor ↗',
+      'Excel 编辑器 ↗': 'Excel Editor ↗',
+      'CSV ↗': 'CSV ↗',
+      'SQLite ↗': 'SQLite ↗',
+      'Excel ↗': 'Excel ↗',
+      'XJY 编辑器 ↗': 'XJY Editor ↗',
+      'XJY 编辑器': 'XJY Editor',
+      反馈: 'Feedback',
+      帮助: 'Help',
+      撤销: 'Undo',
+      重做: 'Redo',
+      保存: 'Save',
+      取消: 'Cancel',
+      确定: 'OK',
+      关闭: 'Close',
+      就绪: 'Ready',
+      '转换并导出…': 'Convert and export…',
+      '辅助编辑…': 'Assisted editing…',
+      '# 索引': '# Index',
+      文本: 'Text',
+      数值: 'Number',
+      布尔: 'Boolean',
+      日期: 'Date',
+      空值: 'Empty',
+      空白: 'Blank',
+      二进制: 'BLOB',
+      公式: 'Formula',
+      数据类型底色图例: 'Data type color legend',
+      表格: 'Table',
+      源码: 'Source',
+      筛选: 'Filter',
+      清除: 'Clear',
+      清除筛选: 'Clear filter',
+      上一页: 'Previous',
+      下一页: 'Next',
+      第一页: 'First page',
+      最后一页: 'Last page',
+      页码: 'Page number',
 
-    // CSV Editor
-    '打开 CSV': 'Open CSV',
-    打开示例: 'Load sample',
-    解析设置: 'Parse settings',
-    复制选中内容: 'Copy selection',
-    剪切: 'Cut',
-    '导出 CSV…': 'Export CSV…',
-    '打开文件，改好几处。': 'Open a CSV file and edit in place.',
-    '拖入 CSV 或打开示例。前导零、长数字、日期和空格均按原文保留。':
-      'Drop a CSV or load the sample. Leading zeros, long IDs, dates and spaces stay intact.',
-    查找: 'Find',
-    输入要查找的文本: 'Text to find…',
-    上一个匹配: 'Previous match',
-    下一个匹配: 'Next match',
-    '替换…': 'Replace…',
-    筛选列: 'Filter column',
-    '包含文本…': 'Contains text…',
-    筛选内容: 'Filter text',
-    插入行: 'Insert row',
-    删除选中行: 'Delete selected rows',
-    插入列: 'Insert column',
-    删除选中列: 'Delete selected columns',
-    修改列名: 'Rename column',
-    清空选中内容: 'Clear selection',
-    应用并返回表格: 'Apply & return to table',
-    放弃源码修改: 'Discard source edits',
-    'Ctrl+D 多选相同文本 · Alt+点击添加光标': 'Ctrl+D select next match · Alt+Click add cursor',
-    '从一份 CSV 开始': 'Start with a CSV file',
-    '把文件拖到这里，或点击上方“打开 CSV”。': 'Drop a file here, or click “Open CSV” above.',
-    '支持逗号、分号和制表符 · 无需上传': 'Supports comma, semicolon & tab delimiters · No upload',
-    '拖动框选 · Ctrl 多选 · Shift 扩选 · 双击编辑':
-      'Drag to select · Ctrl multi-select · Shift range · Double-click to edit',
-    'CSV 数据表': 'CSV data table',
+      // CSV Editor
+      '打开 CSV': 'Open CSV',
+      打开示例: 'Load sample',
+      解析设置: 'Parse settings',
+      复制选中内容: 'Copy selection',
+      剪切: 'Cut',
+      '导出 CSV…': 'Export CSV…',
+      '打开文件，改好几处。': 'Open a CSV file and edit in place.',
+      '拖入 CSV 或打开示例。前导零、长数字、日期和空格均按原文保留。':
+        'Drop a CSV or load the sample. Leading zeros, long IDs, dates and spaces stay intact.',
+      查找: 'Find',
+      输入要查找的文本: 'Text to find…',
+      上一个匹配: 'Previous match',
+      下一个匹配: 'Next match',
+      '替换…': 'Replace…',
+      筛选列: 'Filter column',
+      '包含文本…': 'Contains text…',
+      筛选内容: 'Filter text',
+      插入行: 'Insert row',
+      删除选中行: 'Delete selected rows',
+      插入列: 'Insert column',
+      删除选中列: 'Delete selected columns',
+      修改列名: 'Rename column',
+      清空选中内容: 'Clear selection',
+      应用并返回表格: 'Apply & return to table',
+      放弃源码修改: 'Discard source edits',
+      'Ctrl+D 多选相同文本 · Alt+点击添加光标': 'Ctrl+D select next match · Alt+Click add cursor',
+      '从一份 CSV 开始': 'Start with a CSV file',
+      '把文件拖到这里，或点击上方“打开 CSV”。': 'Drop a file here, or click “Open CSV” above.',
+      '支持逗号、分号和制表符 · 无需上传': 'Supports comma, semicolon & tab delimiters · No upload',
+      '拖动框选 · Ctrl 多选 · Shift 扩选 · 双击编辑':
+        'Drag to select · Ctrl multi-select · Shift range · Double-click to edit',
+      'CSV 数据表': 'CSV data table',
 
-    // SQLite Editor
-    打开数据库: 'Open database',
-    '导入 CSV…': 'Import CSV…',
-    '导出数据库…': 'Export database…',
-    表与视图: 'Tables & views',
-    '＋ 新建表': '+ New table',
-    新建数据表: 'Create new table',
-    修改表: 'Edit table',
-    修改当前表结构: 'Edit current table schema',
-    删除表: 'Drop table',
-    删除当前表: 'Drop current table',
-    '＋ 索引': '+ Index',
-    新建索引: 'Create new index',
-    打开数据库后选择数据表: 'Open a database to select a table',
-    '打开数据库，修改一条记录。': 'Open a SQLite database and edit records.',
-    '保留字段类型、主键、索引和触发器。修改完成后下载新文件。':
-      'Preserves column types, primary keys, indexes and triggers.',
-    数据: 'Data',
-    结构: 'Schema',
-    '＋ 条件': '+ Condition',
-    '再添加一个条件（多个条件同时满足）': 'Add another filter condition (AND)',
-    '添加记录…': 'Insert row…',
-    '删除选中记录…': 'Delete selected rows…',
-    '选择一份本地 SQLite 文件': 'Choose a local SQLite file',
-    '也可以拖入文件，或打开示例体验。': 'Drop a .sqlite / .db file here, or load the sample.',
-    'SQLite 数据表': 'SQLite data table',
-    '每页 100 条': '100 rows per page',
-    '新建表…': 'New table…',
-    '修改当前表…': 'Edit table…',
-    '删除当前表…': 'Drop table…',
-    '新建索引…': 'New index…',
-    '表、视图、索引与触发器；普通索引与触发器可直接删除':
-      'Tables, views, indexes & triggers; user indexes and triggers can be dropped directly',
-    执行全部: 'Run all',
-    执行当前语句: 'Run current statement',
-    'Shift+Enter：执行光标所在的语句': 'Shift+Enter: run statement at cursor',
-    执行选中: 'Run selection',
-    只执行选中的文字: 'Run selected SQL text only',
-    清空: 'Clear',
-    '查询不产生修改；含修改的整批作为一步，可撤销':
-      'SELECT queries do not mutate; write batches execute atomically with undo',
-    '输入 SQL，例如 SELECT * FROM 表名 WHERE …;\n多条语句用分号分隔。Ctrl+Enter 执行全部，Shift+Enter 执行光标所在语句。':
-      'Enter SQL, e.g. SELECT * FROM table_name WHERE …;\nSeparate statements with semicolons. Ctrl+Enter runs all, Shift+Enter runs statement at cursor.',
-    结果: 'Result',
-    尚未执行: 'Not run yet',
-    '数据库已变化，结果可能过期': 'Database changed; result may be stale',
-    复制结果: 'Copy result',
-    '导出结果 CSV…': 'Export result CSV…',
-    '双击编辑 · Ctrl 多选 · Shift 扩选 · 勾选多行删除':
-      'Double-click to edit · Ctrl multi-select · Shift range · Tick rows to delete',
-    包含: 'contains',
-    不包含: 'does not contain',
-    等于: 'equals',
-    不等于: 'not equal',
-    开头是: 'starts with',
-    结尾是: 'ends with',
-    为空: 'is NULL / empty',
-    不为空: 'is not NULL / empty',
-    '为 NULL': 'is NULL',
-    '不为 NULL': 'is not NULL',
-    为空文本: 'is empty text',
-    数据表: 'Table',
-    视图: 'View',
-    文件与编辑: 'File and editing',
-    'CSV 源码': 'CSV source',
-    筛选方式: 'Filter operator',
-    数据库对象列表: 'Database objects',
-    数据库结构: 'Database schema',
-    'SQL 语句': 'SQL statements',
-    'SQL 查询结果': 'SQL query result',
-    执行消息: 'Execution messages',
-    单元格地址: 'Cell address',
-    筛选列字母: 'Filter column letter',
-    筛选文本: 'Filter text',
-    数据清洗操作栏: 'Data cleaning toolbar',
-    '选择 Excel 工作表': 'Select Excel worksheet',
-    '在 FindChanged.com 中直观查看清洗前后的数据差异':
-      'Compare before and after cleaning in FindChanged.com',
-    清洗规则流水线: 'Cleaning rule pipeline',
-    选择要添加的清洗规则: 'Select a cleaning rule to add',
-    数据预览与清洗结果: 'Data preview and cleaned result',
+      // SQLite Editor
+      打开数据库: 'Open database',
+      '导入 CSV…': 'Import CSV…',
+      '导出数据库…': 'Export database…',
+      表与视图: 'Tables & views',
+      '＋ 新建表': '+ New table',
+      新建数据表: 'Create new table',
+      修改表: 'Edit table',
+      修改当前表结构: 'Edit current table schema',
+      删除表: 'Drop table',
+      删除当前表: 'Drop current table',
+      '＋ 索引': '+ Index',
+      新建索引: 'Create new index',
+      打开数据库后选择数据表: 'Open a database to select a table',
+      '打开数据库，修改一条记录。': 'Open a SQLite database and edit records.',
+      '保留字段类型、主键、索引和触发器。修改完成后下载新文件。':
+        'Preserves column types, primary keys, indexes and triggers.',
+      数据: 'Data',
+      结构: 'Schema',
+      '＋ 条件': '+ Condition',
+      '再添加一个条件（多个条件同时满足）': 'Add another filter condition (AND)',
+      '添加记录…': 'Insert row…',
+      '删除选中记录…': 'Delete selected rows…',
+      '选择一份本地 SQLite 文件': 'Choose a local SQLite file',
+      '也可以拖入文件，或打开示例体验。': 'Drop a .sqlite / .db file here, or load the sample.',
+      'SQLite 数据表': 'SQLite data table',
+      '每页 100 条': '100 rows per page',
+      '新建表…': 'New table…',
+      '修改当前表…': 'Edit table…',
+      '删除当前表…': 'Drop table…',
+      '新建索引…': 'New index…',
+      '表、视图、索引与触发器；普通索引与触发器可直接删除':
+        'Tables, views, indexes & triggers; user indexes and triggers can be dropped directly',
+      执行全部: 'Run all',
+      执行当前语句: 'Run current statement',
+      'Shift+Enter：执行光标所在的语句': 'Shift+Enter: run statement at cursor',
+      执行选中: 'Run selection',
+      只执行选中的文字: 'Run selected SQL text only',
+      清空: 'Clear',
+      '查询不产生修改；含修改的整批作为一步，可撤销':
+        'SELECT queries do not mutate; write batches execute atomically with undo',
+      '输入 SQL，例如 SELECT * FROM 表名 WHERE …;\n多条语句用分号分隔。Ctrl+Enter 执行全部，Shift+Enter 执行光标所在语句。':
+        'Enter SQL, e.g. SELECT * FROM table_name WHERE …;\nSeparate statements with semicolons. Ctrl+Enter runs all, Shift+Enter runs statement at cursor.',
+      结果: 'Result',
+      尚未执行: 'Not run yet',
+      '数据库已变化，结果可能过期': 'Database changed; result may be stale',
+      复制结果: 'Copy result',
+      '导出结果 CSV…': 'Export result CSV…',
+      '双击编辑 · Ctrl 多选 · Shift 扩选 · 拖拉序号列选多行':
+        'Double-click to edit · Ctrl multi-select · Shift range · Drag row numbers to select rows',
+      不包含: 'does not contain',
+      开头是: 'starts with',
+      结尾是: 'ends with',
+      '为 NULL': 'is NULL',
+      '不为 NULL': 'is not NULL',
+      为空文本: 'is empty text',
+      数据表: 'Table',
+      视图: 'View',
+      选择本页全部记录: 'Select all records on this page',
+      文件与编辑: 'File and editing',
+      'CSV 源码': 'CSV source',
+      筛选方式: 'Filter operator',
+      数据库对象列表: 'Database objects',
+      数据库结构: 'Database schema',
+      'SQL 语句': 'SQL statements',
+      'SQL 查询结果': 'SQL query result',
+      执行消息: 'Execution messages',
+      单元格地址: 'Cell address',
+      筛选列字母: 'Filter column letter',
+      筛选文本: 'Filter text',
+      数据清洗操作栏: 'Data cleaning toolbar',
+      '选择 Excel 工作表': 'Select Excel worksheet',
+      '在 FindChanged.com 中直观查看清洗前后的数据差异':
+        'Compare before and after cleaning in FindChanged.com',
+      清洗规则流水线: 'Cleaning rule pipeline',
+      选择要添加的清洗规则: 'Select a cleaning rule to add',
+      数据预览与清洗结果: 'Data preview and cleaned result',
 
-    // Excel Editor
-    打开工作簿: 'Open workbook',
-    清空内容: 'Clear cells',
-    '导出工作簿…': 'Export workbook…',
-    工作表: 'Worksheets',
-    打开工作簿后选择工作表: 'Open a workbook to select a sheet',
-    '打开工作簿，修改几处。': 'Open an Excel workbook and edit cells in place.',
-    '支持 .xlsx 在位编辑，保留原工作簿部件；.xls 只读预览。':
-      'In-place .xlsx editing preserves styles, charts & sheets; read-only .xls preview.',
-    定位: 'Go to',
-    前往: 'Go',
-    首行为表头: 'First row as header',
-    显示隐藏行列: 'Show hidden rows/cols',
-    '公式由Excel重算。浏览器展示缓存或公式文本，不计算公式结果。':
-      'Formulas are recalculated by Excel on next open. Browser shows cached values or formula text.',
-    从一份本地工作簿开始: 'Start with a local Excel workbook',
-    '拖入 .xlsx，或点击“打开示例”。': 'Drop an .xlsx file here, or click “Load sample”.',
-    'Excel 工作表': 'Excel worksheet',
-    双击单元格直接编辑: 'Double-click any cell to edit',
-    前30列: 'Prev 30 cols',
-    后30列: 'Next 30 cols',
-    '工作表 XML 源码': 'Worksheet XML source',
-    '只修改现有单元格值及普通公式，保留其他结构。':
-      'Modify existing cell values and formulas while keeping other XML structures intact.',
-    应用源码: 'Apply source',
-    'Ctrl 多选 · Shift 扩选 · 双击编辑 · Enter 提交 · Esc 取消':
-      'Ctrl multi-select · Shift range · Double-click to edit · Enter commit · Esc cancel',
+      // Excel Editor
+      打开工作簿: 'Open workbook',
+      新建空白: 'New blank',
+      '查找替换…': 'Find & replace…',
+      '输入要查找的文本…': 'Text to find…',
+      '替换后的文本（留空则删除匹配文本）': 'Replacement text (leave blank to remove)',
+      区分大小写: 'Case sensitive',
+      查找并定位下一个: 'Find & jump next',
+      全部替换: 'Replace all',
+      '点击单元格查看或编辑内容 / 公式（Enter 应用）…':
+        'Select a cell to view or edit value / formula (Enter to apply)…',
+      编辑栏: 'Formula bar',
+      应用: 'Apply',
+      清空内容: 'Clear cells',
+      '导出工作簿…': 'Export workbook…',
+      工作表: 'Worksheets',
+      打开工作簿后选择工作表: 'Open a workbook to select a sheet',
+      '打开工作簿，修改几处。': 'Open an Excel workbook and edit cells in place.',
+      '支持 .xlsx 在位编辑，保留原工作簿部件；.xls 只读预览。':
+        'In-place .xlsx editing preserves styles, charts & sheets; read-only .xls preview.',
+      定位: 'Go to',
+      前往: 'Go',
+      首行为表头: 'First row as header',
+      显示隐藏行列: 'Show hidden rows/cols',
+      '公式由Excel重算。浏览器展示缓存或公式文本，不计算公式结果。':
+        'Formulas are recalculated by Excel on next open. Browser shows cached values or formula text.',
+      '公式结果来自原文件缓存；浏览器不计算公式。隐藏行列默认不显示。':
+        'Formula values come from cached results; browser does not evaluate formulas. Hidden rows/cols are hidden by default.',
+      '工作簿已修改：公式显示待重算，下载后由Excel重算。原图表、样式和其他部件保留。':
+        'Workbook modified: formulas marked for recalculation in Excel. Original charts, styles and other parts are preserved.',
+      隐藏工作表: 'Hidden sheet',
+      从一份本地工作簿开始: 'Start with a local Excel workbook',
+      '拖入 .xlsx，或点击“打开示例”。': 'Drop an .xlsx file here, or click “Load sample”.',
+      'Excel 工作表': 'Excel worksheet',
+      双击单元格直接编辑: 'Double-click any cell to edit',
+      前30列: 'Prev 30 cols',
+      后30列: 'Next 30 cols',
+      '工作表 XML 源码': 'Worksheet XML source',
+      '只修改现有单元格值及普通公式，保留其他结构。':
+        'Modify existing cell values and formulas while keeping other XML structures intact.',
+      应用源码: 'Apply source',
+      'Ctrl 多选 · Shift 扩选 · 双击编辑 · Enter 提交 · Esc 取消':
+        'Ctrl multi-select · Shift range · Double-click to edit · Enter commit · Esc cancel',
 
-    // Data Cleaner Workbench
-    打开文件: 'Open file',
-    载入示例数据: 'Load sample data',
-    '导入配方 JSON': 'Import recipe JSON',
-    '导出配方 JSON': 'Export recipe JSON',
-    'Pro / API 设置': 'Pro / API settings',
-    '▶ 运行清洗': '▶ Run cleaning',
-    '在 FindChanged.com 对比清洗前后 ↗': 'Compare before/after in FindChanged.com ↗',
-    导出清洗结果: 'Export cleaned data',
-    导出异常脏行: 'Export quarantined rows',
-    清洗步骤流水线: 'Cleaning pipeline',
-    '免费版 · ≤8步 / ≤5000行': 'Free tier · ≤8 steps / ≤5,000 rows',
-    '＋ 添加': '+ Add',
-    '还没有清洗步骤。': 'No cleaning steps yet.',
-    '从上方选择规则添加，或点击「载入示例数据」快速体验。':
-      'Choose a rule above to add a step, or click “Load sample data” to try it out.',
-    '还没有清洗步骤。从上方选择规则添加，或点击「载入示例数据」快速体验。':
-      'No cleaning steps yet. Choose a rule above to add a step, or click “Load sample data” to try it out.',
-    清空步骤: 'Clear steps',
-    输入行数: 'Input rows',
-    输出行数: 'Output rows',
-    修改单元格: 'Modified cells',
-    删除行数: 'Dropped rows',
-    分流异常行: 'Quarantined rows',
-    原始数据: 'Original data',
-    清洗结果: 'Cleaned result',
-    '报告 & 配方 JSON': 'Report & Recipe JSON',
-    '拖入 CSV / Excel (.xlsx) / JSON 文件': 'Drop a CSV / Excel (.xlsx) / JSON file here',
-    '先用免费规则本地可视化调试清洗步骤，清洗完成后可一键跳转到 FindChanged.com 对比前后差异。':
-      'Build and test cleaning steps visually in your browser, then compare before/after in FindChanged.com.',
-    '免费体验支持 5,000 行 / 8 步以内；Pro 规则与云端 API 支持大文件、统计异常值与类型不符检测。':
-      'Free tier supports up to 5,000 rows / 8 steps locally; Pro rules & API unlock large files, outlier detection and PII masking.',
-    '就绪 · 请打开文件或载入示例': 'Ready · Open a file or load sample data',
-    未加载文件: 'No file loaded',
-    'Pro / 云端 API 设置': 'Pro / Cloud API Settings',
-    '不填 API Key 时默认使用免费本地模式（≤5,000 行 / ≤8 步，数据不出浏览器）。填入 Pro API Key 后将解锁统计异常值检测、类型不符分析、PII 脱敏、模糊去重与大文件云端 API 执行（纯内存处理不落盘）。':
-      'Without an API Key, the workbench runs in free local browser mode (≤5,000 rows / ≤8 steps). Enter a Pro API Key to unlock statistical outlier detection, type mismatch analysis, PII masking, fuzzy deduplication and large-file in-memory cloud execution.',
-    'API 地址': 'API Endpoint',
-    '粘贴你的 Pro API Key': 'Paste your Pro API Key',
-    '购买 Pro 额度包 ↗': 'Buy Pro quota pack ↗',
-    切回免费本地版: 'Switch to free local mode',
-    验证并连接: 'Verify & connect',
-    // Data Cleaner Rule Categories & Labels
-    '1. 文本与字符清洗': '1. Text & Whitespace Cleaning',
-    '2. 空值与行过滤': '2. Missing Values & Row Filtering',
-    '3. 去重': '3. Deduplication',
-    '4. 列结构操作': '4. Column Structure Operations',
-    '5. JSON 专项': '5. JSON Operations',
-    '6. 格式与类型标准化': '6. Format & Type Normalization',
-    '7. 校验与脱敏 (Pro)': '7. Validation & PII Masking (Pro)',
-    '8. 统计与类型分析 (Pro)': '8. Outliers & Type Analysis (Pro)',
-    去首尾空白: 'Trim leading/trailing whitespace',
-    合并连续空白: 'Collapse consecutive spaces',
-    '清除不可见/控制字符': 'Remove invisible/control characters',
-    全角转半角: 'Full-width to half-width',
-    大小写转换: 'Case transformation',
-    查找与替换: 'Find & replace',
-    正则提取: 'Regex extract',
-    '[PRO] 正则提取': '[PRO] Regex extract',
-    正则替换: 'Regex replace',
-    '[PRO] 正则替换': '[PRO] Regex replace',
-    删除空行: 'Drop empty rows',
-    空值填充: 'Fill missing values',
-    '向下填充 / 合并单元格补齐 (Fill Down)': 'Fill down empty/merged cells (Fill Down)',
-    '条件筛选/剔除行': 'Filter / drop rows by condition',
-    精确去重: 'Exact deduplication',
-    规范化去重: 'Normalized deduplication',
-    '[PRO] 规范化去重': '[PRO] Normalized deduplication',
-    模糊相似去重: 'Fuzzy deduplication',
-    '[PRO] 模糊相似去重': '[PRO] Fuzzy deduplication',
-    删除列: 'Drop columns',
-    保留列: 'Keep columns',
-    重命名列: 'Rename columns',
-    调整列顺序: 'Reorder columns',
-    拆分列: 'Split column',
-    合并列: 'Merge columns',
-    'JSON 嵌套拍平': 'Flatten nested JSON',
-    'JSON 数组展开 (Unwind)': 'Unwind JSON array (Unwind)',
-    '[PRO] JSON 数组展开 (Unwind)': '[PRO] Unwind JSON array (Unwind)',
-    '数字/金额清洗': 'Clean numbers & currency',
-    日期时间标准化: 'Normalize dates & timestamps',
-    '[PRO] 日期时间标准化': '[PRO] Normalize dates & timestamps',
-    '布尔/枚举值统一': 'Normalize booleans & enums',
-    '[PRO] 布尔/枚举值统一': '[PRO] Normalize booleans & enums',
-    '敏感信息脱敏 (PII)': 'Mask sensitive data (PII)',
-    '[PRO] 敏感信息脱敏 (PII)': '[PRO] Mask sensitive data (PII)',
-    格式校验与脏数据分流: 'Validate format & quarantine dirty rows',
-    '[PRO] 格式校验与脏数据分流': '[PRO] Validate format & quarantine dirty rows',
-    '统计异常值检测 (Z-score/IQR/MAD)': 'Detect statistical outliers (Z-score/IQR/MAD)',
-    '[PRO] 统计异常值检测 (Z-score/IQR/MAD)': '[PRO] Detect statistical outliers (Z-score/IQR/MAD)',
-    数据类型分析与类型不符检测: 'Detect data type mismatches',
-    '[PRO] 数据类型分析与类型不符检测': '[PRO] Detect data type mismatches',
-    '值范围校验 / 超限分流': 'Validate value range & quarantine',
-    '[PRO] 值范围校验 / 超限分流': '[PRO] Validate value range & quarantine',
-    作用列: 'Target column',
-    '全部列 (*)': 'All columns (*)',
-    '（请先载入数据）': '(Load data first)',
-    转换方式: 'Case mode',
-    '全部小写 (abc)': 'lowercase (abc)',
-    '全部大写 (ABC)': 'UPPERCASE (ABC)',
-    '首字母大写 (Abc)': 'Title Case (Abc)',
-    查找内容: 'Find text',
-    替换为: 'Replace with',
-    填充默认值: 'Default fill value',
-    重复保留策略: 'Keep strategy',
-    保留首次出现: 'Keep first occurrence',
-    保留最后一次出现: 'Keep last occurrence',
-    条件: 'Condition',
-    比较值: 'Compare value',
-    分隔符: 'Delimiter',
-    '目标列名（逗号分隔）': 'New column names (comma-separated)',
-    '参与合并的列（逗号分隔）': 'Columns to merge (comma-separated)',
-    连接符: 'Separator',
-    新列名: 'New column name',
-    启用: 'Enable',
-    删除步骤: 'Remove step',
+      // Data Cleaner Workbench
+      打开文件: 'Open file',
+      载入示例数据: 'Load sample data',
+      '导入配方 JSON': 'Import recipe JSON',
+      '导出配方 JSON': 'Export recipe JSON',
+      'Pro / API 设置': 'Pro / API settings',
+      '▶ 运行清洗': '▶ Run cleaning',
+      '在 FindChanged.com 对比清洗前后 ↗': 'Compare before/after in FindChanged.com ↗',
+      导出清洗结果: 'Export cleaned data',
+      导出异常脏行: 'Export quarantined rows',
+      清洗步骤流水线: 'Cleaning pipeline',
+      '＋ 添加': '+ Add',
+      '还没有清洗步骤。': 'No cleaning steps yet.',
+      '从上方选择规则添加，或点击「载入示例数据」快速体验。':
+        'Choose a rule above to add a step, or click “Load sample data” to try it out.',
+      清空步骤: 'Clear steps',
+      输入行数: 'Input rows',
+      输出行数: 'Output rows',
+      修改单元格: 'Modified cells',
+      删除行数: 'Dropped rows',
+      分流异常行: 'Quarantined rows',
+      原始数据: 'Original data',
+      清洗结果: 'Cleaned result',
+      '报告 & 配方 JSON': 'Report & Recipe JSON',
+      '拖入 CSV / Excel (.xlsx) / JSON 文件': 'Drop a CSV / Excel (.xlsx) / JSON file here',
+      '先用免费规则本地可视化调试清洗步骤，清洗完成后可一键跳转到 FindChanged.com 对比前后差异。':
+        'Build and test cleaning steps visually in your browser, then compare before/after in FindChanged.com.',
+      '免费体验支持 5,000 行 / 8 步以内；Pro 规则与云端 API 支持大文件、统计异常值与类型不符检测。':
+        'Free tier supports up to 5,000 rows / 8 steps locally; Pro rules & API unlock large files, outlier detection and PII masking.',
+      '就绪 · 请打开文件或载入示例': 'Ready · Open a file or load sample data',
+      未加载文件: 'No file loaded',
+      'Pro / 云端 API 设置': 'Pro / Cloud API Settings',
+      '不填 API Key 时默认使用免费本地模式（≤5,000 行 / ≤8 步，数据不出浏览器）。填入 Pro API Key 后将解锁统计异常值检测、类型不符分析、PII 脱敏、模糊去重与大文件云端 API 执行（纯内存处理不落盘）。':
+        'Without an API Key, the workbench runs in free local browser mode (≤5,000 rows / ≤8 steps). Enter a Pro API Key to unlock statistical outlier detection, type mismatch analysis, PII masking, fuzzy deduplication and large-file in-memory cloud execution.',
+      'API 地址': 'API Endpoint',
+      '粘贴你的 Pro API Key': 'Paste your Pro API Key',
+      '购买 Pro 额度包 ↗': 'Buy Pro quota pack ↗',
+      切回免费本地版: 'Switch to free local mode',
+      验证并连接: 'Verify & connect',
+
+      // Data Cleaner Rule Categories & Labels
+      '1. 文本与字符清洗': '1. Text & Whitespace Cleaning',
+      '2. 空值与行过滤': '2. Missing Values & Row Filtering',
+      '3. 去重': '3. Deduplication',
+      '4. 列结构操作': '4. Column Structure Operations',
+      '5. JSON 专项': '5. JSON Operations',
+      '6. 格式与类型标准化': '6. Format & Type Normalization',
+      '7. 校验与脱敏 (Pro)': '7. Validation & PII Masking (Pro)',
+      '8. 统计与类型分析 (Pro)': '8. Outliers & Type Analysis (Pro)',
+      去首尾空白: 'Trim leading/trailing whitespace',
+      合并连续空白: 'Collapse consecutive spaces',
+      '清除不可见/控制字符': 'Remove invisible/control characters',
+      全角转半角: 'Full-width to half-width',
+      大小写转换: 'Case transformation',
+      查找与替换: 'Find & replace',
+      正则提取: 'Regex extract',
+      '[PRO] 正则提取': '[PRO] Regex extract',
+      正则替换: 'Regex replace',
+      '[PRO] 正则替换': '[PRO] Regex replace',
+      删除空行: 'Drop empty rows',
+      空值填充: 'Fill missing values',
+      '向下填充 / 合并单元格补齐 (Fill Down)': 'Fill down empty/merged cells (Fill Down)',
+      '条件筛选/剔除行': 'Filter / drop rows by condition',
+      精确去重: 'Exact deduplication',
+      规范化去重: 'Normalized deduplication',
+      '[PRO] 规范化去重': '[PRO] Normalized deduplication',
+      模糊相似去重: 'Fuzzy deduplication',
+      '[PRO] 模糊相似去重': '[PRO] Fuzzy deduplication',
+      删除列: 'Drop columns',
+      保留列: 'Keep columns',
+      重命名列: 'Rename columns',
+      调整列顺序: 'Reorder columns',
+      拆分列: 'Split column',
+      合并列: 'Merge columns',
+      'JSON 嵌套拍平': 'Flatten nested JSON',
+      'JSON 数组展开 (Unwind)': 'Unwind JSON array (Unwind)',
+      '[PRO] JSON 数组展开 (Unwind)': '[PRO] Unwind JSON array (Unwind)',
+      '数字/金额清洗': 'Clean numbers & currency',
+      日期时间标准化: 'Normalize dates & timestamps',
+      '[PRO] 日期时间标准化': '[PRO] Normalize dates & timestamps',
+      '布尔/枚举值统一': 'Normalize booleans & enums',
+      '[PRO] 布尔/枚举值统一': '[PRO] Normalize booleans & enums',
+      '敏感信息脱敏 (PII)': 'Mask sensitive data (PII)',
+      '[PRO] 敏感信息脱敏 (PII)': '[PRO] Mask sensitive data (PII)',
+      格式校验与脏数据分流: 'Validate format & quarantine dirty rows',
+      '[PRO] 格式校验与脏数据分流': '[PRO] Validate format & quarantine dirty rows',
+      '统计异常值检测 (Z-score/IQR/MAD)': 'Detect statistical outliers (Z-score/IQR/MAD)',
+      '[PRO] 统计异常值检测 (Z-score/IQR/MAD)':
+        '[PRO] Detect statistical outliers (Z-score/IQR/MAD)',
+      数据类型分析与类型不符检测: 'Detect data type mismatches',
+      '[PRO] 数据类型分析与类型不符检测': '[PRO] Detect data type mismatches',
+      '值范围校验 / 超限分流': 'Validate value range & quarantine',
+      '[PRO] 值范围校验 / 超限分流': '[PRO] Validate value range & quarantine',
+      作用列: 'Target column',
+      '全部列 (*)': 'All columns (*)',
+      '（请先载入数据）': '(Load data first)',
+      转换方式: 'Case mode',
+      '全部小写 (abc)': 'lowercase (abc)',
+      '全部大写 (ABC)': 'UPPERCASE (ABC)',
+      '首字母大写 (Abc)': 'Title Case (Abc)',
+      查找内容: 'Find text',
+      替换为: 'Replace with',
+      填充默认值: 'Default fill value',
+      重复保留策略: 'Keep strategy',
+      保留首次出现: 'Keep first occurrence',
+      保留最后一次出现: 'Keep last occurrence',
+      条件: 'Condition',
+      比较值: 'Compare value',
+      分隔符: 'Delimiter',
+      '目标列名（逗号分隔）': 'New column names (comma-separated)',
+      '参与合并的列（逗号分隔）': 'Columns to merge (comma-separated)',
+      连接符: 'Separator',
+      新列名: 'New column name',
+      启用: 'Enable',
+      停用: 'Disable',
+      上移: 'Move up',
+      下移: 'Move down',
+      删除步骤: 'Remove step',
+      不为空: 'Is not empty',
+      为空: 'Is empty',
+      等于: 'Equals',
+      不等于: 'Not equals',
+      包含: 'Contains',
+      '大于 (数值)': 'Greater than (number)',
+      '小于 (数值)': 'Less than (number)',
+      要替换的文本: 'Text to find',
+      替换后的文本: 'Replacement text',
+      '例如：未知 / 0': 'e.g. Unknown / 0',
+      '为空/不为空条件可留空': 'Optional for empty checks',
+      '如 - 或 ,': 'e.g. - or ,',
+      '如空格或 -': 'e.g. space or -',
+      '分析列（数值）': 'Numeric column',
+      统计方法: 'Statistical method',
+      '正态分布 Z-score (3σ)': 'Normal Z-score (3σ)',
+      '四分位距 IQR (1.5×)': 'Interquartile Range IQR (1.5×)',
+      '稳健 Modified Z-score (MAD)': 'Robust Modified Z-score (MAD)',
+      阈值: 'Threshold',
+      脱敏类型: 'Masking type',
+      '手机号 (138****5678)': 'Phone number (138****5678)',
+      '邮箱 (al***@example.com)': 'Email (al***@example.com)',
+      身份证号: 'ID card number',
+      银行卡号: 'Bank card number',
+      '相似度阈值 (0.1~1.0)': 'Similarity threshold (0.1–1.0)',
+      源列: 'Source column',
+      正则表达式: 'Regular expression',
+      '例如 订单号:(ORD-\\d+)': 'e.g. Order:(ORD-\\d+)',
+      提取到新列: 'Extract into column',
+      匹配模式: 'Pattern',
+      替换文本: 'Replacement',
+      数组列: 'Array column',
+      目标列: 'Target column',
+      范围类型: 'Range type',
+      数值范围: 'Numeric range',
+      '日期范围 (YYYY-MM-DD)': 'Date range (YYYY-MM-DD)',
+      '最小值（可留空）': 'Minimum (optional)',
+      '最大值（可留空）': 'Maximum (optional)',
+      '如 2026-01-01': 'e.g. 2026-01-01',
+      '如 2026-12-31': 'e.g. 2026-12-31',
+      '如 0': 'e.g. 0',
+      '如 120': 'e.g. 120',
+      边界条件: 'Boundary mode',
+      '闭区间 [min, max]（含边界）': 'Inclusive [min, max]',
+      '开区间 (min, max)（不含边界）': 'Exclusive (min, max)',
+      超限处理: 'Out-of-range action',
+      分流到异常脏行: 'Quarantine invalid rows',
+      直接删除超限行: 'Drop invalid rows',
+      保留并新增标记列: 'Keep & add flag column',
+      '还没有清洗步骤。从上方选择规则添加，或点击「载入示例数据」快速体验。':
+        'No cleaning steps yet. Pick a rule above or click “Load sample data” to try it out.',
+      '当前没有可展示的数据。': 'No data to display.',
+      异常原因: 'Issue details',
+      清洗执行报告: 'Cleaning execution report',
+      '可复用配方 Pipeline JSON': 'Reusable Pipeline JSON',
+      'API 调用示例（cURL）': 'API usage example (cURL)',
+      '正在通过 Pro 云端 API 执行清洗…': 'Running cleaning via Pro Cloud API…',
+      '已将清洗前后数据发送到 FindChanged.com': 'Sent before/after data to FindChanged.com',
+      '数据超过 FindChanged 浏览器直传上限（5MB），请分别导出原始与清洗后文件后手动拖入 FindChanged.com 对比。':
+        'Data exceeds the 5 MB FindChanged browser handoff limit. Export both files and drop them into FindChanged.com manually.',
+      '等待 FindChanged 页面握手超时（15 秒），请检查网络或重新点击按钮重试。':
+        'Timed out waiting for FindChanged handshake (15s). Check your connection and try again.',
+      '已载入示例数据与 7 条常用清洗规则，点击「▶ 运行清洗」即可体验':
+        'Loaded sample data with 7 common rules. Click “▶ Run cleaning” to preview.',
+      'Pro API 已连接 · 不限步数/大文件': 'Pro API connected · Unlimited steps & large files',
+      'Pro API 已连接': 'Pro API connected',
+      '免费版 · ≤8步 / ≤5000行': 'Free tier · ≤8 steps / ≤5,000 rows',
+      已切回免费本地模式: 'Switched back to free local mode',
+      '请填写 API 地址和 API Key。': 'Please enter both API Endpoint and API Key.',
+      '正在验证 API Key…': 'Verifying API Key…',
+      尚未加载数据: 'No data loaded yet',
+    },
+
+    'zh-TW': {
+      // Shared header & footer
+      'CSV 编辑器': 'CSV 編輯器',
+      'SQLite 编辑器': 'SQLite 編輯器',
+      'Excel 编辑器': 'Excel 編輯器',
+      数据清洗工作台: '資料清理工作台',
+      'CSV 编辑器 · XJY Editor': 'CSV 編輯器 · XJY Editor',
+      'SQLite 编辑器 · XJY Editor': 'SQLite 編輯器 · XJY Editor',
+      'Excel 编辑器 · XJY Editor': 'Excel 編輯器 · XJY Editor',
+      '数据清洗工作台 · XJY Editor': '資料清理工作台 · XJY Editor',
+      '● 文件只在本机处理': '● 檔案僅在本機處理',
+      '● 数据库只在本机处理': '● 資料庫僅在本機處理',
+      '● 工作簿只在本机处理': '● 活頁簿僅在本機處理',
+      '● 免费基础规则在本地处理': '● 免費基礎規則於本機瀏覽器處理',
+      '数据清洗 ↗': '資料清理 ↗',
+      'SQLite 编辑器 ↗': 'SQLite 編輯器 ↗',
+      'CSV 编辑器 ↗': 'CSV 編輯器 ↗',
+      'Excel 编辑器 ↗': 'Excel 編輯器 ↗',
+      'CSV ↗': 'CSV ↗',
+      'SQLite ↗': 'SQLite ↗',
+      'Excel ↗': 'Excel ↗',
+      'XJY 编辑器 ↗': 'XJY 編輯器 ↗',
+      'XJY 编辑器': 'XJY 編輯器',
+      反馈: '意見回饋',
+      帮助: '說明',
+      撤销: '復原',
+      重做: '重做',
+      保存: '儲存',
+      取消: '取消',
+      确定: '確定',
+      关闭: '關閉',
+      就绪: '就緒',
+      '转换并导出…': '轉換並匯出…',
+      '辅助编辑…': '輔助編輯…',
+      '# 索引': '# 索引',
+      文本: '文字',
+      数值: '數值',
+      布尔: '布林',
+      日期: '日期',
+      空值: '空值',
+      空白: '空白',
+      二进制: '二進位',
+      公式: '公式',
+      数据类型底色图例: '資料型別底色圖例',
+      表格: '表格',
+      源码: '原始碼',
+      筛选: '篩選',
+      清除: '清除',
+      清除筛选: '清除篩選',
+      上一页: '上一頁',
+      下一页: '下一頁',
+      第一页: '第一頁',
+      最后一页: '最後一頁',
+      页码: '頁碼',
+
+      // CSV Editor
+      '打开 CSV': '開啟 CSV',
+      打开示例: '載入範例',
+      解析设置: '解析設定',
+      复制选中内容: '複製選取內容',
+      剪切: '剪下',
+      '导出 CSV…': '匯出 CSV…',
+      '打开文件，改好几处。': '開啟 CSV 檔案並直接編輯。',
+      '拖入 CSV 或打开示例。前导零、长数字、日期和空格均按原文保留。':
+        '拖入 CSV 或載入範例。前導零、長數字、日期與空白皆依原文保留。',
+      查找: '搜尋',
+      输入要查找的文本: '輸入要搜尋的文字',
+      上一个匹配: '上一個符合項目',
+      下一个匹配: '下一個符合項目',
+      '替换…': '取代…',
+      筛选列: '篩選欄',
+      '包含文本…': '包含文字…',
+      筛选内容: '篩選內容',
+      插入行: '插入列',
+      删除选中行: '刪除選取列',
+      插入列: '插入欄',
+      删除选中列: '刪除選取欄',
+      修改列名: '重新命名欄位',
+      清空选中内容: '清除選取內容',
+      应用并返回表格: '套用並返回表格',
+      放弃源码修改: '放棄原始碼修改',
+      'Ctrl+D 多选相同文本 · Alt+点击添加光标': 'Ctrl+D 選取下一個相同文字 · Alt+點選新增游標',
+      '从一份 CSV 开始': '從一份 CSV 檔案開始',
+      '把文件拖到这里，或点击上方“打开 CSV”。': '將檔案拖曳至此，或點選上方「開啟 CSV」。',
+      '支持逗号、分号和制表符 · 无需上传': '支援逗號、分號與定位字元 · 無需上傳',
+      '拖动框选 · Ctrl 多选 · Shift 扩选 · 双击编辑':
+        '拖曳框選 · Ctrl 多選 · Shift 擴選 · 連按兩下編輯',
+      'CSV 数据表': 'CSV 資料表',
+
+      // SQLite Editor
+      打开数据库: '開啟資料庫',
+      '导入 CSV…': '匯入 CSV…',
+      '导出数据库…': '匯出資料庫…',
+      表与视图: '資料表與檢視表',
+      '＋ 新建表': '＋ 新增資料表',
+      新建数据表: '建立新資料表',
+      修改表: '修改資料表',
+      修改当前表结构: '修改目前資料表結構',
+      删除表: '刪除資料表',
+      删除当前表: '刪除目前資料表',
+      '＋ 索引': '＋ 索引',
+      新建索引: '建立新索引',
+      打开数据库后选择数据表: '開啟資料庫後選擇資料表',
+      '打开数据库，修改一条记录。': '開啟資料庫，直接編輯資料列。',
+      '保留字段类型、主键、索引和触发器。修改完成后下载新文件。':
+        '保留欄位型別、主鍵、索引與觸發程序。修改完成後下載新檔案。',
+      数据: '資料',
+      结构: '結構',
+      '＋ 条件': '＋ 條件',
+      '再添加一个条件（多个条件同时满足）': '再新增一個條件（多個條件同時成立）',
+      '添加记录…': '新增資料列…',
+      '删除选中记录…': '刪除選取資料列…',
+      '选择一份本地 SQLite 文件': '選擇一份本機 SQLite 檔案',
+      '也可以拖入文件，或打开示例体验。': '也可拖曳檔案至此，或載入範例體驗。',
+      'SQLite 数据表': 'SQLite 資料表',
+      '每页 100 条': '每頁 100 筆',
+      '新建表…': '新增資料表…',
+      '修改当前表…': '修改目前資料表…',
+      '删除当前表…': '刪除目前資料表…',
+      '新建索引…': '新增索引…',
+      '表、视图、索引与触发器；普通索引与触发器可直接删除':
+        '資料表、檢視表、索引與觸發程序；一般索引與觸發程序可直接刪除',
+      执行全部: '執行全部',
+      执行当前语句: '執行目前陳述式',
+      'Shift+Enter：执行光标所在的语句': 'Shift+Enter：執行游標所在的陳述式',
+      执行选中: '執行選取範圍',
+      只执行选中的文字: '僅執行選取的 SQL 文字',
+      清空: '清空',
+      '查询不产生修改；含修改的整批作为一步，可撤销':
+        '查詢不會異動資料；含異動的整批操作視為單一步驟，可復原',
+      '输入 SQL，例如 SELECT * FROM 表名 WHERE …;\n多条语句用分号分隔。Ctrl+Enter 执行全部，Shift+Enter 执行光标所在语句。':
+        '輸入 SQL，例如 SELECT * FROM 資料表名 WHERE …;\n多條陳述式以分號分隔。Ctrl+Enter 執行全部，Shift+Enter 執行游標所在陳述式。',
+      结果: '結果',
+      尚未执行: '尚未執行',
+      '数据库已变化，结果可能过期': '資料庫已異動，結果可能已過期',
+      复制结果: '複製結果',
+      '导出结果 CSV…': '匯出結果 CSV…',
+      '双击编辑 · Ctrl 多选 · Shift 扩选 · 拖拉序号列选多行':
+        '連按兩下編輯 · Ctrl 多選 · Shift 擴選 · 拖曳序號欄選取多列',
+      不包含: '不包含',
+      开头是: '開頭為',
+      结尾是: '結尾為',
+      '为 NULL': '為 NULL',
+      '不为 NULL': '不為 NULL',
+      为空文本: '為空字串',
+      数据表: '資料表',
+      视图: '檢視表',
+      选择本页全部记录: '選取本頁全部資料',
+      文件与编辑: '檔案與編輯',
+      'CSV 源码': 'CSV 原始碼',
+      筛选方式: '篩選方式',
+      数据库对象列表: '資料庫物件清單',
+      数据库结构: '資料庫結構',
+      'SQL 语句': 'SQL 陳述式',
+      'SQL 查询结果': 'SQL 查詢結果',
+      执行消息: '執行訊息',
+      单元格地址: '儲存格位址',
+      筛选列字母: '篩選欄字母',
+      筛选文本: '篩選文字',
+      数据清洗操作栏: '資料清理工具列',
+      '选择 Excel 工作表': '選擇 Excel 工作表',
+      '在 FindChanged.com 中直观查看清洗前后的数据差异':
+        '在 FindChanged.com 中直覺檢視清理前後的資料差異',
+      清洗规则流水线: '清理規則管線',
+      选择要添加的清洗规则: '選擇要新增的清理規則',
+      数据预览与清洗结果: '資料預覽與清理結果',
+
+      // Excel Editor
+      打开工作簿: '開啟活頁簿',
+      新建空白: '新增空白',
+      '查找替换…': '搜尋與取代…',
+      '输入要查找的文本…': '輸入要搜尋的文字…',
+      '替换后的文本（留空则删除匹配文本）': '取代後的文字（留空則刪除符合文字）',
+      区分大小写: '區分大小寫',
+      查找并定位下一个: '搜尋並定位下一個',
+      全部替换: '全部取代',
+      '点击单元格查看或编辑内容 / 公式（Enter 应用）…':
+        '點選儲存格檢視或編輯內容 / 公式（Enter 套用）…',
+      编辑栏: '資料編輯列',
+      应用: '套用',
+      清空内容: '清除內容',
+      '导出工作簿…': '匯出活頁簿…',
+      工作表: '工作表',
+      打开工作簿后选择工作表: '開啟活頁簿後選擇工作表',
+      '打开工作簿，修改几处。': '開啟活頁簿並直接編輯儲存格。',
+      '支持 .xlsx 在位编辑，保留原工作簿部件；.xls 只读预览。':
+        '支援 .xlsx 原地編輯，保留原活頁簿元件；.xls 僅供唯讀預覽。',
+      定位: '移至',
+      前往: '前往',
+      首行为表头: '首列為標題',
+      显示隐藏行列: '顯示隱藏列與欄',
+      '公式由Excel重算。浏览器展示缓存或公式文本，不计算公式结果。':
+        '公式由 Excel 重新計算。瀏覽器僅顯示快取值或公式文字，不即時計算結果。',
+      '公式结果来自原文件缓存；浏览器不计算公式。隐藏行列默认不显示。':
+        '公式結果來自原檔案快取；瀏覽器不計算公式。隱藏列與欄預設不顯示。',
+      '工作簿已修改：公式显示待重算，下载后由Excel重算。原图表、样式和其他部件保留。':
+        '活頁簿已修改：公式標記為待重算，下載後由 Excel 重算。原圖表、樣式與其他元件均保留。',
+      隐藏工作表: '隱藏工作表',
+      从一份本地工作簿开始: '從一份本機活頁簿開始',
+      '拖入 .xlsx，或点击“打开示例”。': '拖入 .xlsx，或點選「載入範例」。',
+      'Excel 工作表': 'Excel 工作表',
+      双击单元格直接编辑: '連按兩下儲存格直接編輯',
+      前30列: '前 30 欄',
+      后30列: '後 30 欄',
+      '工作表 XML 源码': '工作表 XML 原始碼',
+      '只修改现有单元格值及普通公式，保留其他结构。':
+        '僅修改現有儲存格值與一般公式，保留其他 XML 結構。',
+      应用源码: '套用原始碼',
+      'Ctrl 多选 · Shift 扩选 · 双击编辑 · Enter 提交 · Esc 取消':
+        'Ctrl 多選 · Shift 擴選 · 連按兩下編輯 · Enter 確認 · Esc 取消',
+
+      // Data Cleaner Workbench
+      打开文件: '開啟檔案',
+      载入示例数据: '載入範例資料',
+      '导入配方 JSON': '匯入配方 JSON',
+      '导出配方 JSON': '匯出配方 JSON',
+      'Pro / API 设置': 'Pro / API 設定',
+      '▶ 运行清洗': '▶ 執行清理',
+      '在 FindChanged.com 对比清洗前后 ↗': '在 FindChanged.com 比對清理前後 ↗',
+      导出清洗结果: '匯出清理結果',
+      导出异常脏行: '匯出異常資料列',
+      清洗步骤流水线: '清理步驟管線',
+      '＋ 添加': '＋ 新增',
+      '还没有清洗步骤。': '尚未加入清理步驟。',
+      '从上方选择规则添加，或点击「载入示例数据」快速体验。':
+        '請從上方選擇規則新增，或點選「載入範例資料」快速體驗。',
+      清空步骤: '清除步驟',
+      输入行数: '輸入列數',
+      输出行数: '輸出列數',
+      修改单元格: '修改儲存格',
+      删除行数: '刪除列數',
+      分流异常行: '分流異常列',
+      原始数据: '原始資料',
+      清洗结果: '清理結果',
+      '报告 & 配方 JSON': '報告 & 配方 JSON',
+      '拖入 CSV / Excel (.xlsx) / JSON 文件': '拖入 CSV / Excel (.xlsx) / JSON 檔案',
+      '先用免费规则本地可视化调试清洗步骤，清洗完成后可一键跳转到 FindChanged.com 对比前后差异。':
+        '先用免費規則於本機視覺化除錯清理步驟，完成後可一鍵前往 FindChanged.com 比對前後差異。',
+      '免费体验支持 5,000 行 / 8 步以内；Pro 规则与云端 API 支持大文件、统计异常值与类型不符检测。':
+        '免費版支援 5,000 列 / 8 步以內；Pro 規則與雲端 API 支援大型檔案、統計異常值與型別不符偵測。',
+      '就绪 · 请打开文件或载入示例': '就緒 · 請開啟檔案或載入範例',
+      未加载文件: '未載入檔案',
+      'Pro / 云端 API 设置': 'Pro / 雲端 API 設定',
+      '不填 API Key 时默认使用免费本地模式（≤5,000 行 / ≤8 步，数据不出浏览器）。填入 Pro API Key 后将解锁统计异常值检测、类型不符分析、PII 脱敏、模糊去重与大文件云端 API 执行（纯内存处理不落盘）。':
+        '未填 API Key 時預設使用免費本機模式（≤5,000 列 / ≤8 步，資料不離開瀏覽器）。填入 Pro API Key 後將解鎖統計異常值偵測、型別不符分析、PII 去識別化、模糊去重複與大型檔案雲端 API 執行（純記憶體處理不寫入磁碟）。',
+      'API 地址': 'API 端點',
+      '粘贴你的 Pro API Key': '貼上您的 Pro API Key',
+      '购买 Pro 额度包 ↗': '購買 Pro 額度包 ↗',
+      切回免费本地版: '切換回免費本機版',
+      验证并连接: '驗證並連線',
+
+      // Data Cleaner Rule Categories & Labels
+      '1. 文本与字符清洗': '1. 文字與字元清理',
+      '2. 空值与行过滤': '2. 空值與資料列篩選',
+      '3. 去重': '3. 去除重複',
+      '4. 列结构操作': '4. 欄位結構操作',
+      '5. JSON 专项': '5. JSON 專用處理',
+      '6. 格式与类型标准化': '6. 格式與型別標準化',
+      '7. 校验与脱敏 (Pro)': '7. 驗證與去識別化 (Pro)',
+      '8. 统计与类型分析 (Pro)': '8. 統計與型別分析 (Pro)',
+      去首尾空白: '去除前後空白',
+      合并连续空白: '合併連續空白',
+      '清除不可见/控制字符': '清除不可見/控制字元',
+      全角转半角: '全形轉半形',
+      大小写转换: '大小寫轉換',
+      查找与替换: '搜尋與取代',
+      正则提取: '正規表示式擷取',
+      '[PRO] 正则提取': '[PRO] 正規表示式擷取',
+      正则替换: '正規表示式取代',
+      '[PRO] 正则替换': '[PRO] 正規表示式取代',
+      删除空行: '刪除空白列',
+      空值填充: '空值填補',
+      '向下填充 / 合并单元格补齐 (Fill Down)': '向下填補 / 合併儲存格補齊 (Fill Down)',
+      '条件筛选/剔除行': '條件篩選/剔除列',
+      精确去重: '精確去重複',
+      规范化去重: '標準化去重複',
+      '[PRO] 规范化去重': '[PRO] 標準化去重複',
+      模糊相似去重: '模糊相似去重複',
+      '[PRO] 模糊相似去重': '[PRO] 模糊相似去重複',
+      删除列: '刪除欄位',
+      保留列: '保留欄位',
+      重命名列: '重新命名欄位',
+      调整列顺序: '調整欄位順序',
+      拆分列: '分割欄位',
+      合并列: '合併欄位',
+      'JSON 嵌套拍平': 'JSON 巢狀展平',
+      'JSON 数组展开 (Unwind)': 'JSON 陣列展開 (Unwind)',
+      '[PRO] JSON 数组展开 (Unwind)': '[PRO] JSON 陣列展開 (Unwind)',
+      '数字/金额清洗': '數字/金額清理',
+      日期时间标准化: '日期時間標準化',
+      '[PRO] 日期时间标准化': '[PRO] 日期時間標準化',
+      '布尔/枚举值统一': '布林/列舉值統一',
+      '[PRO] 布尔/枚举值统一': '[PRO] 布林/列舉值統一',
+      '敏感信息脱敏 (PII)': '敏感資訊去識別化 (PII)',
+      '[PRO] 敏感信息脱敏 (PII)': '[PRO] 敏感資訊去識別化 (PII)',
+      格式校验与脏数据分流: '格式驗證與異常資料分流',
+      '[PRO] 格式校验与脏数据分流': '[PRO] 格式驗證與異常資料分流',
+      '统计异常值检测 (Z-score/IQR/MAD)': '統計異常值偵測 (Z-score/IQR/MAD)',
+      '[PRO] 统计异常值检测 (Z-score/IQR/MAD)': '[PRO] 統計異常值偵測 (Z-score/IQR/MAD)',
+      数据类型分析与类型不符检测: '資料型別分析與型別不符偵測',
+      '[PRO] 数据类型分析与类型不符检测': '[PRO] 資料型別分析與型別不符偵測',
+      '值范围校验 / 超限分流': '數值範圍驗證 / 超限分流',
+      '[PRO] 值范围校验 / 超限分流': '[PRO] 數值範圍驗證 / 超限分流',
+      作用列: '目標欄位',
+      '全部列 (*)': '全部欄位 (*)',
+      '（请先载入数据）': '（請先載入資料）',
+      转换方式: '轉換方式',
+      '全部小写 (abc)': '全部小寫 (abc)',
+      '全部大写 (ABC)': '全部大寫 (ABC)',
+      '首字母大写 (Abc)': '字首大寫 (Abc)',
+      查找内容: '搜尋內容',
+      替换为: '取代為',
+      填充默认值: '填補預設值',
+      重复保留策略: '重複保留策略',
+      保留首次出现: '保留首次出現',
+      保留最后一次出现: '保留最後一次出現',
+      条件: '條件',
+      比较值: '比較值',
+      分隔符: '分隔符號',
+      '目标列名（逗号分隔）': '目標欄位名（逗號分隔）',
+      '参与合并的列（逗号分隔）': '參與合併的欄位（逗號分隔）',
+      连接符: '連接符號',
+      新列名: '新欄位名稱',
+      启用: '啟用',
+      停用: '停用',
+      上移: '上移',
+      下移: '下移',
+      删除步骤: '移除步驟',
+      不为空: '不為空',
+      为空: '為空',
+      等于: '等於',
+      不等于: '不等於',
+      包含: '包含',
+      '大于 (数值)': '大於 (數值)',
+      '小于 (数值)': '小於 (數值)',
+      要替换的文本: '要取代的文字',
+      替换后的文本: '取代後的文字',
+      '例如：未知 / 0': '例如：未知 / 0',
+      '为空/不为空条件可留空': '為空/不為空條件可留空',
+      '如 - 或 ,': '如 - 或 ,',
+      '如空格或 -': '如空白或 -',
+      '分析列（数值）': '分析欄位（數值）',
+      统计方法: '統計方法',
+      '正态分布 Z-score (3σ)': '常態分佈 Z-score (3σ)',
+      '四分位距 IQR (1.5×)': '四分位距 IQR (1.5×)',
+      '稳健 Modified Z-score (MAD)': '穩健 Modified Z-score (MAD)',
+      阈值: '閾值',
+      脱敏类型: '去識別化類型',
+      '手机号 (138****5678)': '手機號碼 (0912****78)',
+      '邮箱 (al***@example.com)': '電子郵件 (al***@example.com)',
+      身份证号: '身分證字號',
+      银行卡号: '銀行卡號',
+      '相似度阈值 (0.1~1.0)': '相似度閾值 (0.1~1.0)',
+      源列: '來源欄位',
+      正则表达式: '正規表示式',
+      '例如 订单号:(ORD-\\d+)': '例如 訂單編號:(ORD-\\d+)',
+      提取到新列: '擷取至新欄位',
+      匹配模式: '比對模式',
+      替换文本: '取代文字',
+      数组列: '陣列欄位',
+      目标列: '目標欄位',
+      范围类型: '範圍類型',
+      数值范围: '數值範圍',
+      '日期范围 (YYYY-MM-DD)': '日期範圍 (YYYY-MM-DD)',
+      '最小值（可留空）': '最小值（可留空）',
+      '最大值（可留空）': '最大值（可留空）',
+      '如 2026-01-01': '如 2026-01-01',
+      '如 2026-12-31': '如 2026-12-31',
+      '如 0': '如 0',
+      '如 120': '如 120',
+      边界条件: '邊界條件',
+      '闭区间 [min, max]（含边界）': '閉區間 [min, max]（含邊界）',
+      '开区间 (min, max)（不含边界）': '開區間 (min, max)（不含邊界）',
+      超限处理: '超限處理',
+      分流到异常脏行: '分流至異常資料列',
+      直接删除超限行: '直接刪除超限列',
+      保留并新增标记列: '保留並新增標記欄',
+      '还没有清洗步骤。从上方选择规则添加，或点击「载入示例数据」快速体验。':
+        '尚未加入清理步驟。請從上方選擇規則新增，或點選「載入範例資料」快速體驗。',
+      '当前没有可展示的数据。': '目前沒有可顯示的資料。',
+      异常原因: '異常原因',
+      清洗执行报告: '清理執行報告',
+      '可复用配方 Pipeline JSON': '可重複使用配方 Pipeline JSON',
+      'API 调用示例（cURL）': 'API 呼叫範例（cURL）',
+      '正在通过 Pro 云端 API 执行清洗…': '正在透過 Pro 雲端 API 執行清理…',
+      '已将清洗前后数据发送到 FindChanged.com': '已將清理前後資料傳送至 FindChanged.com',
+      '数据超过 FindChanged 浏览器直传上限（5MB），请分别导出原始与清洗后文件后手动拖入 FindChanged.com 对比。':
+        '資料超過 FindChanged 瀏覽器直傳上限（5MB），請分別匯出原始與清理後檔案再手動拖入 FindChanged.com 比對。',
+      '等待 FindChanged 页面握手超时（15 秒），请检查网络或重新点击按钮重试。':
+        '等待 FindChanged 頁面交握逾時（15 秒），請檢查網路或重新點選按鈕重試。',
+      '已载入示例数据与 7 条常用清洗规则，点击「▶ 运行清洗」即可体验':
+        '已載入範例資料與 7 條常用清理規則，點選「▶ 執行清理」即可體驗',
+      'Pro API 已连接 · 不限步数/大文件': 'Pro API 已連線 · 不限步數/大型檔案',
+      'Pro API 已连接': 'Pro API 已連線',
+      '免费版 · ≤8步 / ≤5000行': '免費版 · ≤8 步 / ≤5,000 列',
+      已切回免费本地模式: '已切換回免費本機模式',
+      '请填写 API 地址和 API Key。': '請填寫 API 端點與 API Key。',
+      '正在验证 API Key…': '正在驗證 API Key…',
+      尚未加载数据: '尚未載入資料',
+    },
+
+    ja: {
+      // Shared header & footer
+      'CSV 编辑器': 'CSV エディター',
+      'SQLite 编辑器': 'SQLite エディター',
+      'Excel 编辑器': 'Excel エディター',
+      数据清洗工作台: 'データクリーニング・ワークベンチ',
+      'CSV 编辑器 · XJY Editor': 'CSV エディター · XJY Editor',
+      'SQLite 编辑器 · XJY Editor': 'SQLite エディター · XJY Editor',
+      'Excel 编辑器 · XJY Editor': 'Excel エディター · XJY Editor',
+      '数据清洗工作台 · XJY Editor': 'データクリーニング・ワークベンチ · XJY Editor',
+      '● 文件只在本机处理': '● ファイルはローカル端末内で処理',
+      '● 数据库只在本机处理': '● データベースはローカル端末内で処理',
+      '● 工作簿只在本机处理': '● ワークブックはローカル端末内で処理',
+      '● 免费基础规则在本地处理': '● 無料ルールはブラウザー内でローカル処理',
+      '数据清洗 ↗': 'データクリーニング ↗',
+      'SQLite 编辑器 ↗': 'SQLite エディター ↗',
+      'CSV 编辑器 ↗': 'CSV エディター ↗',
+      'Excel 编辑器 ↗': 'Excel エディター ↗',
+      'CSV ↗': 'CSV ↗',
+      'SQLite ↗': 'SQLite ↗',
+      'Excel ↗': 'Excel ↗',
+      'XJY 编辑器 ↗': 'XJY エディター ↗',
+      'XJY 编辑器': 'XJY エディター',
+      反馈: 'フィードバック',
+      帮助: 'ヘルプ',
+      撤销: '元に戻す',
+      重做: 'やり直す',
+      保存: '保存',
+      取消: 'キャンセル',
+      确定: 'OK',
+      关闭: '閉じる',
+      就绪: '準備完了',
+      '转换并导出…': '変換してエクスポート…',
+      '辅助编辑…': '編集支援…',
+      '# 索引': '# インデックス',
+      文本: 'テキスト',
+      数值: '数値',
+      布尔: '真偽値',
+      日期: '日付',
+      空值: '空',
+      空白: '空白',
+      二进制: 'BLOB',
+      公式: '数式',
+      数据类型底色图例: 'データ型の背景色凡例',
+      表格: 'テーブル',
+      源码: 'ソース',
+      筛选: 'フィルター',
+      清除: 'クリア',
+      清除筛选: 'フィルターをクリア',
+      上一页: '前へ',
+      下一页: '次へ',
+      第一页: '最初のページ',
+      最后一页: '最後のページ',
+      页码: 'ページ番号',
+
+      // CSV Editor
+      '打开 CSV': 'CSV を開く',
+      打开示例: 'サンプルを開く',
+      解析设置: 'パース設定',
+      复制选中内容: '選択範囲をコピー',
+      剪切: '切り取り',
+      '导出 CSV…': 'CSV をエクスポート…',
+      '打开文件，改好几处。': 'CSV ファイルを開いてそのまま編集できます。',
+      '拖入 CSV 或打开示例。前导零、长数字、日期和空格均按原文保留。':
+        'CSV をドロップするかサンプルを開きます。先頭ゼロ・長い数値・日付・空白は原文のまま保持されます。',
+      查找: '検索',
+      输入要查找的文本: '検索するテキストを入力…',
+      上一个匹配: '前の一致',
+      下一个匹配: '次の一致',
+      '替换…': '置換…',
+      筛选列: 'フィルター対象列',
+      '包含文本…': 'テキストを含む…',
+      筛选内容: 'フィルター条件',
+      插入行: '行を挿入',
+      删除选中行: '選択行を削除',
+      插入列: '列を挿入',
+      删除选中列: '選択列を削除',
+      修改列名: '列名を変更',
+      清空选中内容: '選択範囲をクリア',
+      应用并返回表格: '適用してテーブルに戻る',
+      放弃源码修改: 'ソースの変更を破棄',
+      'Ctrl+D 多选相同文本 · Alt+点击添加光标':
+        'Ctrl+D 次の一致を選択 · Alt+クリックでカーソル追加',
+      '从一份 CSV 开始': 'CSV ファイルから始める',
+      '把文件拖到这里，或点击上方“打开 CSV”。':
+        'ファイルをここにドロップするか、上の「CSV を開く」をクリック。',
+      '支持逗号、分号和制表符 · 无需上传': 'カンマ・セミコロン・タブ区切り対応 · アップロード不要',
+      '拖动框选 · Ctrl 多选 · Shift 扩选 · 双击编辑':
+        'ドラッグで範囲選択 · Ctrl 複数選択 · Shift 拡張選択 · ダブルクリックで編集',
+      'CSV 数据表': 'CSV データテーブル',
+
+      // SQLite Editor
+      打开数据库: 'データベースを開く',
+      '导入 CSV…': 'CSV をインポート…',
+      '导出数据库…': 'データベースをエクスポート…',
+      表与视图: 'テーブルとビュー',
+      '＋ 新建表': '＋ 新規テーブル',
+      新建数据表: '新しいテーブルを作成',
+      修改表: 'テーブルを編集',
+      修改当前表结构: '現在のテーブル構造を編集',
+      删除表: 'テーブルを削除',
+      删除当前表: '現在のテーブルを削除',
+      '＋ 索引': '＋ インデックス',
+      新建索引: '新しいインデックスを作成',
+      打开数据库后选择数据表: 'データベースを開いてテーブルを選択',
+      '打开数据库，修改一条记录。': 'SQLite データベースを開いてレコードを編集できます。',
+      '保留字段类型、主键、索引和触发器。修改完成后下载新文件。':
+        '列の型・主キー・インデックス・トリガーを保持したまま編集し、新しいファイルをダウンロードします。',
+      数据: 'データ',
+      结构: 'スキーマ',
+      '＋ 条件': '＋ 条件',
+      '再添加一个条件（多个条件同时满足）': '条件を追加（AND 結合）',
+      '添加记录…': 'レコードを追加…',
+      '删除选中记录…': '選択レコードを削除…',
+      '选择一份本地 SQLite 文件': 'ローカルの SQLite ファイルを選択',
+      '也可以拖入文件，或打开示例体验。':
+        '.sqlite / .db ファイルをドロップするかサンプルで試せます。',
+      'SQLite 数据表': 'SQLite データテーブル',
+      '每页 100 条': '1ページ 100 件',
+      '新建表…': '新規テーブル…',
+      '修改当前表…': 'テーブルを編集…',
+      '删除当前表…': 'テーブルを削除…',
+      '新建索引…': '新規インデックス…',
+      '表、视图、索引与触发器；普通索引与触发器可直接删除':
+        'テーブル・ビュー・インデックス・トリガー。ユーザー定義のインデックスとトリガーは直接削除できます',
+      执行全部: 'すべて実行',
+      执行当前语句: '現在の文を実行',
+      'Shift+Enter：执行光标所在的语句': 'Shift+Enter：カーソル位置の SQL 文を実行',
+      执行选中: '選択範囲を実行',
+      只执行选中的文字: '選択中の SQL テキストのみ実行',
+      清空: 'クリア',
+      '查询不产生修改；含修改的整批作为一步，可撤销':
+        'SELECT クエリは変更を行いません。更新を含むバッチは1ステップとして元に戻せます',
+      '输入 SQL，例如 SELECT * FROM 表名 WHERE …;\n多条语句用分号分隔。Ctrl+Enter 执行全部，Shift+Enter 执行光标所在语句。':
+        'SQL を入力してください（例: SELECT * FROM table_name WHERE …;）。\n複数の文はセミコロンで区切ります。Ctrl+Enter ですべて実行、Shift+Enter でカーソル位置の文を実行。',
+      结果: '結果',
+      尚未执行: '未実行',
+      '数据库已变化，结果可能过期': 'データベースが変更されたため結果が古い可能性があります',
+      复制结果: '結果をコピー',
+      '导出结果 CSV…': '結果を CSV でエクスポート…',
+      '双击编辑 · Ctrl 多选 · Shift 扩选 · 拖拉序号列选多行':
+        'ダブルクリックで編集 · Ctrl 複数選択 · Shift 範囲選択 · 行番号ドラッグで複数行選択',
+      不包含: '含まない',
+      开头是: 'で始まる',
+      结尾是: 'で終わる',
+      '为 NULL': 'NULL である',
+      '不为 NULL': 'NULL でない',
+      为空文本: '空文字である',
+      数据表: 'テーブル',
+      视图: 'ビュー',
+      选择本页全部记录: 'このページの全レコードを選択',
+      文件与编辑: 'ファイルと編集',
+      'CSV 源码': 'CSV ソース',
+      筛选方式: 'フィルター条件',
+      数据库对象列表: 'データベースオブジェクト一覧',
+      数据库结构: 'データベーススキーマ',
+      'SQL 语句': 'SQL 文',
+      'SQL 查询结果': 'SQL クエリ結果',
+      执行消息: '実行メッセージ',
+      单元格地址: 'セル番地',
+      筛选列字母: 'フィルター列文字',
+      筛选文本: 'フィルターテキスト',
+      数据清洗操作栏: 'データクリーニングツールバー',
+      '选择 Excel 工作表': 'Excel シートを選択',
+      '在 FindChanged.com 中直观查看清洗前后的数据差异':
+        'FindChanged.com でクリーニング前後の差分を視覚的に比較',
+      清洗规则流水线: 'クリーニングルールパイプライン',
+      选择要添加的清洗规则: '追加するクリーニングルールを選択',
+      数据预览与清洗结果: 'データプレビューとクリーニング結果',
+
+      // Excel Editor
+      打开工作簿: 'ワークブックを開く',
+      新建空白: '新規作成',
+      '查找替换…': '検索と置換…',
+      '输入要查找的文本…': '検索するテキストを入力…',
+      '替换后的文本（留空则删除匹配文本）': '置換後のテキスト（空欄で一致部分を削除）',
+      区分大小写: '大文字・小文字を区別',
+      查找并定位下一个: '次を検索して移動',
+      全部替换: 'すべて置換',
+      '点击单元格查看或编辑内容 / 公式（Enter 应用）…':
+        'セルを選択して値・数式を表示または編集（Enter で適用）…',
+      编辑栏: '数式バー',
+      应用: '適用',
+      清空内容: '内容をクリア',
+      '导出工作簿…': 'ワークブックをエクスポート…',
+      工作表: 'ワークシート',
+      打开工作簿后选择工作表: 'ワークブックを開いてシートを選択',
+      '打开工作簿，修改几处。': 'Excel ワークブックを開いてセルを直接編集できます。',
+      '支持 .xlsx 在位编辑，保留原工作簿部件；.xls 只读预览。':
+        '.xlsx のインプレース編集で書式・グラフ・シートを保持。 .xls は読み取り専用プレビューに対応。',
+      定位: '移動',
+      前往: '移動',
+      首行为表头: '先頭行を見出しにする',
+      显示隐藏行列: '非表示の行・列を表示',
+      '公式由Excel重算。浏览器展示缓存或公式文本，不计算公式结果。':
+        '数式は次回 Excel で開く際に再計算されます。ブラウザーではキャッシュ値または数式テキストを表示します。',
+      '公式结果来自原文件缓存；浏览器不计算公式。隐藏行列默认不显示。':
+        '数式の結果は元ファイルのキャッシュ値です。ブラウザーでは再計算しません。非表示の行・列は既定で非表示です。',
+      '工作簿已修改：公式显示待重算，下载后由Excel重算。原图表、样式和其他部件保留。':
+        'ワークブックは変更済みです。数式はダウンロード後に Excel で再計算されます。元のグラフ・書式・その他のパーツは保持されます。',
+      隐藏工作表: '非表示シート',
+      从一份本地工作簿开始: 'ローカルの Excel ワークブックから始める',
+      '拖入 .xlsx，或点击“打开示例”。':
+        '.xlsx ファイルをドロップするか「サンプルを開く」をクリック。',
+      'Excel 工作表': 'Excel ワークシート',
+      双击单元格直接编辑: 'セルをダブルクリックして編集',
+      前30列: '前の 30 列',
+      后30列: '次の 30 列',
+      '工作表 XML 源码': 'ワークシート XML ソース',
+      '只修改现有单元格值及普通公式，保留其他结构。':
+        '既存のセル値と通常数式のみ変更し、他の XML 構造を保持します。',
+      应用源码: 'ソースを適用',
+      'Ctrl 多选 · Shift 扩选 · 双击编辑 · Enter 提交 · Esc 取消':
+        'Ctrl 複数選択 · Shift 範囲選択 · ダブルクリック編集 · Enter 確定 · Esc キャンセル',
+
+      // Data Cleaner Workbench
+      打开文件: 'ファイルを開く',
+      载入示例数据: 'サンプルデータを読み込む',
+      '导入配方 JSON': 'レシピ JSON をインポート',
+      '导出配方 JSON': 'レシピ JSON をエクスポート',
+      'Pro / API 设置': 'Pro / API 設定',
+      '▶ 运行清洗': '▶ クリーニング実行',
+      '在 FindChanged.com 对比清洗前后 ↗': 'FindChanged.com で前後を比較 ↗',
+      导出清洗结果: 'クリーニング結果をエクスポート',
+      导出异常脏行: '隔離した異常行をエクスポート',
+      清洗步骤流水线: 'クリーニングパイプライン',
+      '＋ 添加': '＋ 追加',
+      '还没有清洗步骤。': 'クリーニングステップがまだありません。',
+      '从上方选择规则添加，或点击「载入示例数据」快速体验。':
+        '上からルールを選んで追加するか、「サンプルデータを読み込む」でお試しください。',
+      清空步骤: 'ステップをクリア',
+      输入行数: '入力行数',
+      输出行数: '出力行数',
+      修改单元格: '変更セル数',
+      删除行数: '削除行数',
+      分流异常行: '隔離した異常行',
+      原始数据: '元データ',
+      清洗结果: 'クリーニング結果',
+      '报告 & 配方 JSON': 'レポート & レシピ JSON',
+      '拖入 CSV / Excel (.xlsx) / JSON 文件': 'CSV / Excel (.xlsx) / JSON ファイルをドロップ',
+      '先用免费规则本地可视化调试清洗步骤，清洗完成后可一键跳转到 FindChanged.com 对比前后差异。':
+        '無料ルールでブラウザー上でステップを調整し、完了後はワンクリックで FindChanged.com にて前後を比較できます。',
+      '免费体验支持 5,000 行 / 8 步以内；Pro 规则与云端 API 支持大文件、统计异常值与类型不符检测。':
+        '無料プランはローカルで最大 5,000 行 / 8 ステップ対応。Pro ルールとクラウド API で大容量ファイル・外れ値検出・PII マスクを解放。',
+      '就绪 · 请打开文件或载入示例': '準備完了 · ファイルを開くかサンプルを読み込んでください',
+      未加载文件: 'ファイル未読み込み',
+      'Pro / 云端 API 设置': 'Pro / クラウド API 設定',
+      '不填 API Key 时默认使用免费本地模式（≤5,000 行 / ≤8 步，数据不出浏览器）。填入 Pro API Key 后将解锁统计异常值检测、类型不符分析、PII 脱敏、模糊去重与大文件云端 API 执行（纯内存处理不落盘）。':
+        'API Key 未入力時は無料ローカルモード（最大 5,000 行 / 8 ステップ・データは端末外へ送信されません）で動作します。Pro API Key を入力すると、統計的外れ値検出・型不一致分析・PII マスク・あいまい重複排除・大容量ファイルのインメモリ処理が利用できます。',
+      'API 地址': 'API エンドポイント',
+      '粘贴你的 Pro API Key': 'Pro API Key を貼り付け',
+      '购买 Pro 额度包 ↗': 'Pro クレジットを購入 ↗',
+      切回免费本地版: '無料ローカルモードに戻す',
+      验证并连接: '検証して接続',
+
+      // Data Cleaner Rule Categories & Labels
+      '1. 文本与字符清洗': '1. テキスト・空白クリーニング',
+      '2. 空值与行过滤': '2. 欠損値・行フィルタリング',
+      '3. 去重': '3. 重複排除',
+      '4. 列结构操作': '4. 列構造の操作',
+      '5. JSON 专项': '5. JSON 専用操作',
+      '6. 格式与类型标准化': '6. 書式・型の標準化',
+      '7. 校验与脱敏 (Pro)': '7. 検証・PII マスク (Pro)',
+      '8. 统计与类型分析 (Pro)': '8. 外れ値・型分析 (Pro)',
+      去首尾空白: '前後の空白を除去',
+      合并连续空白: '連続する空白を 1 つに統合',
+      '清除不可见/控制字符': '不可視・制御文字を除去',
+      全角转半角: '全角を半角に変換',
+      大小写转换: '大文字・小文字変換',
+      查找与替换: '検索と置換',
+      正则提取: '正規表現で抽出',
+      '[PRO] 正则提取': '[PRO] 正規表現で抽出',
+      正则替换: '正規表現で置換',
+      '[PRO] 正则替换': '[PRO] 正規表現で置換',
+      删除空行: '空行を削除',
+      空值填充: '欠損値を補完',
+      '向下填充 / 合并单元格补齐 (Fill Down)': '下方向へ補完 / 結合セル補完 (Fill Down)',
+      '条件筛选/剔除行': '条件で行を抽出・除外',
+      精确去重: '完全一致で重複排除',
+      规范化去重: '正規化して重複排除',
+      '[PRO] 规范化去重': '[PRO] 正規化して重複排除',
+      模糊相似去重: 'あいまい一致で重複排除',
+      '[PRO] 模糊相似去重': '[PRO] あいまい一致で重複排除',
+      删除列: '列を削除',
+      保留列: '列を保持',
+      重命名列: '列名を変更',
+      调整列顺序: '列の順序を変更',
+      拆分列: '列を分割',
+      合并列: '列を結合',
+      'JSON 嵌套拍平': 'ネストされた JSON をフラット化',
+      'JSON 数组展开 (Unwind)': 'JSON 配列を展開 (Unwind)',
+      '[PRO] JSON 数组展开 (Unwind)': '[PRO] JSON 配列を展開 (Unwind)',
+      '数字/金额清洗': '数値・金額のクリーニング',
+      日期时间标准化: '日時の標準化',
+      '[PRO] 日期时间标准化': '[PRO] 日時の標準化',
+      '布尔/枚举值统一': '真偽値・列挙値の統一',
+      '[PRO] 布尔/枚举值统一': '[PRO] 真偽値・列挙値の統一',
+      '敏感信息脱敏 (PII)': '個人情報マスク (PII)',
+      '[PRO] 敏感信息脱敏 (PII)': '[PRO] 個人情報マスク (PII)',
+      格式校验与脏数据分流: '形式検証と異常行の隔離',
+      '[PRO] 格式校验与脏数据分流': '[PRO] 形式検証と異常行の隔離',
+      '统计异常值检测 (Z-score/IQR/MAD)': '統計的外れ値検出 (Z-score/IQR/MAD)',
+      '[PRO] 统计异常值检测 (Z-score/IQR/MAD)': '[PRO] 統計的外れ値検出 (Z-score/IQR/MAD)',
+      数据类型分析与类型不符检测: 'データ型分析と型不一致検出',
+      '[PRO] 数据类型分析与类型不符检测': '[PRO] データ型分析と型不一致検出',
+      '值范围校验 / 超限分流': '値範囲の検証 / 範囲外行の隔離',
+      '[PRO] 值范围校验 / 超限分流': '[PRO] 値範囲の検証 / 範囲外行の隔離',
+      作用列: '対象列',
+      '全部列 (*)': 'すべての列 (*)',
+      '（请先载入数据）': '（先にデータを読み込んでください）',
+      转换方式: '変換モード',
+      '全部小写 (abc)': 'すべて小文字 (abc)',
+      '全部大写 (ABC)': 'すべて大文字 (ABC)',
+      '首字母大写 (Abc)': '先頭大文字 (Abc)',
+      查找内容: '検索テキスト',
+      替换为: '置換先',
+      填充默认值: '補完する既定値',
+      重复保留策略: '残す行のルール',
+      保留首次出现: '最初の出現を残す',
+      保留最后一次出现: '最後の出現を残す',
+      条件: '条件',
+      比较值: '比較値',
+      分隔符: '区切り文字',
+      '目标列名（逗号分隔）': '出力列名（カンマ区切り）',
+      '参与合并的列（逗号分隔）': '結合する列（カンマ区切り）',
+      连接符: '結合文字',
+      新列名: '新しい列名',
+      启用: '有効化',
+      停用: '無効化',
+      上移: '上へ移動',
+      下移: '下へ移動',
+      删除步骤: 'ステップを削除',
+      不为空: '空でない',
+      为空: '空である',
+      等于: '等しい',
+      不等于: '等しくない',
+      包含: '含む',
+      '大于 (数值)': 'より大きい (数値)',
+      '小于 (数值)': 'より小さい (数値)',
+      要替换的文本: '検索するテキスト',
+      替换后的文本: '置換後のテキスト',
+      '例如：未知 / 0': '例：不明 / 0',
+      '为空/不为空条件可留空': '空判定の場合は省略可',
+      '如 - 或 ,': '例：- または ,',
+      '如空格或 -': '例：スペースまたは -',
+      '分析列（数值）': '分析列（数値）',
+      统计方法: '統計手法',
+      '正态分布 Z-score (3σ)': '正規分布 Z-score (3σ)',
+      '四分位距 IQR (1.5×)': '四分位範囲 IQR (1.5×)',
+      '稳健 Modified Z-score (MAD)': 'ロバスト Modified Z-score (MAD)',
+      阈值: 'しきい値',
+      脱敏类型: 'マスク種別',
+      '手机号 (138****5678)': '電話番号 (090****5678)',
+      '邮箱 (al***@example.com)': 'メールアドレス (al***@example.com)',
+      身份证号: '本人確認番号',
+      银行卡号: '銀行カード番号',
+      '相似度阈值 (0.1~1.0)': '類似度しきい値 (0.1〜1.0)',
+      源列: '元列',
+      正则表达式: '正規表現',
+      '例如 订单号:(ORD-\\d+)': '例：Order:(ORD-\\d+)',
+      提取到新列: '抽出先の新しい列',
+      匹配模式: 'パターン',
+      替换文本: '置換テキスト',
+      数组列: '配列列',
+      目标列: '対象列',
+      范围类型: '範囲タイプ',
+      数值范围: '数値範囲',
+      '日期范围 (YYYY-MM-DD)': '日付範囲 (YYYY-MM-DD)',
+      '最小值（可留空）': '最小値（省略可）',
+      '最大值（可留空）': '最大値（省略可）',
+      '如 2026-01-01': '例：2026-01-01',
+      '如 2026-12-31': '例：2026-12-31',
+      '如 0': '例：0',
+      '如 120': '例：120',
+      边界条件: '境界条件',
+      '闭区间 [min, max]（含边界）': '閉区間 [min, max]（境界を含む）',
+      '开区间 (min, max)（不含边界）': '開区間 (min, max)（境界を含まない）',
+      超限处理: '範囲外の処理',
+      分流到异常脏行: '異常行へ隔離',
+      直接删除超限行: '範囲外行を直接削除',
+      保留并新增标记列: '保持してフラグ列を追加',
+      '还没有清洗步骤。从上方选择规则添加，或点击「载入示例数据」快速体验。':
+        'クリーニングステップがありません。上からルールを追加するか、「サンプルデータを読み込む」でお試しください。',
+      '当前没有可展示的数据。': '表示できるデータがありません。',
+      异常原因: '異常の詳細',
+      清洗执行报告: 'クリーニング実行レポート',
+      '可复用配方 Pipeline JSON': '再利用可能なレシピ Pipeline JSON',
+      'API 调用示例（cURL）': 'API 呼び出し例（cURL）',
+      '正在通过 Pro 云端 API 执行清洗…': 'Pro クラウド API でクリーニングを実行中…',
+      '已将清洗前后数据发送到 FindChanged.com':
+        'クリーニング前後のデータを FindChanged.com へ送信しました',
+      '数据超过 FindChanged 浏览器直传上限（5MB），请分别导出原始与清洗后文件后手动拖入 FindChanged.com 对比。':
+        'データが FindChanged ブラウザー直接送信の上限（5MB）を超えています。元ファイルと結果ファイルをそれぞれエクスポートし、FindChanged.com に手動でドロップして比較してください。',
+      '等待 FindChanged 页面握手超时（15 秒），请检查网络或重新点击按钮重试。':
+        'FindChanged とのハンドシェイクがタイムアウトしました（15 秒）。接続を確認してもう一度お試しください。',
+      '已载入示例数据与 7 条常用清洗规则，点击「▶ 运行清洗」即可体验':
+        'サンプルデータと 7 件の定番ルールを読み込みました。「▶ クリーニング実行」をクリックしてプレビューできます。',
+      'Pro API 已连接 · 不限步数/大文件': 'Pro API 接続済み · ステップ無制限・大容量対応',
+      'Pro API 已连接': 'Pro API 接続済み',
+      '免费版 · ≤8步 / ≤5000行': '無料プラン · ≤8 ステップ / ≤5,000 行',
+      已切回免费本地模式: '無料ローカルモードに戻しました',
+      '请填写 API 地址和 API Key。': 'API エンドポイントと API Key の両方を入力してください。',
+      '正在验证 API Key…': 'API Key を検証中…',
+      尚未加载数据: 'データがまだ読み込まれていません',
+    },
   };
 
-  const PATTERNS = [
-    [/^已打开 (.+)$/, (_, f) => `Opened ${f}`],
-    [/^已载入 (.+)$/, (_, f) => `Loaded ${f}`],
-    [
-      /^显示 (\d+) \/ 共 (\d+) 行 · (\d+) 列 · ([^·]+) · 没有未保存修改$/,
-      (_, a, b, c, enc) => `Showing ${a} / ${b} rows · ${c} cols · ${enc.trim()} · Saved`,
+  const PATTERNS_BY_LOCALE = {
+    en: [
+      [/^已打开 (.+)$/, (_, f) => `Opened ${f}`],
+      [/^已载入 (.+)（(\d+) 行）$/, (_, f, n) => `Loaded ${f} (${n} rows)`],
+      [/^已载入 (.+)$/, (_, f) => `Loaded ${f}`],
+      [
+        /^显示 (\d+) \/ 共 (\d+) 行 · (\d+) 列 · ([^·]+) · 没有未保存修改$/,
+        (_, a, b, c, enc) => `Showing ${a} / ${b} rows · ${c} cols · ${enc.trim()} · Saved`,
+      ],
+      [
+        /^显示 (\d+) \/ 共 (\d+) 行 · (\d+) 列 · ([^·]+) · 有未保存修改$/,
+        (_, a, b, c, enc) =>
+          `Showing ${a} / ${b} rows · ${c} cols · ${enc.trim()} · Unsaved changes`,
+      ],
+      [/^([^·]+) · ([^·]+) · 没有未保存修改$/, (_, a, b) => `${a.trim()} · ${b.trim()} · Saved`],
+      [
+        /^([^·]+) · ([^·]+) · 有未保存修改$/,
+        (_, a, b) => `${a.trim()} · ${b.trim()} · Unsaved changes`,
+      ],
+      [
+        /^([^·]+) · 没有未保存修改( · 只读)?$/,
+        (_, a, ro) => `${a.trim()} · Saved${ro ? ' · Read-only' : ''}`,
+      ],
+      [
+        /^([^·]+) · 有未保存修改( · 只读)?$/,
+        (_, a, ro) => `${a.trim()} · Unsaved changes${ro ? ' · Read-only' : ''}`,
+      ],
+      [
+        /^显示 (\d+) 行 \/ 当前范围 (\d+) 行 · (\d+) 列 · 可定位到其他单元格$/,
+        (_, a, b, c) => `Showing ${a} rows / ${b} in range · ${c} cols · Use Go to for other cells`,
+      ],
+      [
+        /^(.+) · (\d+) 行 × (\d+) 列 \(([^)]+)\)$/,
+        (_, f, r, c, fmt) => `${f} · ${r} rows × ${c} cols (${fmt})`,
+      ],
+      [
+        /^显示 ([\d–-]+) \/ 筛选 (\d+) \/ 共 (\d+) 条 · 每页 (\d+) 条$/,
+        (_, r, f, t, p) => `Showing ${r} / Filtered ${f} / Total ${t} · ${p} per page`,
+      ],
+      [
+        /^已选 (\d+) 格 · 计数 (\d+) · 求和 ([^·]+) · 均值 ([^·]+) · 最小 ([^·]+) · 最大 (.+)$/,
+        (_, sel, cnt, sum, avg, min, max) =>
+          `Selected ${sel} cells · Count ${cnt} · Sum ${sum.trim()} · Avg ${avg.trim()} · Min ${min.trim()} · Max ${max.trim()}`,
+      ],
+      [
+        /^已选 (\d+) 格 · 双击编辑 · Enter提交 · Shift\+Enter换行 · Esc取消$/,
+        (_, n) =>
+          `Selected ${n} cells · Double-click to edit · Enter commit · Shift+Enter newline · Esc cancel`,
+      ],
+      [
+        /^已选 (\d+) 格 · Ctrl 多选 · Shift 扩选 · 双击编辑$/,
+        (_, n) => `Selected ${n} cells · Ctrl multi-select · Shift range · Double-click to edit`,
+      ],
+      [
+        /^已选 (\d+) 行 \/ (\d+) 格 · 拖拉框选单元格或整行 · 双击编辑$/,
+        (_, r, c) =>
+          `Selected ${r} rows / ${c} cells · Drag to select cells or rows · Double-click to edit`,
+      ],
+      [/^\/ (\d+) 页$/, (_, n) => `/ ${n}`],
+      [/^(\d+) \/ (\d+) 步骤$/, (_, a, b) => `${a} / ${b} steps`],
+      [/^(\d+) 步骤 \(Pro 不限\)$/, (_, a) => `${a} steps (Pro unlimited)`],
+      [/^异常脏行 \((\d+)\)$/, (_, n) => `Quarantined (${n})`],
+      [/^(\d+) 行 × (\d+) 列$/, (_, r, c) => `${r} rows × ${c} cols`],
+      [
+        /^清洗完成！输出 (\d+) 行，修改 (\d+) 个单元格，删除 (\d+) 行，分流异常 (\d+) 行(?:（本月 API 已用 (\d+) 行 \/ (\d+) 次）)?。可点击上方「在 FindChanged\.com 对比清洗前后 ↗」直观查看差异。$/,
+        (_, out, mod, drop, quar, uRows, uCalls) =>
+          `Cleaning complete! ${out} output rows, ${mod} modified cells, ${drop} dropped, ${quar} quarantined` +
+          (uRows ? ` (API usage this month: ${uRows} rows / ${uCalls} calls)` : '') +
+          '. Click “Compare before/after in FindChanged.com ↗” above to inspect all diffs.',
+      ],
+      [
+        /^已完成前 (\d+) 行清洗预览（源文件 (\d+) 行超出免费版 (\d+) 行上限）。全量导出或 API 批处理请升级 Pro。$/,
+        (_, proc, total, max) =>
+          `Previewed first ${proc} rows (file has ${total} rows, exceeding the ${max}-row free limit). Upgrade to Pro / API for full export.`,
+      ],
+      [
+        /^当前文件共 (\d+) 行，超过免费版 (\d+) 行上限。点击「运行清洗」仍可预览前 (\d+) 行清洗效果，全量导出需升级 Pro \/ API。$/,
+        (_, total, max, prev) =>
+          `This file has ${total} rows (above the ${max}-row free limit). Click “Run cleaning” to preview the first ${prev} rows; upgrade to Pro / API for full export.`,
+      ],
+      [/^清洗完成 · 输出 (\d+) 行$/, (_, n) => `Cleaning complete · ${n} output rows`],
+      [
+        /^表格仅预览前 (\d+) 行（共 (\d+) 行），导出将包含全部有效结果。$/,
+        (_, shown, total) =>
+          `Previewing first ${shown} of ${total} rows; export includes all cleaned rows.`,
+      ],
+      [
+        /^「(.+)」属于 Pro \/ 云端 API 高阶规则（支持大文件、统计异常值检测与类型不符分析）。当前免费本地体验版仅支持基础规则。$/,
+        (_, rule) =>
+          `“${translateString(rule, 'en')}” is a Pro / Cloud API rule. Connect a Pro API Key to unlock it.`,
+      ],
+      [
+        /^免费版单次流水线最多支持 (\d+) 个步骤。升级 Pro \/ API 可解锁不限步骤与大文件批处理。$/,
+        (_, max) =>
+          `Free tier supports up to ${max} steps per pipeline. Upgrade to Pro / API for unlimited steps.`,
+      ],
+      [
+        /^连接成功！当前档位：([A-Z]+)（本月已用 (\d+) \/ (\d+) 行）$/,
+        (_, tier, used, quota) =>
+          `Connected! Tier: ${tier} (monthly usage: ${used} / ${quota} rows)`,
+      ],
+      [/^已连接 (.+)（([A-Z]+)）$/, (_, ep, tier) => `Connected to ${ep} (${tier})`],
+      [/^连接失败：(.+)$/, (_, err) => `Connection failed: ${err}`],
+      [/^执行失败：(.+)$/, (_, err) => `Execution failed: ${err}`],
+      [/^文件解析失败：(.+)$/, (_, err) => `Failed to parse file: ${err}`],
+      [/^已导入配方：(.+)$/, (_, f) => `Imported recipe: ${f}`],
+      [/^导入配方失败：(.+)$/, (_, err) => `Failed to import recipe: ${err}`],
+      [
+        /^浏览器拦截了新标签页弹窗，请允许弹窗后重试，或直接访问 (.+)$/,
+        (_, url) => `Pop-up blocked by browser. Allow pop-ups and try again, or open ${url}`,
+      ],
+      [
+        /^FindChanged 拒收了对比数据（原因：(.+)）。$/,
+        (_, why) => `FindChanged rejected the handoff data (reason: ${why}).`,
+      ],
     ],
-    [
-      /^显示 (\d+) \/ 共 (\d+) 行 · (\d+) 列 · ([^·]+) · 有未保存修改$/,
-      (_, a, b, c, enc) => `Showing ${a} / ${b} rows · ${c} cols · ${enc.trim()} · Unsaved changes`,
-    ],
-    [/^([^·]+) · ([^·]+) · 没有未保存修改$/, (_, a, b) => `${a.trim()} · ${b.trim()} · Saved`],
-    [
-      /^([^·]+) · ([^·]+) · 有未保存修改$/,
-      (_, a, b) => `${a.trim()} · ${b.trim()} · Unsaved changes`,
-    ],
-    [
-      /^显示 ([\d–-]+) \/ 筛选 (\d+) \/ 共 (\d+) 条 · 每页 (\d+) 条$/,
-      (_, r, f, t, p) => `Showing ${r} / Filtered ${f} / Total ${t} · ${p} per page`,
-    ],
-    [
-      /^已选 (\d+) 格 · Ctrl 多选 · Shift 扩选 · 双击编辑$/,
-      (_, n) => `Selected ${n} cells · Ctrl multi-select · Shift range · Double-click to edit`,
-    ],
-    [
-      /^已选 (\d+) 行 \/ (\d+) 格 · 双击编辑 · 勾选多行删除$/,
-      (_, r, c) => `Selected ${r} rows / ${c} cells · Double-click to edit · Tick rows to delete`,
-    ],
-    [/^(\d+) \/ (\d+) 步骤$/, (_, a, b) => `${a} / ${b} steps`],
-    [/^(\d+) 步骤 \(Pro 不限\)$/, (_, a) => `${a} steps (Pro unlimited)`],
-    [/^异常脏行 \((\d+)\)$/, (_, n) => `Quarantined (${n})`],
-    [/^(\d+) 行 × (\d+) 列$/, (_, r, c) => `${r} rows × ${c} cols`],
-  ];
 
-  let locale = 'zh-CN';
+    'zh-TW': [
+      [/^已打开 (.+)$/, (_, f) => `已開啟 ${f}`],
+      [/^已载入 (.+)（(\d+) 行）$/, (_, f, n) => `已載入 ${f}（${n} 列）`],
+      [/^已载入 (.+)$/, (_, f) => `已載入 ${f}`],
+      [
+        /^显示 (\d+) \/ 共 (\d+) 行 · (\d+) 列 · ([^·]+) · 没有未保存修改$/,
+        (_, a, b, c, enc) => `顯示 ${a} / 共 ${b} 列 · ${c} 欄 · ${enc.trim()} · 已儲存`,
+      ],
+      [
+        /^显示 (\d+) \/ 共 (\d+) 行 · (\d+) 列 · ([^·]+) · 有未保存修改$/,
+        (_, a, b, c, enc) => `顯示 ${a} / 共 ${b} 列 · ${c} 欄 · ${enc.trim()} · 有未儲存變更`,
+      ],
+      [/^([^·]+) · ([^·]+) · 没有未保存修改$/, (_, a, b) => `${a.trim()} · ${b.trim()} · 已儲存`],
+      [
+        /^([^·]+) · ([^·]+) · 有未保存修改$/,
+        (_, a, b) => `${a.trim()} · ${b.trim()} · 有未儲存變更`,
+      ],
+      [
+        /^([^·]+) · 没有未保存修改( · 只读)?$/,
+        (_, a, ro) => `${a.trim()} · 已儲存${ro ? ' · 唯讀' : ''}`,
+      ],
+      [
+        /^([^·]+) · 有未保存修改( · 只读)?$/,
+        (_, a, ro) => `${a.trim()} · 有未儲存變更${ro ? ' · 唯讀' : ''}`,
+      ],
+      [
+        /^显示 (\d+) 行 \/ 当前范围 (\d+) 行 · (\d+) 列 · 可定位到其他单元格$/,
+        (_, a, b, c) => `顯示 ${a} 列 / 目前範圍 ${b} 列 · ${c} 欄 · 可使用「移至」前往其他儲存格`,
+      ],
+      [
+        /^(.+) · (\d+) 行 × (\d+) 列 \(([^)]+)\)$/,
+        (_, f, r, c, fmt) => `${f} · ${r} 列 × ${c} 欄 (${fmt})`,
+      ],
+      [
+        /^显示 ([\d–-]+) \/ 筛选 (\d+) \/ 共 (\d+) 条 · 每页 (\d+) 条$/,
+        (_, r, f, t, p) => `顯示 ${r} / 篩選 ${f} / 共 ${t} 筆 · 每頁 ${p} 筆`,
+      ],
+      [
+        /^已选 (\d+) 格 · 计数 (\d+) · 求和 ([^·]+) · 均值 ([^·]+) · 最小 ([^·]+) · 最大 (.+)$/,
+        (_, sel, cnt, sum, avg, min, max) =>
+          `已選 ${sel} 格 · 計數 ${cnt} · 加總 ${sum.trim()} · 平均 ${avg.trim()} · 最小 ${min.trim()} · 最大 ${max.trim()}`,
+      ],
+      [
+        /^已选 (\d+) 格 · 双击编辑 · Enter提交 · Shift\+Enter换行 · Esc取消$/,
+        (_, n) => `已選 ${n} 格 · 連按兩下編輯 · Enter 確認 · Shift+Enter 換行 · Esc 取消`,
+      ],
+      [
+        /^已选 (\d+) 格 · Ctrl 多选 · Shift 扩选 · 双击编辑$/,
+        (_, n) => `已選 ${n} 格 · Ctrl 多選 · Shift 擴選 · 連按兩下編輯`,
+      ],
+      [
+        /^已选 (\d+) 行 \/ (\d+) 格 · 拖拉框选单元格或整行 · 双击编辑$/,
+        (_, r, c) => `已選 ${r} 列 / ${c} 格 · 拖曳框選儲存格或整列 · 連按兩下編輯`,
+      ],
+      [/^\/ (\d+) 页$/, (_, n) => `/ ${n} 頁`],
+      [/^(\d+) \/ (\d+) 步骤$/, (_, a, b) => `${a} / ${b} 步驟`],
+      [/^(\d+) 步骤 \(Pro 不限\)$/, (_, a) => `${a} 步驟 (Pro 不限)`],
+      [/^异常脏行 \((\d+)\)$/, (_, n) => `異常資料列 (${n})`],
+      [/^(\d+) 行 × (\d+) 列$/, (_, r, c) => `${r} 列 × ${c} 欄`],
+      [
+        /^清洗完成！输出 (\d+) 行，修改 (\d+) 个单元格，删除 (\d+) 行，分流异常 (\d+) 行(?:（本月 API 已用 (\d+) 行 \/ (\d+) 次）)?。可点击上方「在 FindChanged\.com 对比清洗前后 ↗」直观查看差异。$/,
+        (_, out, mod, drop, quar, uRows, uCalls) =>
+          `清理完成！輸出 ${out} 列，修改 ${mod} 個儲存格，刪除 ${drop} 列，分流異常 ${quar} 列` +
+          (uRows ? `（本月 API 已用 ${uRows} 列 / ${uCalls} 次）` : '') +
+          '。可點選上方「在 FindChanged.com 比對清理前後 ↗」直覺檢視差異。',
+      ],
+      [
+        /^已完成前 (\d+) 行清洗预览（源文件 (\d+) 行超出免费版 (\d+) 行上限）。全量导出或 API 批处理请升级 Pro。$/,
+        (_, proc, total, max) =>
+          `已完成前 ${proc} 列清理預覽（原檔案 ${total} 列超出免費版 ${max} 列上限）。完整匯出或 API 批次處理請升級 Pro。`,
+      ],
+      [
+        /^当前文件共 (\d+) 行，超过免费版 (\d+) 行上限。点击「运行清洗」仍可预览前 (\d+) 行清洗效果，全量导出需升级 Pro \/ API。$/,
+        (_, total, max, prev) =>
+          `目前檔案共 ${total} 列，超過免費版 ${max} 列上限。點選「執行清理」仍可預覽前 ${prev} 列清理效果，完整匯出需升級 Pro / API。`,
+      ],
+      [/^清洗完成 · 输出 (\d+) 行$/, (_, n) => `清理完成 · 輸出 ${n} 列`],
+      [
+        /^表格仅预览前 (\d+) 行（共 (\d+) 行），导出将包含全部有效结果。$/,
+        (_, shown, total) => `表格僅預覽前 ${shown} 列（共 ${total} 列），匯出將包含全部有效結果。`,
+      ],
+      [
+        /^「(.+)」属于 Pro \/ 云端 API 高阶规则（支持大文件、统计异常值检测与类型不符分析）。当前免费本地体验版仅支持基础规则。$/,
+        (_, rule) =>
+          `「${translateString(rule, 'zh-TW')}」屬於 Pro / 雲端 API 進階規則（支援大型檔案、統計異常值偵測與型別不符分析）。目前免費本機體驗版僅支援基礎規則。`,
+      ],
+      [
+        /^免费版单次流水线最多支持 (\d+) 个步骤。升级 Pro \/ API 可解锁不限步骤与大文件批处理。$/,
+        (_, max) =>
+          `免費版單次管線最多支援 ${max} 個步驟。升級 Pro / API 可解鎖不限步驟與大型檔案批次處理。`,
+      ],
+      [
+        /^连接成功！当前档位：([A-Z]+)（本月已用 (\d+) \/ (\d+) 行）$/,
+        (_, tier, used, quota) => `連線成功！目前方案：${tier}（本月已用 ${used} / ${quota} 列）`,
+      ],
+      [/^已连接 (.+)（([A-Z]+)）$/, (_, ep, tier) => `已連線至 ${ep}（${tier}）`],
+      [/^连接失败：(.+)$/, (_, err) => `連線失敗：${err}`],
+      [/^执行失败：(.+)$/, (_, err) => `執行失敗：${err}`],
+      [/^文件解析失败：(.+)$/, (_, err) => `檔案解析失敗：${err}`],
+      [/^已导入配方：(.+)$/, (_, f) => `已匯入配方：${f}`],
+      [/^导入配方失败：(.+)$/, (_, err) => `匯入配方失敗：${err}`],
+      [
+        /^浏览器拦截了新标签页弹窗，请允许弹窗后重试，或直接访问 (.+)$/,
+        (_, url) => `瀏覽器已封鎖新分頁彈出視窗，請允許彈出視窗後重試，或直接前往 ${url}`,
+      ],
+      [
+        /^FindChanged 拒收了对比数据（原因：(.+)）。$/,
+        (_, why) => `FindChanged 拒收了比對資料（原因：${why}）。`,
+      ],
+    ],
+
+    ja: [
+      [/^已打开 (.+)$/, (_, f) => `${f} を開きました`],
+      [/^已载入 (.+)（(\d+) 行）$/, (_, f, n) => `${f} を読み込みました（${n} 行）`],
+      [/^已载入 (.+)$/, (_, f) => `${f} を読み込みました`],
+      [
+        /^显示 (\d+) \/ 共 (\d+) 行 · (\d+) 列 · ([^·]+) · 没有未保存修改$/,
+        (_, a, b, c, enc) => `${a} / 全 ${b} 行を表示 · ${c} 列 · ${enc.trim()} · 保存済み`,
+      ],
+      [
+        /^显示 (\d+) \/ 共 (\d+) 行 · (\d+) 列 · ([^·]+) · 有未保存修改$/,
+        (_, a, b, c, enc) => `${a} / 全 ${b} 行を表示 · ${c} 列 · ${enc.trim()} · 未保存の変更あり`,
+      ],
+      [/^([^·]+) · ([^·]+) · 没有未保存修改$/, (_, a, b) => `${a.trim()} · ${b.trim()} · 保存済み`],
+      [
+        /^([^·]+) · ([^·]+) · 有未保存修改$/,
+        (_, a, b) => `${a.trim()} · ${b.trim()} · 未保存の変更あり`,
+      ],
+      [
+        /^([^·]+) · 没有未保存修改( · 只读)?$/,
+        (_, a, ro) => `${a.trim()} · 保存済み${ro ? ' · 読み取り専用' : ''}`,
+      ],
+      [
+        /^([^·]+) · 有未保存修改( · 只读)?$/,
+        (_, a, ro) => `${a.trim()} · 未保存の変更あり${ro ? ' · 読み取り専用' : ''}`,
+      ],
+      [
+        /^显示 (\d+) 行 \/ 当前范围 (\d+) 行 · (\d+) 列 · 可定位到其他单元格$/,
+        (_, a, b, c) => `${a} 行表示 / 現在範囲 ${b} 行 · ${c} 列 · 「移動」で他のセルへ移動可能`,
+      ],
+      [
+        /^(.+) · (\d+) 行 × (\d+) 列 \(([^)]+)\)$/,
+        (_, f, r, c, fmt) => `${f} · ${r} 行 × ${c} 列 (${fmt})`,
+      ],
+      [
+        /^显示 ([\d–-]+) \/ 筛选 (\d+) \/ 共 (\d+) 条 · 每页 (\d+) 条$/,
+        (_, r, f, t, p) => `${r} 件表示 / 抽出 ${f} 件 / 全 ${t} 件 · 1ページ ${p} 件`,
+      ],
+      [
+        /^已选 (\d+) 格 · 计数 (\d+) · 求和 ([^·]+) · 均值 ([^·]+) · 最小 ([^·]+) · 最大 (.+)$/,
+        (_, sel, cnt, sum, avg, min, max) =>
+          `${sel} セル選択 · 個数 ${cnt} · 合計 ${sum.trim()} · 平均 ${avg.trim()} · 最小 ${min.trim()} · 最大 ${max.trim()}`,
+      ],
+      [
+        /^已选 (\d+) 格 · 双击编辑 · Enter提交 · Shift\+Enter换行 · Esc取消$/,
+        (_, n) =>
+          `${n} セル選択 · ダブルクリック編集 · Enter 確定 · Shift+Enter 改行 · Esc キャンセル`,
+      ],
+      [
+        /^已选 (\d+) 格 · Ctrl 多选 · Shift 扩选 · 双击编辑$/,
+        (_, n) => `${n} セル選択 · Ctrl 複数選択 · Shift 範囲選択 · ダブルクリックで編集`,
+      ],
+      [
+        /^已选 (\d+) 行 \/ (\d+) 格 · 拖拉框选单元格或整行 · 双击编辑$/,
+        (_, r, c) =>
+          `${r} 行 / ${c} セル選択 · ドラッグでセルまたは行全体を選択 · ダブルクリックで編集`,
+      ],
+      [/^\/ (\d+) 页$/, (_, n) => `/ ${n} ページ`],
+      [/^(\d+) \/ (\d+) 步骤$/, (_, a, b) => `${a} / ${b} ステップ`],
+      [/^(\d+) 步骤 \(Pro 不限\)$/, (_, a) => `${a} ステップ (Pro 無制限)`],
+      [/^异常脏行 \((\d+)\)$/, (_, n) => `隔離行 (${n})`],
+      [/^(\d+) 行 × (\d+) 列$/, (_, r, c) => `${r} 行 × ${c} 列`],
+      [
+        /^清洗完成！输出 (\d+) 行，修改 (\d+) 个单元格，删除 (\d+) 行，分流异常 (\d+) 行(?:（本月 API 已用 (\d+) 行 \/ (\d+) 次）)?。可点击上方「在 FindChanged\.com 对比清洗前后 ↗」直观查看差异。$/,
+        (_, out, mod, drop, quar, uRows, uCalls) =>
+          `クリーニング完了！出力 ${out} 行、変更 ${mod} セル、削除 ${drop} 行、隔離 ${quar} 行` +
+          (uRows ? `（今月の API 使用量: ${uRows} 行 / ${uCalls} 回）` : '') +
+          '。上の「FindChanged.com で前後を比較 ↗」から差分を確認できます。',
+      ],
+      [
+        /^已完成前 (\d+) 行清洗预览（源文件 (\d+) 行超出免费版 (\d+) 行上限）。全量导出或 API 批处理请升级 Pro。$/,
+        (_, proc, total, max) =>
+          `先頭 ${proc} 行のクリーニングプレビューが完了しました（元ファイル ${total} 行は無料版の上限 ${max} 行を超えています）。全件エクスポートや API バッチ処理には Pro へアップグレードしてください。`,
+      ],
+      [
+        /^当前文件共 (\d+) 行，超过免费版 (\d+) 行上限。点击「运行清洗」仍可预览前 (\d+) 行清洗效果，全量导出需升级 Pro \/ API。$/,
+        (_, total, max, prev) =>
+          `このファイルは ${total} 行あり、無料版の上限（${max} 行）を超えています。「クリーニング実行」で先頭 ${prev} 行をプレビューできます。全件エクスポートには Pro / API が必要です。`,
+      ],
+      [/^清洗完成 · 输出 (\d+) 行$/, (_, n) => `クリーニング完了 · 出力 ${n} 行`],
+      [
+        /^表格仅预览前 (\d+) 行（共 (\d+) 行），导出将包含全部有效结果。$/,
+        (_, shown, total) =>
+          `テーブルでは先頭 ${shown} 行のみ表示しています（全 ${total} 行）。エクスポートには全件が含まれます。`,
+      ],
+      [
+        /^「(.+)」属于 Pro \/ 云端 API 高阶规则（支持大文件、统计异常值检测与类型不符分析）。当前免费本地体验版仅支持基础规则。$/,
+        (_, rule) =>
+          `「${translateString(rule, 'ja')}」は Pro / クラウド API 向けの高度なルールです。Pro API Key を接続すると利用できます。`,
+      ],
+      [
+        /^免费版单次流水线最多支持 (\d+) 个步骤。升级 Pro \/ API 可解锁不限步骤与大文件批处理。$/,
+        (_, max) =>
+          `無料プランは 1 パイプラインあたり最大 ${max} ステップまでです。Pro / API にアップグレードするとステップ無制限と大容量ファイル処理が利用できます。`,
+      ],
+      [
+        /^连接成功！当前档位：([A-Z]+)（本月已用 (\d+) \/ (\d+) 行）$/,
+        (_, tier, used, quota) =>
+          `接続成功！現在のプラン: ${tier}（今月の使用量: ${used} / ${quota} 行）`,
+      ],
+      [/^已连接 (.+)（([A-Z]+)）$/, (_, ep, tier) => `${ep} に接続済み（${tier}）`],
+      [/^连接失败：(.+)$/, (_, err) => `接続失敗: ${err}`],
+      [/^执行失败：(.+)$/, (_, err) => `実行失敗: ${err}`],
+      [/^文件解析失败：(.+)$/, (_, err) => `ファイルの解析に失敗しました: ${err}`],
+      [/^已导入配方：(.+)$/, (_, f) => `レシピをインポートしました: ${f}`],
+      [/^导入配方失败：(.+)$/, (_, err) => `レシピのインポートに失敗しました: ${err}`],
+      [
+        /^浏览器拦截了新标签页弹窗，请允许弹窗后重试，或直接访问 (.+)$/,
+        (_, url) =>
+          `ブラウザーによりポップアップがブロックされました。許可して再試行するか、${url} を直接開いてください`,
+      ],
+      [
+        /^FindChanged 拒收了对比数据（原因：(.+)）。$/,
+        (_, why) => `FindChanged が比較データを受理しませんでした（理由: ${why}）。`,
+      ],
+    ],
+  };
+
+  function normalizeLocale(raw) {
+    if (!raw || typeof raw !== 'string') return null;
+    const lower = raw.trim().toLowerCase().replace(/_/g, '-');
+    if (!lower) return null;
+    if (
+      lower === 'zh-tw' ||
+      lower === 'zh-hk' ||
+      lower === 'zh-mo' ||
+      lower === 'zh-hant' ||
+      lower.startsWith('zh-hant-') ||
+      lower.startsWith('zh-tw-') ||
+      lower.startsWith('zh-hk-') ||
+      lower.startsWith('zh-mo-')
+    ) {
+      return 'zh-TW';
+    }
+    if (lower === 'zh' || lower.startsWith('zh-')) {
+      return 'zh-CN';
+    }
+    if (lower === 'ja' || lower.startsWith('ja-')) {
+      return 'ja';
+    }
+    if (lower === 'en' || lower.startsWith('en-')) {
+      return 'en';
+    }
+    return null;
+  }
+
+  function detectLocale(navLang) {
+    return normalizeLocale(navLang) || 'en';
+  }
+
+  let locale = detectLocale(typeof navigator !== 'undefined' ? navigator.language : 'zh-CN');
   try {
-    const urlLang = new URLSearchParams(location.search).get('lang');
-    if (urlLang === 'en' || urlLang === 'zh-CN') {
+    const urlLang = normalizeLocale(new URLSearchParams(location.search).get('lang'));
+    if (urlLang) {
       locale = urlLang;
       localStorage.setItem(STORAGE_KEY, locale);
     } else {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === 'en' || saved === 'zh-CN') locale = saved;
+      const saved = normalizeLocale(localStorage.getItem(STORAGE_KEY));
+      if (saved) locale = saved;
     }
   } catch (_) {}
 
@@ -1359,16 +2617,20 @@ header .language-picker {
   const origAttrs = new WeakMap();
   let applying = false;
 
-  function translateString(str) {
-    if (!str) return str;
+  function translateString(str, targetLocale = locale) {
+    if (!str || targetLocale === 'zh-CN') return str;
     const trimmed = str.trim();
     if (!trimmed) return str;
-    if (Object.hasOwn(EXACT, trimmed)) {
-      return str.replace(trimmed, EXACT[trimmed]);
+    const exact = EXACT_BY_LOCALE[targetLocale];
+    if (exact && Object.hasOwn(exact, trimmed)) {
+      return str.replace(trimmed, exact[trimmed]);
     }
-    for (const [re, fn] of PATTERNS) {
-      const m = trimmed.match(re);
-      if (m) return str.replace(trimmed, fn(...m));
+    const patterns = PATTERNS_BY_LOCALE[targetLocale];
+    if (patterns) {
+      for (const [re, fn] of patterns) {
+        const m = trimmed.match(re);
+        if (m) return str.replace(trimmed, fn(...m));
+      }
     }
     return str;
   }
@@ -1386,21 +2648,28 @@ header .language-picker {
     if (isDataContainer(node)) return;
     if (node.nodeType === 3) {
       const cur = node.nodeValue;
-      if (locale === 'en') {
-        if (!origText.has(node) || cur !== lastTranslated.get(node)) {
+      if (locale !== 'zh-CN') {
+        if (!origText.has(node)) {
+          origText.set(node, cur);
+        } else if (lastTranslated.has(node)) {
+          if (cur !== lastTranslated.get(node)) origText.set(node, cur);
+        } else if (cur !== origText.get(node)) {
           origText.set(node, cur);
         }
         const source = origText.get(node);
-        const next = translateString(source);
+        const next = translateString(source, locale);
+        lastTranslated.set(node, next);
         if (next !== cur) {
-          lastTranslated.set(node, next);
           node.nodeValue = next;
         }
       } else if (origText.has(node)) {
         const orig = origText.get(node);
-        if (cur === lastTranslated.get(node) && cur !== orig) {
-          node.nodeValue = orig;
+        if (lastTranslated.has(node) && cur === lastTranslated.get(node)) {
+          if (cur !== orig) node.nodeValue = orig;
+        } else {
+          origText.set(node, cur);
         }
+        lastTranslated.delete(node);
       }
       return;
     }
@@ -1410,39 +2679,56 @@ header .language-picker {
     for (const attr of ['placeholder', 'title', 'aria-label', 'label']) {
       if (!node.hasAttribute(attr)) continue;
       const val = node.getAttribute(attr);
-      if (locale === 'en') {
+      const trKey = attr + '_tr';
+      if (locale !== 'zh-CN') {
         if (!attrMap) {
           attrMap = {};
           origAttrs.set(node, attrMap);
         }
-        if (!(attr in attrMap) || val !== attrMap[attr + '_en']) {
+        if (!(attr in attrMap)) {
+          attrMap[attr] = val;
+        } else if (trKey in attrMap) {
+          if (val !== attrMap[trKey]) attrMap[attr] = val;
+        } else if (val !== attrMap[attr]) {
           attrMap[attr] = val;
         }
-        const next = translateString(attrMap[attr]);
-        attrMap[attr + '_en'] = next;
+        const next = translateString(attrMap[attr], locale);
+        attrMap[trKey] = next;
         if (next !== val) node.setAttribute(attr, next);
       } else if (attrMap && attr in attrMap) {
-        if (val === attrMap[attr + '_en'] && val !== attrMap[attr]) {
-          node.setAttribute(attr, attrMap[attr]);
+        if (trKey in attrMap && val === attrMap[trKey]) {
+          if (val !== attrMap[attr]) node.setAttribute(attr, attrMap[attr]);
+        } else {
+          attrMap[attr] = val;
         }
+        delete attrMap[trKey];
       }
     }
     for (const child of node.childNodes) applyNode(child);
   }
 
   let origTitle = document.title;
-  let lastTitleEn = '';
+  let lastTitleTranslated = null;
   function applyAll() {
     if (applying) return;
     applying = true;
     try {
       document.documentElement.lang = locale;
-      if (locale === 'en') {
-        if (document.title !== lastTitleEn) origTitle = document.title;
-        lastTitleEn = translateString(origTitle);
-        document.title = lastTitleEn;
-      } else if (document.title === lastTitleEn && origTitle) {
-        document.title = origTitle;
+      if (locale !== 'zh-CN') {
+        if (lastTitleTranslated === null || document.title !== lastTitleTranslated) {
+          origTitle = document.title;
+        }
+        lastTitleTranslated = translateString(origTitle, locale);
+        if (document.title !== lastTitleTranslated) {
+          document.title = lastTitleTranslated;
+        }
+      } else {
+        if (lastTitleTranslated !== null && document.title === lastTitleTranslated) {
+          if (origTitle && document.title !== origTitle) document.title = origTitle;
+        } else {
+          origTitle = document.title;
+        }
+        lastTitleTranslated = null;
       }
       if (document.body) applyNode(document.body);
       for (const picker of document.querySelectorAll('[data-language-picker]')) {
@@ -1454,10 +2740,11 @@ header .language-picker {
   }
 
   function setLocale(next) {
-    if (next !== 'zh-CN' && next !== 'en') return;
-    locale = next;
+    const normalized = normalizeLocale(next);
+    if (!normalized || !SUPPORTED_LOCALES.includes(normalized)) return;
+    locale = normalized;
     try {
-      localStorage.setItem(STORAGE_KEY, next);
+      localStorage.setItem(STORAGE_KEY, normalized);
     } catch (_) {}
     applyAll();
     document.dispatchEvent(new CustomEvent('xjy-language-change', { detail: { locale } }));
@@ -1465,8 +2752,8 @@ header .language-picker {
 
   if (!global.XJYI18n) {
     global.XJYI18n = {
-      t: (_id, source) => (locale === 'en' ? translateString(source) : source),
-      message: (text) => (locale === 'en' ? translateString(text) : text),
+      t: (_id, source) => (locale !== 'zh-CN' ? translateString(source, locale) : source),
+      message: (text) => (locale !== 'zh-CN' ? translateString(text, locale) : text),
       setLocale,
       get locale() {
         return locale;
@@ -1478,6 +2765,11 @@ header .language-picker {
   }
 
   function mount() {
+    if (location.protocol === 'file:') {
+      for (const link of document.querySelectorAll('a[data-offline-href]')) {
+        link.setAttribute('href', link.dataset.offlineHref);
+      }
+    }
     const host = document.querySelector('header .local, header .header-right');
     if (host && !host.querySelector('[data-language-picker]')) {
       const select = document.createElement('select');
@@ -1485,7 +2777,10 @@ header .language-picker {
       select.className = 'language-picker';
       select.setAttribute('aria-label', 'Language');
       select.innerHTML =
-        '<option value="zh-CN">简体中文</option><option value="en">English</option>';
+        '<option value="zh-CN">简体中文</option>' +
+        '<option value="zh-TW">繁體中文</option>' +
+        '<option value="ja">日本語</option>' +
+        '<option value="en">English</option>';
       select.value = locale;
       select.onchange = () => setLocale(select.value);
       host.append(select);
@@ -2280,10 +3575,56 @@ safe-buffer/index.js:
       const controls = document.createElement('div');
       controls.className = 'cell-editor-controls';
       let type = null;
+      const getLocale = () => {
+        const l = (global.XJYI18n?.locale || document.documentElement.lang || '').toLowerCase();
+        if (l.startsWith('en')) return 'en';
+        if (l.startsWith('ja')) return 'ja';
+        if (l.includes('tw') || l.includes('hk') || l.includes('hant')) return 'zh-TW';
+        return 'zh-CN';
+      };
+      const LABELS = {
+        'zh-CN': {
+          type: '字段存储类型',
+          commitTitle: '提交（Enter）',
+          cancelTitle: '取消（Esc）',
+          commitAria: '提交单元格',
+          cancelAria: '取消单元格编辑',
+          editAria: '编辑单元格',
+          hint: 'Enter 保存 · Shift+Enter 换行 · Esc 取消',
+        },
+        'zh-TW': {
+          type: '欄位儲存類型',
+          commitTitle: '套用（Enter）',
+          cancelTitle: '取消（Esc）',
+          commitAria: '套用儲存格',
+          cancelAria: '取消儲存格編輯',
+          editAria: '編輯儲存格',
+          hint: 'Enter 儲存 · Shift+Enter 換行 · Esc 取消',
+        },
+        ja: {
+          type: 'ストレージ型',
+          commitTitle: '確定（Enter）',
+          cancelTitle: 'キャンセル（Esc）',
+          commitAria: 'セルを確定',
+          cancelAria: 'セル編集をキャンセル',
+          editAria: 'セルを編集',
+          hint: 'Enter 保存 · Shift+Enter 改行 · Esc キャンセル',
+        },
+        en: {
+          type: 'Storage type',
+          commitTitle: 'Commit (Enter)',
+          cancelTitle: 'Cancel (Esc)',
+          commitAria: 'Commit cell',
+          cancelAria: 'Cancel cell edit',
+          editAria: 'Edit cell',
+          hint: 'Enter save · Shift+Enter newline · Esc cancel',
+        },
+      };
+      const L = LABELS[getLocale()];
       if (options.types) {
         type = document.createElement('select');
         type.id = 'celltype';
-        type.setAttribute('aria-label', '字段存储类型');
+        type.setAttribute('aria-label', L.type);
         for (const name of options.types) {
           const option = document.createElement('option');
           option.value = name;
@@ -2300,21 +3641,21 @@ safe-buffer/index.js:
       abort.id = 'cellcancel';
       save.textContent = '✓';
       abort.textContent = '×';
-      save.title = '提交（Enter）';
-      abort.title = '取消（Esc）';
-      save.setAttribute('aria-label', '提交单元格');
-      abort.setAttribute('aria-label', '取消单元格编辑');
+      save.title = L.commitTitle;
+      abort.title = L.cancelTitle;
+      save.setAttribute('aria-label', L.commitAria);
+      abort.setAttribute('aria-label', L.cancelAria);
       controls.append(save, abort);
       const input = document.createElement('textarea');
       input.id = 'cellvalue';
       input.rows = 1;
       input.spellcheck = false;
       input.wrap = 'off';
-      input.setAttribute('aria-label', options.label || '编辑单元格');
+      input.setAttribute('aria-label', options.label || L.editAria);
       input.value = options.value ?? '';
       input.disabled = type?.value === 'null';
       const hint = document.createElement('small');
-      hint.textContent = 'Enter 保存 · Shift+Enter 换行 · Esc 取消';
+      hint.textContent = L.hint;
       const error = document.createElement('small');
       error.className = 'cell-editor-error';
       error.setAttribute('role', 'alert');
@@ -2422,6 +3763,125 @@ safe-buffer/index.js:
       },
     };
   }
+  function initColumnResizer() {
+    if (global.__xjyColResizerReady || typeof document === 'undefined') return;
+    global.__xjyColResizerReady = true;
+    const widths = new Map();
+    let drag = null;
+
+    function colKey(th) {
+      const idx = Array.prototype.indexOf.call(th.parentElement.children, th);
+      return th.dataset.column || th.textContent.trim() || String(idx);
+    }
+
+    function applySavedWidths(grid) {
+      if (!grid || !widths.size) return;
+      const ths = grid.querySelectorAll('thead th');
+      ths.forEach((th) => {
+        const w = widths.get(colKey(th));
+        if (w) {
+          th.style.width = w + 'px';
+          th.style.minWidth = w + 'px';
+          th.style.maxWidth = w + 'px';
+        }
+      });
+    }
+
+    function isNearRightEdge(th, clientX) {
+      const rect = th.getBoundingClientRect();
+      return rect.right - clientX <= 7 && rect.right - clientX >= -2;
+    }
+
+    document.addEventListener(
+      'pointermove',
+      (e) => {
+        if (drag) {
+          const w = Math.max(
+            48,
+            Math.min(1200, Math.round(drag.startWidth + (e.clientX - drag.startX))),
+          );
+          drag.th.style.width = w + 'px';
+          drag.th.style.minWidth = w + 'px';
+          drag.th.style.maxWidth = w + 'px';
+          widths.set(drag.key, w);
+          return;
+        }
+        const th = e.target.closest?.('#grid thead th');
+        if (th && !th.dataset.all && isNearRightEdge(th, e.clientX)) {
+          th.style.cursor = 'col-resize';
+        } else if (th && th.style.cursor === 'col-resize') {
+          th.style.cursor = '';
+        }
+      },
+      true,
+    );
+
+    document.addEventListener(
+      'pointerdown',
+      (e) => {
+        if (e.button !== 0) return;
+        const th = e.target.closest?.('#grid thead th');
+        if (!th || th.dataset.all || !isNearRightEdge(th, e.clientX)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        drag = {
+          th,
+          key: colKey(th),
+          startX: e.clientX,
+          startWidth: th.getBoundingClientRect().width,
+          pointerId: e.pointerId,
+        };
+        th.setPointerCapture?.(e.pointerId);
+      },
+      true,
+    );
+
+    for (const evt of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+      document.addEventListener(
+        evt,
+        (e) => {
+          if (drag && drag.pointerId === e.pointerId) {
+            drag = null;
+          }
+        },
+        true,
+      );
+    }
+
+    document.addEventListener(
+      'dblclick',
+      (e) => {
+        const th = e.target.closest?.('#grid thead th');
+        if (!th || th.dataset.all || !isNearRightEdge(th, e.clientX)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const colIndex = Array.prototype.indexOf.call(th.parentElement.children, th);
+        const table = th.closest('table');
+        if (!table) return;
+        let maxLen = th.textContent.trim().length;
+        for (const tr of table.querySelectorAll('tbody tr')) {
+          const td = tr.children[colIndex];
+          if (td) maxLen = Math.max(maxLen, td.textContent.trim().length);
+        }
+        const fit = Math.max(72, Math.min(520, maxLen * 9 + 36));
+        th.style.width = fit + 'px';
+        th.style.minWidth = fit + 'px';
+        th.style.maxWidth = fit + 'px';
+        widths.set(colKey(th), fit);
+      },
+      true,
+    );
+
+    const watch = () => {
+      const grid = document.getElementById('grid');
+      if (!grid) return;
+      applySavedWidths(grid);
+      new MutationObserver(() => applySavedWidths(grid)).observe(grid, { childList: true });
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch);
+    else watch();
+  }
+  initColumnResizer();
   global.ExplorerCellEditor = { create };
 })(globalThis);
 </script>
@@ -2574,41 +4034,104 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
  * XML mapping follows FindChanged core/src/structured/transform.ts conventions. */
 (function (g) {
   'use strict';
-  const english = {
-    请先打开文档: 'Open a document first',
-    '含 DTD 的 XML 暂不转换': 'XML with a DTD cannot be converted',
-    'XML 语法错误，请先修复源码': 'Invalid XML; repair the source first',
-    '转换最多支持 200 层嵌套': 'Conversion supports up to 200 nested levels',
-    'CDATA 将转换为普通文本': 'CDATA becomes ordinary text',
-    混合文本的位置及不同名称子元素的交错顺序不会保留:
-      'Mixed text positions and interleaved child element order are not preserved',
-    'XML 注释不会保留': 'XML comments are not preserved',
-    'XML 处理指令不会保留': 'XML processing instructions are not preserved',
-    'XML 按 @属性、#text、同名元素数组映射；空元素为 null，单个元素不表示数组':
-      'XML maps attributes to @name, text to #text, repeated elements to arrays, and empty elements to null; single elements do not indicate arrays',
-    '只支持单个 JSON / YAML 文档': 'Only a single JSON / YAML document is supported',
-    '只支持 YAML 1.2': 'Only YAML 1.2 is supported',
-    'YAML 注释不会保留': 'YAML comments are not preserved',
-    '含锚点或别名的 YAML 暂不转换，请先明确引用的展开方式':
-      'YAML anchors and aliases require an explicit expansion policy and cannot be converted yet',
-    '自定义 YAML 标签暂不转换': 'Custom YAML tags cannot be converted',
-    只支持字符串映射键: 'Only string mapping keys are supported',
-    '此 YAML 数值无法直接保留为 JSON 数字：':
-      'This YAML number cannot be preserved directly as a JSON number: ',
-    '不支持此 YAML 标量类型': 'Unsupported YAML scalar type',
-    'XML 不保留 JSON / YAML 的数字、布尔、null 和数组类型；空数组可能没有对应元素':
-      'XML does not retain JSON / YAML number, boolean, null or array types; empty arrays may produce no elements',
-    '不能作为 XML 名称：': 'Invalid XML name: ',
-    'XML 属性和 #text 只能是标量': 'XML attributes and #text must be scalars',
-    '转换结果不是有效 XML，请检查字符、命名空间及名称':
-      'Invalid XML output; check characters, namespaces and names',
-    请选择其他目标格式: 'Choose a different target format',
+  const translations = {
+    en: {
+      请先打开文档: 'Open a document first',
+      '含 DTD 的 XML 暂不转换': 'XML with a DTD cannot be converted',
+      'XML 语法错误，请先修复源码': 'Invalid XML; repair the source first',
+      '转换最多支持 200 层嵌套': 'Conversion supports up to 200 nested levels',
+      'CDATA 将转换为普通文本': 'CDATA becomes ordinary text',
+      混合文本的位置及不同名称子元素的交错顺序不会保留:
+        'Mixed text positions and interleaved child element order are not preserved',
+      'XML 注释不会保留': 'XML comments are not preserved',
+      'XML 处理指令不会保留': 'XML processing instructions are not preserved',
+      'XML 按 @属性、#text、同名元素数组映射；空元素为 null，单个元素不表示数组':
+        'XML maps attributes to @name, text to #text, repeated elements to arrays, and empty elements to null; single elements do not indicate arrays',
+      '只支持单个 JSON / YAML 文档': 'Only a single JSON / YAML document is supported',
+      '只支持 YAML 1.2': 'Only YAML 1.2 is supported',
+      'YAML 注释不会保留': 'YAML comments are not preserved',
+      '含锚点或别名的 YAML 暂不转换，请先明确引用的展开方式':
+        'YAML anchors and aliases require an explicit expansion policy and cannot be converted yet',
+      '自定义 YAML 标签暂不转换': 'Custom YAML tags cannot be converted',
+      只支持字符串映射键: 'Only string mapping keys are supported',
+      '此 YAML 数值无法直接保留为 JSON 数字：':
+        'This YAML number cannot be preserved directly as a JSON number: ',
+      '不支持此 YAML 标量类型': 'Unsupported YAML scalar type',
+      'XML 不保留 JSON / YAML 的数字、布尔、null 和数组类型；空数组可能没有对应元素':
+        'XML does not retain JSON / YAML number, boolean, null or array types; empty arrays may produce no elements',
+      '不能作为 XML 名称：': 'Invalid XML name: ',
+      'XML 属性和 #text 只能是标量': 'XML attributes and #text must be scalars',
+      '转换结果不是有效 XML，请检查字符、命名空间及名称':
+        'Invalid XML output; check characters, namespaces and names',
+      请选择其他目标格式: 'Choose a different target format',
+    },
+    'zh-TW': {
+      请先打开文档: '請先開啟文件',
+      '含 DTD 的 XML 暂不转换': '含 DTD 的 XML 暫不支援轉換',
+      'XML 语法错误，请先修复源码': 'XML 語法錯誤，請先修復原始碼',
+      '转换最多支持 200 层嵌套': '轉換最多支援 200 層巢狀結構',
+      'CDATA 将转换为普通文本': 'CDATA 將轉換為一般文字',
+      混合文本的位置及不同名称子元素的交错顺序不会保留:
+        '混合文字的位置及不同名稱子元素的交錯順序不會保留',
+      'XML 注释不会保留': 'XML 註解不會保留',
+      'XML 处理指令不会保留': 'XML 處理指令不會保留',
+      'XML 按 @属性、#text、同名元素数组映射；空元素为 null，单个元素不表示数组':
+        'XML 依 @屬性、#text、同名元素陣列對應；空元素為 null，單一元素不表示陣列',
+      '只支持单个 JSON / YAML 文档': '僅支援單一 JSON / YAML 文件',
+      '只支持 YAML 1.2': '僅支援 YAML 1.2',
+      'YAML 注释不会保留': 'YAML 註解不會保留',
+      '含锚点或别名的 YAML 暂不转换，请先明确引用的展开方式':
+        '含錨點或別名的 YAML 暫不支援轉換，請先明確指定參照的展開方式',
+      '自定义 YAML 标签暂不转换': '自訂 YAML 標籤暫不支援轉換',
+      只支持字符串映射键: '僅支援字串對應鍵',
+      '此 YAML 数值无法直接保留为 JSON 数字：': '此 YAML 數值無法直接保留為 JSON 數字：',
+      '不支持此 YAML 标量类型': '不支援此 YAML 純量類型',
+      'XML 不保留 JSON / YAML 的数字、布尔、null 和数组类型；空数组可能没有对应元素':
+        'XML 不保留 JSON / YAML 的數字、布林、null 與陣列類型；空陣列可能沒有對應元素',
+      '不能作为 XML 名称：': '無法作為 XML 名稱：',
+      'XML 属性和 #text 只能是标量': 'XML 屬性與 #text 只能為純量',
+      '转换结果不是有效 XML，请检查字符、命名空间及名称':
+        '轉換結果不是有效的 XML，請檢查字元、命名空間及名稱',
+      请选择其他目标格式: '請選擇其他目標格式',
+    },
+    ja: {
+      请先打开文档: '先にドキュメントを開いてください',
+      '含 DTD 的 XML 暂不转换': 'DTD を含む XML は変換できません',
+      'XML 语法错误，请先修复源码': 'XML 構文エラーです。先にソースを修復してください',
+      '转换最多支持 200 层嵌套': '変換は最大 200 階層のネストまで対応しています',
+      'CDATA 将转换为普通文本': 'CDATA は通常のテキストに変換されます',
+      混合文本的位置及不同名称子元素的交错顺序不会保留:
+        '混在テキストの位置や異なる名前の子要素の交互順序は保持されません',
+      'XML 注释不会保留': 'XML コメントは保持されません',
+      'XML 处理指令不会保留': 'XML 処理命令は保持されません',
+      'XML 按 @属性、#text、同名元素数组映射；空元素为 null，单个元素不表示数组':
+        'XML は @属性、#text、同名要素の配列としてマッピングされます。空要素は null になり、単一要素は配列になりません',
+      '只支持单个 JSON / YAML 文档': '単一の JSON / YAML ドキュメントのみ対応しています',
+      '只支持 YAML 1.2': 'YAML 1.2 のみ対応しています',
+      'YAML 注释不会保留': 'YAML コメントは保持されません',
+      '含锚点或别名的 YAML 暂不转换，请先明确引用的展开方式':
+        'アンカーやエイリアスを含む YAML は展開ポリシーが必要なため変換できません',
+      '自定义 YAML 标签暂不转换': 'カスタム YAML タグは変換できません',
+      只支持字符串映射键: '文字列のマッピングキーのみ対応しています',
+      '此 YAML 数值无法直接保留为 JSON 数字：':
+        'この YAML 数値は JSON 数値として直接保持できません：',
+      '不支持此 YAML 标量类型': '未対応の YAML スカラー型です',
+      'XML 不保留 JSON / YAML 的数字、布尔、null 和数组类型；空数组可能没有对应元素':
+        'XML は JSON / YAML の数値・真偽値・null・配列型を保持しません。空配列は要素を生成しない場合があります',
+      '不能作为 XML 名称：': '無効な XML 名：',
+      'XML 属性和 #text 只能是标量': 'XML 属性と #text はスカラー値である必要があります',
+      '转换结果不是有效 XML，请检查字符、命名空间及名称':
+        '無効な XML 出力です。文字・名前空間・名前を確認してください',
+      请选择其他目标格式: '別の変換先形式を選択してください',
+    },
   };
   function message(text) {
-    if (g.XJYI18n?.locale !== 'en') return text;
-    for (const [zh, en] of Object.entries(english)) {
-      if (text === zh) return en;
-      if (zh.endsWith('：') && text.startsWith(zh)) return en + text.slice(zh.length);
+    const loc = g.XJYI18n?.locale;
+    const dict = translations[loc];
+    if (!dict) return text;
+    for (const [zh, tr] of Object.entries(dict)) {
+      if (text === zh) return tr;
+      if (zh.endsWith('：') && text.startsWith(zh)) return tr + text.slice(zh.length);
     }
     return text;
   }
@@ -2845,11 +4368,56 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
     };
   }
   function table(rows, to, options = {}) {
-    if (!['csv', 'tsv', 'xlsx'].includes(to)) throw Error('不支持的目标格式');
+    if (!['csv', 'tsv', 'xlsx', 'json', 'md'].includes(to)) throw Error('不支持的目标格式');
     if (rows.reduce((s, r) => s + r.length, 0) > 1000000)
       throw Error('一次转换最多支持 100 万个单元格');
     if (rows.some((r) => r.some((v) => typeof v !== 'string')))
       throw Error('表格转换需要明确的文本值');
+    if (to === 'json') {
+      const header = rows[0] || [];
+      const keys = header.map((h, i) => (h.trim() ? h.trim() : `col_${i + 1}`));
+      const seen = new Map();
+      const uniqueKeys = keys.map((k) => {
+        const count = seen.get(k) || 0;
+        seen.set(k, count + 1);
+        return count === 0 ? k : `${k}_${count + 1}`;
+      });
+      const objs = rows.slice(1).map((r) => {
+        const o = {};
+        for (let i = 0; i < uniqueKeys.length; i++) o[uniqueKeys[i]] = r[i] ?? '';
+        return o;
+      });
+      const text = JSON.stringify(objs, null, 2) + '\n';
+      return {
+        bytes: new TextEncoder().encode(text),
+        text,
+        mime: 'application/json;charset=utf-8',
+        warnings: [
+          '首行作为 JSON 对象键名，所有单元格按文本导出，不包含样式、公式计算缓存或工作簿其他内容',
+        ],
+      };
+    }
+    if (to === 'md') {
+      const width = Math.max(1, ...rows.map((r) => r.length));
+      const padRow = (r) => Array.from({ length: width }, (_, i) => r[i] ?? '');
+      const escMd = (s) => String(s).replace(/\|/g, '\\|').replace(/\r?\n/g, '<br>');
+      const head = rows.length
+        ? padRow(rows[0])
+        : Array.from({ length: width }, (_, i) => `Col ${i + 1}`);
+      const body = rows.slice(1).map(padRow);
+      const lines = [
+        '| ' + head.map(escMd).join(' | ') + ' |',
+        '| ' + head.map(() => '---').join(' | ') + ' |',
+        ...body.map((r) => '| ' + r.map(escMd).join(' | ') + ' |'),
+      ];
+      const text = lines.join('\n') + '\n';
+      return {
+        bytes: new TextEncoder().encode(text),
+        text,
+        mime: 'text/markdown;charset=utf-8',
+        warnings: ['生成 GitHub 风格 Markdown 表格，仅包含单元格文本，不包含样式与公式缓存'],
+      };
+    }
     const delimiter = to === 'tsv' ? '\t' : ',',
       field = (v) =>
         /["\r\n]/.test(v) || v.includes(delimiter) ? '"' + v.replace(/"/g, '""') + '"' : v;
@@ -2892,8 +4460,49 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
     <script>/* A modal owns an immutable snapshot; editor state and file handles stay untouched. */
 (function (g) {
   'use strict';
-  const en = () => g.XJYI18n?.locale === 'en',
-    t = (zh, english) => (en() ? english : zh);
+  const UI_STRINGS = {
+    'zh-TW': {
+      '转换并导出…': '轉換並匯出…',
+      转换当前文档并导出: '轉換目前文件並匯出',
+      '使用打开此窗口时的编辑内容。导出新文件，当前文档和未保存状态保持。':
+        '使用開啟此視窗時的編輯內容。匯出新檔案，目前文件與未儲存狀態保持不變。',
+      '目标格式 ': '目標格式 ',
+      ' 编码 ': ' 編碼 ',
+      ' 文件名 ': ' 檔案名稱 ',
+      我已了解以上转换规则和内容变化: '我已了解以上轉換規則與內容變化',
+      '转换规则说明 ↗': '轉換規則說明 ↗',
+      '结果预览（最多显示 6000 字符；XLSX 显示前 30 行文本）':
+        '結果預覽（最多顯示 6000 字元；XLSX 顯示前 30 列文字）',
+      取消: '取消',
+      导出新文件: '匯出新檔案',
+      '请输入有效文件名，扩展名应为 .': '請輸入有效的檔案名稱，副檔名應為 .',
+      '已发起转换文件下载，当前文档的未保存状态保留。':
+        '已開始下載轉換後的檔案，目前文件的未儲存狀態保持不變。',
+    },
+    ja: {
+      '转换并导出…': '変換してエクスポート…',
+      转换当前文档并导出: '現在のドキュメントを変換してエクスポート',
+      '使用打开此窗口时的编辑内容。导出新文件，当前文档和未保存状态保持。':
+        'このダイアログを開いた時点の編集内容を使用します。新しいファイルとしてエクスポートされ、現在のドキュメントと未保存状態は保持されます。',
+      '目标格式 ': '変換先形式 ',
+      ' 编码 ': ' 文字コード ',
+      ' 文件名 ': ' ファイル名 ',
+      我已了解以上转换规则和内容变化: '上記の変換ルールと内容の変更を確認しました',
+      '转换规则说明 ↗': '変換ルールの説明 ↗',
+      '结果预览（最多显示 6000 字符；XLSX 显示前 30 行文本）':
+        '結果プレビュー（最大 6000 文字、XLSX は先頭 30 行をテキスト表示）',
+      取消: 'キャンセル',
+      导出新文件: '新しいファイルをエクスポート',
+      '请输入有效文件名，扩展名应为 .': '有効なファイル名を入力してください。拡張子は .',
+      '已发起转换文件下载，当前文档的未保存状态保留。':
+        '変換ファイルのダウンロードを開始しました。現在のドキュメントの未保存状態は保持されます。',
+    },
+  };
+  const t = (zh, english) => {
+    const loc = g.XJYI18n?.locale;
+    if (loc === 'en') return english;
+    return UI_STRINGS[loc]?.[zh] ?? zh;
+  };
   function initDraggableDialogs() {
     if (g.__xjyDialogDragInitialized || typeof document === 'undefined') return;
     g.__xjyDialogDragInitialized = true;
@@ -3424,11 +5033,20 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
     let current = null;
     let applyBtn = null;
 
-    const isEn = () =>
-      (global.XJYI18n?.locale || win.document?.documentElement?.lang || '')
-        .toLowerCase()
-        .startsWith('en');
-    const labelText = () => (isEn() ? 'Apply to FindChanged ↗' : '回传到 FindChanged ↗');
+    const getLocale = () => {
+      const l = (global.XJYI18n?.locale || win.document?.documentElement?.lang || '').toLowerCase();
+      if (l.startsWith('en')) return 'en';
+      if (l.startsWith('ja')) return 'ja';
+      if (l.includes('tw') || l.includes('hk') || l.includes('hant')) return 'zh-TW';
+      return 'zh-CN';
+    };
+    const labelText = () => {
+      const loc = getLocale();
+      if (loc === 'en') return 'Apply to FindChanged ↗';
+      if (loc === 'ja') return 'FindChanged に適用 ↗';
+      if (loc === 'zh-TW') return '回傳至 FindChanged ↗';
+      return '回传到 FindChanged ↗';
+    };
 
     function ensureButton() {
       if (applyBtn || !api.mountAfter || !win.document) return;
@@ -3976,10 +5594,16 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
   const ALLOWED_EXTS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.csv', '.txt', '.xlsx', '.xls'];
   const TIMEOUT_MS = 30000;
 
-  const isEn = () => (document.documentElement.lang || '').toLowerCase().startsWith('en');
+  const getLocale = () => {
+    const l = (document.documentElement.lang || '').toLowerCase();
+    if (l.startsWith('en')) return 'en';
+    if (l.startsWith('ja')) return 'ja';
+    if (l.includes('tw') || l.includes('hk') || l.includes('hant')) return 'zh-TW';
+    return 'zh-CN';
+  };
 
   const T = {
-    zh: {
+    'zh-CN': {
       title: '意见反馈',
       note: '仅发送你填写的描述和主动添加的附件，不会上传你在编辑器中打开的任何文件。',
       offlineNote:
@@ -4000,6 +5624,53 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
       errTimeout: '提交超时，请重试（重复提交会自动去重）。',
       errNetwork: '网络请求失败，请检查网络连接或发送邮件至 contact@xjyeditor.com。',
       errGeneric: '提交失败：',
+    },
+    'zh-TW': {
+      title: '意見回饋',
+      note: '僅傳送您填寫的說明與主動附加的檔案，不會上傳您在編輯器中開啟的任何檔案。',
+      offlineNote:
+        '目前為離線本機檔案（file://），無法直接提交線上回饋。請寄信至 contact@xjyeditor.com，或在 https://xjyeditor.com 提交。',
+      descLabel: '問題描述或功能建議',
+      descPlaceholder: '請描述您遇到的問題、期待的功能，或對資料清洗規則的建議…',
+      attachLabel: '附件（選填，最多 3 個，每個 ≤ 5MB，支援圖片/CSV/Excel/TXT）',
+      cancel: '取消',
+      submit: '提交回饋',
+      submitting: '正在提交…',
+      done: '已收到回饋，編號：',
+      errEmpty: '請先填寫回饋內容。',
+      errTooLong: '回饋內容超過 10,000 字上限。',
+      errTooMany: '最多只能附加 3 個檔案。',
+      errType: '不支援的附件格式（僅支援 png/jpg/gif/webp/csv/txt/xlsx/xls）。',
+      errSize: '單一附件不能超過 5 MB。',
+      errRate: '提交過於頻繁，請稍後再試。',
+      errTimeout: '提交逾時，請重試（重複提交會自動去重）。',
+      errNetwork: '網路請求失敗，請檢查網路連線或寄信至 contact@xjyeditor.com。',
+      errGeneric: '提交失敗：',
+    },
+    ja: {
+      title: 'フィードバックを送信',
+      note: '入力した説明と明示的に添付したファイルのみが送信されます。エディターで開いているファイルがアップロードされることはありません。',
+      offlineNote:
+        'オフラインのローカルファイル（file://）のため、オンライン送信できません。contact@xjyeditor.com までメールいただくか、https://xjyeditor.com から送信してください。',
+      descLabel: '不具合の報告または機能のご要望',
+      descPlaceholder:
+        '発生した不具合、ご希望の機能、データクレンジングルールのご提案などをご記入ください…',
+      attachLabel: '添付ファイル（任意、最大 3 件、各 5 MB 以下：画像 / CSV / Excel / TXT）',
+      cancel: 'キャンセル',
+      submit: '送信',
+      submitting: '送信中…',
+      done: 'フィードバックを受け付けました。受付番号：',
+      errEmpty: 'フィードバック内容を入力してください。',
+      errTooLong: '内容は 10,000 文字以内で入力してください。',
+      errTooMany: '添付ファイルは最大 3 件までです。',
+      errType:
+        '未対応のファイル形式です（対応形式：png / jpg / gif / webp / csv / txt / xlsx / xls）。',
+      errSize: '各添付ファイルは 5 MB 以下にしてください。',
+      errRate: '送信回数が多すぎます。しばらくしてから再度お試しください。',
+      errTimeout: 'タイムアウトしました。再度お試しください（重複送信は防止されます）。',
+      errNetwork:
+        'ネットワークエラーが発生しました。接続をご確認いただくか contact@xjyeditor.com までご連絡ください。',
+      errGeneric: '送信に失敗しました：',
     },
     en: {
       title: 'Send Feedback',
@@ -4027,7 +5698,7 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
   };
 
   function msg() {
-    return isEn() ? T.en : T.zh;
+    return T[getLocale()] || T['zh-CN'];
   }
 
   function newUuid() {
@@ -4165,7 +5836,7 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
       form.set('visitor_id', getVisitorId());
       form.set('description', desc);
       form.set('app_version', APP_VERSION);
-      form.set('locale', document.documentElement.lang || (isEn() ? 'en' : 'zh-CN'));
+      form.set('locale', document.documentElement.lang || getLocale());
       form.set('page', ('xjyeditor.com' + (location.pathname || '/')).slice(0, 200));
       form.set('context', JSON.stringify({ product: 'xjyeditor' }));
       for (const f of files) form.append('attachments', f, f.name);
@@ -4682,9 +6353,26 @@ EOD`}return{to_workbook:a,to_sheet:t,from_sheet:s}})(),eo=(function(){function e
   $('grid').onpointerover = (e) => {
     if (e.target.closest('.cell-editor')) return;
     if (!dragging || !doc) return;
-    const cell = e.target.closest('[data-cell]');
-    if (!cell) return;
-    active = cell.dataset.cell;
+    const cols = doc.state.columns,
+      visible = rows();
+    if (!cols.length || !visible.length) return;
+    let next = null;
+    if (selectionKind === 'row') {
+      const rowEl = e.target.closest('[data-row]');
+      const cellEl = !rowEl && e.target.closest('[data-cell]');
+      if (rowEl) next = key(rowEl.dataset.row, cols[0]);
+      else if (cellEl) next = cellEl.dataset.cell;
+    } else if (selectionKind === 'column') {
+      const colEl = e.target.closest('[data-col]');
+      const cellEl = !colEl && e.target.closest('[data-cell]');
+      if (colEl) next = key(visible[0].id, colEl.dataset.col);
+      else if (cellEl) next = cellEl.dataset.cell;
+    } else {
+      const cell = e.target.closest('[data-cell]');
+      if (cell) next = cell.dataset.cell;
+    }
+    if (!next) return;
+    active = next;
     chosen = new Set([...dragBase, ...selectedRange(anchor, active, selectionKind)]);
     paintSelection();
   };
