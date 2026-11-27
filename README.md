@@ -62,7 +62,7 @@
 
 - **下载页面**：[https://xjyeditor.com/zh/windows/](https://xjyeditor.com/zh/windows/)（或直接下载本仓库中的 [`XJYEditorHelper.exe`](./XJYEditorHelper.exe)）
 - **当前版本**：`0.4.1`（大小：`6.7 MB`）
-- **SHA-256**：`5acb4b6277d58de4b89ebb1eecb61864c83830260b69bc474b77046e32f455ed`
+- **SHA-256**：`13fa1dfebeb5e04c08c706a7c7b92a070841dff2932ab2abccf48c5ff4aae296`
 
 ---
 

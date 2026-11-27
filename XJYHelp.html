@@ -461,6 +461,7 @@ header a.brand {
             <p>打开 <code>.sqlite</code>、<code>.sqlite3</code>、<code>.db</code>、<code>.db3</code> 数据库文件，左侧选择表或视图，表格每页 100 条，支持多条件组合筛选（包含、不包含、比较运算符、NULL 与空文本判断）和列头点击排序。</p>
             <ul>
               <li>双击字段编辑，并明确选择写入类型：文本、整数、实数、NULL 或 BLOB（十六进制）。整数按 64 位精确处理，不会被舍入。</li>
+              <li><b>二进制（BLOB）预览与文件导入导出</b>：自动识别 PNG、JPEG、GIF、WebP、BMP、ICO、SVG 等图像及 PDF、ZIP、GZIP、JSON、XML 等格式；图像直接在单元格内显示缩略图与尺寸，点击可打开三视图窗口（大图预览、Hex + ASCII 对照、UTF-8 文本），并支持把本地文件直接导入为 BLOB 或按识别扩展名导出文件。</li>
               <li>可添加记录（使用默认值和自动主键）和删除多行。数据库自身的约束、外键和触发器照常生效，失败时整个操作回退。</li>
               <li><b>导入 CSV</b>：可将 CSV / TSV 导入为新表或追加到已有表，自动识别编码与分隔符、推断字段类型并逐列调整，一步撤销。</li>
               <li><b>结构</b>页：列出数据表、视图、索引与触发器及建表 SQL；支持新建/修改/删除表（优先使用 <code>ALTER TABLE</code>，需要时自动重建表并保留数据、索引、触发器与自增序号）和新建/删除索引。</li>
@@ -792,6 +793,7 @@ header a.brand {
             <p>Open a <code>.sqlite</code>, <code>.sqlite3</code>, <code>.db</code> or <code>.db3</code> database, choose a table or view on the left, and page through 100 records at a time with multi-condition filters and column sorting.</p>
             <ul>
               <li>Double-click a field and choose the type to write: text, integer, real, NULL or BLOB (hex). Integers are exact 64-bit values, never rounded.</li>
+              <li><b>BLOB preview &amp; file import/export</b>: automatically detects images (PNG, JPEG, GIF, WebP, BMP, ICO, SVG) and common formats (PDF, ZIP, GZIP, JSON, XML). Images show an inline thumbnail and dimensions in the grid; click to open the inspector with Image, Hex + ASCII and UTF-8 Text views, import a local file into a BLOB cell, or export the BLOB with the detected file extension.</li>
               <li>Add records (with defaults and automatic keys) and delete several rows. The database's own constraints, foreign keys and triggers apply, and a failed action is rolled back completely.</li>
               <li><b>Import CSV</b>: import CSV / TSV files into a new table or append to an existing table with encoding/delimiter detection, conservative type inference and single-step undo.</li>
               <li>The <b>Structure</b> tab lists tables, views, indexes and triggers alongside their SQL definitions, and lets you create, modify or drop tables and indexes with a live SQL preview.</li>
